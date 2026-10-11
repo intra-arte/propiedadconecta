@@ -1,29 +1,32 @@
-# 3 · Guion técnico por escenas — Versión A
+# 3 · Guion técnico por escenas — Versión A (22 s)
 
-Formato 1080 × 1920 (9:16), 25,0 s. Personajes: **Daniela** (29, busca dónde vivir) y **Andrés** (40, agente inmobiliario). Las referencias visuales de ambos están en [03-prompts-ia.md](03-prompts-ia.md).
+Formato 1080 × 1920 (9:16), **22,0 s**. Personajes: **Daniela** (29, busca dónde vivir) y **Andrés** (40, agente inmobiliario). Sus referencias visuales están en [03-prompts-ia.md](03-prompts-ia.md).
+
+> **Fuente de tiempos:** [animatic/linea-de-tiempo.js](animatic/linea-de-tiempo.js). La tabla definitiva, generada a partir de ella, está en [animatic/tabla-de-tiempos.md](animatic/tabla-de-tiempos.md). Si este documento y la tabla no coinciden, manda la tabla.
+>
+> **Sin acceso a la app:** E4, E5 y E6 usan marcadores «CAPTURA PENDIENTE» y «POR CONFIRMAR» en lugar de pantallas. No se describe ningún campo, botón, pantalla ni canal de contacto que no esté confirmado (ver [00-diagnostico.md](00-diagnostico.md)).
 
 ## Resumen
 
 | Escena | Tiempo (s) | Qué pasa | Voz | Texto en pantalla | Fuente |
 |---|---|---|---|---|---|
-| E1 Gancho | 0,0–2,2 | Noche: Daniela lee «ya se arrendó» | L1 | «¿Otra vez?» + burbujas | Clip C01 + gráficos |
-| E2 Agitación | 2,2–4,8 | Baja el celular, exhala; anuncios en loop | L2 | Titular L2 | C01 + gráficos |
-| E3 Giro | 4,8–6,8 | Mañana: toma el celular decidida | L3 | Titular L3 | C02 |
-| E4 Así funciona | 6,8–12,0 | Formulario en 4 campos + «Publicar gratis» | L4 | Rótulos de la UI | UI real + C03 |
-| E5 Del otro lado | 12,0–14,9 | Un agente ve la búsqueda | L5 | Subtítulos | C04 + tarjeta UI |
-| E6 Contacto | 14,9–17,8 | El celular de Daniela vibra; contesta | L6 | Subtítulos | C05 |
-| E7 Alivio + CTA | 17,8–20,1 | Plano abierto con Quito de fondo | L7a | «Publica gratis tu búsqueda» | C06 |
-| E8 Cierre | 20,1–25,0 | Logo + botón CTA | L7b | Botón + «Ahora en Quito» | Edición |
+| E1 Gancho | 0,0–1,8 | Noche: Daniela lee «ya se arrendó» | L1 | «¿Otra vez?» + burbujas | Clip C01 + gráficos |
+| E2 Agitación | 1,8–4,6 | Baja el celular y exhala; anuncios «NO DISPONIBLE» en loop | L2 | Titular L2 | C01 + gráficos |
+| E3 Giro | 4,6–6,6 | Mañana: toma el celular decidida | L3 | Titular L3 | C02 |
+| E4 Así funciona | 6,6–11,6 | **CAPTURA PENDIENTE:** formulario para publicar una búsqueda, y botón y pantalla posterior | L4 | La captura real | UI real + C03 |
+| E5 Del otro lado | 11,6–14,4 | Un agente ve la búsqueda. **CAPTURA PENDIENTE:** vista del agente | L5 | Subtítulos | C04 + UI real |
+| E6 Contacto | 14,4–17,0 | El celular de Daniela vibra; lo toma y mira la pantalla | L6 | Subtítulos | C05 |
+| E7 Alivio + CTA | 17,0–19,3 | Plano abierto con Quito de fondo | L7a | «Publica gratis tu búsqueda» | C06 |
+| E8 Cierre | 19,3–22,0 | Logo + botón CTA | L7b | Botón | Edición |
 
-**Toda la locución aparece en pantalla de alguna forma** (titular, burbuja, campo de UI o subtítulo), así el anuncio se entiende sin sonido. Para no duplicar texto, cada línea se muestra **una sola vez**:
+**Toda la locución aparece en pantalla de alguna forma**, así el anuncio se entiende sin sonido. Cada línea se muestra una sola vez:
 
 | Línea | Se muestra como | Bloques del SRT que se queman |
 |---|---|---|
-| L1 | Titular «¿Otra vez?» + burbujas | — |
-| L2, L3 | Titular | — |
-| L4 | Rótulos y valores de la UI | — |
-| L5, L6 | Subtítulo | 10–13 de `version-a.srt` |
-| L7a | Titular | — |
+| L1 | Titular «¿Otra vez?» + burbuja «Ya se arrendó.» (la burbuja «Ese ya se vendió.» es solo visual) | — |
+| L2, L3, L7a | Titular | — |
+| L4 | La captura del formulario (en el animatic: el marcador con los cuatro datos del brief) | — |
+| L5, L6 | Subtítulo | 9–12 de `version-a.srt` |
 | L7b | Logo | — |
 
 ---
@@ -36,153 +39,141 @@ Muestreada del logo. El azul marino se suma a pedido de la marca.
 
 | Token | HEX | Origen | Uso |
 |---|---|---|---|
-| Verde bosque | `#142A22` | Texto del logo | Texto principal, botón CTA, primera capa del barrido |
-| Verde conecta | `#4DA22D` | Círculo-persona claro | Íconos, checks, acentos. No para texto pequeño sobre blanco (contraste 3:1). |
-| Verde brote | `#92CE58` | Zona clara del techo | Palabra resaltada, flecha del CTA, segunda capa del barrido |
+| Verde bosque | `#142A22` | Texto del logo | Texto sobre fondos claros, botón CTA, telón del barrido |
+| Verde conecta | `#4DA22D` | Círculo-persona claro | Íconos y acentos. No para texto pequeño sobre blanco (contraste 3:1). |
+| Verde brote | `#92CE58` | Zona clara del techo | Resaltado de palabras, flecha del CTA, franja del barrido |
 | Azul marino | `#10213F` | Propuesto (no está en el logo) | Caja de subtítulos y sombras del «mundo problema» |
-| Blanco | `#FFFFFF` | — | Tarjetas de UI; texto sobre marino o bosque |
+| Blanco | `#FFFFFF` | — | Tarjetas; texto sobre marino o bosque |
 | Marfil | `#FAF9F5` | Fondo del logo | Fondo del cierre |
 
 Contrastes: blanco sobre marino 16:1 · blanco sobre bosque 15:1 · bosque sobre brote 8:1 · brote sobre marino 8,5:1.
 
-**Proporción en pantalla:** ~60 % imagen real clara y neutra · ~30 % blanco o marfil (UI y cierre) · ~10 % verdes de acento. El marino solo va en subtítulos y en el color de las escenas nocturnas.
+**Proporción en pantalla:** ~60 % imagen real clara y neutra · ~30 % blanco o marfil · ~10 % verdes de acento. El marino solo va en subtítulos y en el color de las escenas nocturnas.
 
 ### Color de imagen
 
 - **Mundo problema (E1–E2, noche):** sombras hacia azul marino, saturación −15 %, contraste suave. La única luz cálida es una lámpara.
-- **Mundo solución (E3–E7, día):** luz natural, blancos limpios, verdes vivos de plantas, piel natural. Sin filtros de moda.
-- Todos los clips pasan por una **corrección base común** (exposición, balance, piel) antes del look, para que parezcan rodados con la misma cámara.
+- **Mundo solución (E3–E7, día):** luz natural, blancos limpios, verdes vivos de plantas, piel natural.
+- Todos los clips pasan por una corrección base común antes del look.
 
 ### Tipografía
 
-- **Outfit** (Google Fonts, licencia OFL, gratuita): geométrica y con «a» de un piso, como el logotipo. Es compatible, **no** es la letra del logo: nunca se escribe «Propiedad Conecta» con ella en lugar del logo.
-- Titulares: Outfit Bold 92–104 px, interlineado 1,05, máximo 3 líneas, centrados.
+- **Outfit** (Google Fonts, licencia OFL): geométrica y con «a» de un piso, como el logotipo. Es compatible, **no** es la letra del logo. El archivo está en `animatic/fuentes/`.
+- Titulares: Outfit Bold 96 px (el «¿Otra vez?» de E1, 132 px), interlineado 1,05, centrados, borde superior en y = 300 px.
 - Subtítulos: Outfit SemiBold 60 px.
 - UI: la tipografía real de la app.
 
+### Titulares y resaltados
+
+- Sobre fondos oscuros, texto blanco y palabra resaltada en verde brote.
+- Sobre fondos claros, texto verde bosque y la palabra resaltada con un **marcador verde brote detrás** (texto bosque sobre brote, 8:1). Nunca texto verde brote sobre fondo claro: su contraste es menor a 2:1.
+- Sobre video real con fondo cargado, el titular lleva una caja o un degradado suave detrás.
+
 ### Subtítulos
 
-- Texto blanco sobre caja `#10213F` al 88 %, radio 20 px, relleno 14 × 28 px.
-- Una línea preferida (≤ 28 caracteres), máximo dos. Mínimo 0,8 s por bloque.
-- Centro de la caja en y ≈ 1140 px (borde inferior ≤ 1240 px).
-- Opcional: palabra activa en verde brote `#92CE58`.
+- Texto blanco sobre caja `#10213F` al 88 %, radio 20 px, relleno 14 × 28 px; centro de la caja en y ≈ 1140 px.
+- Una línea (≤ 28 caracteres preferido, 32 máximo). Mínimo 0,8 s por bloque.
 
 ### Zonas seguras
 
-Sin texto ni logo en los **270 px superiores, los 672 px inferiores y 65 px a cada lado** (zona de Reels según la guía de Meta; cubre también Stories). Todo texto vive entre y = 270 y y = 1248. Verificar con la plantilla oficial de zonas seguras.
+Sin texto ni logo en los **270 px superiores, los 672 px inferiores y 65 px a cada lado** (Reels; cubre Stories). El animatic lo verifica automáticamente cada 0,1 s (ver `animatic/salida/informe-qa.md`).
 
 ### Componentes gráficos
 
-Se diseñan una vez y se reutilizan en todas las escenas.
-
-- **Tarjeta UI:** blanca, radio 28 px, sombra `0 12 32 rgba(20,42,34,.18)`, relleno 32 px.
-- **Chip:** fondo `#EAF5E1`, texto `#142A22`, totalmente redondeado.
-- **Botón CTA:** fondo `#142A22`, texto blanco Outfit SemiBold, flecha `#92CE58`, alto 112 px, totalmente redondeado.
 - **Burbuja de chat (E1):** genérica, blanca con texto `#142A22`. Sin interfaz ni colores de ninguna app de mensajería real.
-- **Barrido chevrón:** dos formas en V invertida (el techo del logo), `#142A22` y `#92CE58` desfasadas 3 frames, de abajo hacia arriba en 10 frames, con curva suave al entrar y salir. **Solo dos usos:** E2→E3 y E7→E8.
+- **Anuncios genéricos (E2):** tarjetas blancas con foto gris y sello «NO DISPONIBLE», a los lados y desenfocadas; no imitan ningún portal real.
+- **Botón CTA (E8):** fondo `#142A22`, texto blanco Outfit SemiBold 50 px, flecha `#92CE58`, alto 120 px, totalmente redondeado. Es un elemento gráfico del anuncio, no un botón de la app.
+- **Barrido chevrón:** un telón verde bosque con borde en V (la pendiente del techo del logo) y una franja verde brote detrás. Sube en 0,3 s y cubre toda la pantalla justo en el frame del corte. **Solo dos usos:** E2 → E3 y E7 → E8.
+- **Marcadores del animatic:** «CAPTURA PENDIENTE» (amarillo) para pantallas de la app que hay que reemplazar por capturas reales; «POR CONFIRMAR» (celeste) para datos de producto. «IMAGEN POR PRODUCIR» describe el plano que luego será un clip. Ninguno existe en el anuncio final.
 
 ### Música y sonido
 
-- **Música:** electrónica minimal o house suave, 100–110 BPM, sin voces, cálida (pluck, Rhodes, bajo redondo). Optimista pero sobria.
-- **Estructura:** 0–4,8 s filtrada y casi inaudible → **4,8 s se abre el filtro y entra el beat** (el giro también se escucha) → 17,8 s pequeña subida → ~23,5 s resolución y cola hasta 25,0 s.
-- Licencia válida para publicidad pagada (librería comercial o Sound Collection de Meta). Nada de canciones en tendencia con derechos.
+- **Música:** electrónica minimal o house suave, 100–110 BPM, sin voces, cálida. Optimista pero sobria. Con licencia para pauta pagada (librería comercial o Sound Collection de Meta).
+- **Estructura:** 0–4,6 s filtrada y casi inaudible → **4,6 s se abre el filtro y entra el beat**, con el barrido → 17,0 s pequeña subida → ~21,0 s resolución y cola hasta 22,0 s.
 - **SFX** genéricos de librería; nunca el tono de WhatsApp, del iPhone ni de otras marcas.
 
 ---
 
 ## Escenas
 
-### E1 · Gancho — 0,0 → 2,2 s (2,2 s)
+### E1 · Gancho — 0,0 → 1,8 s
 
-- **Fuente:** clip C01 (primeros 2,2 s) + gráficos.
-- **Qué se ve:** de noche, plano medio corto de Daniela recostada en el sofá de su departamento actual, con la cara iluminada por el celular. Mira la pantalla con cansancio. **En el frame 0 ya están la persona y el titular** (sin fundido desde negro).
-- **Cámara:** dolly-in muy lento hacia el rostro, 50 mm, a la altura de los ojos.
-- **Iluminación:** clave baja. Luz fría del celular desde abajo, lámpara cálida tenue al fondo, luces de la ciudad desenfocadas por la ventana. Sombras hacia el marino.
-- **Sonido:** ambiente nocturno de interior; «pop» de mensaje en 0,2 s y 1,2 s; música casi inaudible y filtrada. Voz L1.
-- **Texto:** titular «¿Otra vez?» (blanco, y ≈ 360 px). Burbujas junto al teléfono, con rebote leve: 0,2 s «Ya se arrendó.» · 1,2 s «Ese ya se vendió.» Sin subtítulos.
-- **Transición:** ninguna; sigue el mismo clip.
+- **Fuente:** clip C01 (primera parte) + gráficos.
+- **Qué se ve:** de noche, plano medio corto de Daniela recostada en el sofá, con la cara iluminada por el celular. **En el frame 0 ya están la persona y el titular.**
+- **Cámara:** dolly-in muy lento hacia el rostro, 50 mm.
+- **Iluminación:** clave baja; luz fría del celular, lámpara cálida tenue al fondo, sombras hacia el marino.
+- **Sonido:** ambiente nocturno; «pop» de mensaje en 0,2 s y 0,9 s; música casi inaudible. Voz L1 (0,10–1,60 s).
+- **Texto:** titular «¿Otra vez?» (blanco, 132 px). Burbujas junto al teléfono: 0,2 s «Ya se arrendó.» · 0,9 s «Ese ya se vendió.». Entre 1,9 y 2,6 s suben y se desvanecen.
+- **Transición:** ninguna; sigue el mismo plano.
 
-### E2 · Agitación — 2,2 → 4,8 s (2,6 s)
+### E2 · Agitación — 1,8 → 4,6 s
 
 - **Fuente:** C01 (continúa) + gráficos.
-- **Qué se ve:** Daniela baja el celular al pecho, apoya la cabeza en el sofá y exhala. A los lados, por delante del video, suben en loop rápido tarjetas de anuncios genéricos (fotos IMG-01…06), algunas con sello «NO DISPONIBLE», con desenfoque leve y 70 % de opacidad para no competir con el titular (no hace falta recortar a la actriz). Las burbujas de E1 salen hacia arriba con el scroll.
+- **Qué se ve:** Daniela baja el celular al pecho, apoya la cabeza y exhala. A los lados suben en loop tarjetas de anuncios genéricos con sello «NO DISPONIBLE», desenfocadas y semitransparentes.
 - **Cámara:** el push-in termina y se asienta.
-- **Iluminación:** igual que E1.
-- **Sonido:** whooshes cortos y suaves del scroll, suspiro natural; música aún filtrada. Voz L2.
+- **Sonido:** whooshes suaves del scroll, suspiro natural; música filtrada. Voz L2 (1,80–4,40 s).
 - **Texto:** titular «Deja de perseguir anuncios por todo Quito.» («perseguir anuncios» en verde brote).
-- **Transición → E3:** barrido chevrón de abajo hacia arriba con whoosh. Al terminar, la música abre el filtro y entra el beat (4,8 s).
+- **Transición → E3:** barrido chevrón centrado en 4,6 s; al terminar entra el beat.
 
-### E3 · Giro — 4,8 → 6,8 s (2,0 s)
+### E3 · Giro — 4,6 → 6,6 s
 
 - **Fuente:** C02.
-- **Qué se ve:** a la mañana siguiente, el mismo departamento lleno de luz. Daniela, en la mesa junto a la ventana, toma el celular con decisión, sonríe apenas y empieza a escribir. La pantalla no se ve.
-- **Cámara:** push-in lento con un arco leve de izquierda a derecha, 35 mm.
-- **Iluminación:** clave alta, luz natural de ventana (5600 K), sombras suaves, plantas verdes desenfocadas en primer plano.
-- **Sonido:** entra el beat; ambiente diurno sutil (ciudad lejana, pájaros). Voz L3.
-- **Texto:** titular «Mejor publica tú lo que buscas.» («tú» en verde brote).
-- **Transición → E4:** zoom digital hacia el celular (100 → 130 % en 6 frames) mientras la tarjeta del formulario nace desde el teléfono y crece hasta su tamaño final (10 frames).
+- **Qué se ve:** a la mañana siguiente, el mismo departamento lleno de luz. Daniela, junto a la ventana, toma el celular con decisión y empieza a escribir. La pantalla no se ve.
+- **Cámara:** push-in lento con un arco leve, 35 mm.
+- **Iluminación:** clave alta, luz natural de ventana, plantas verdes en primer plano.
+- **Sonido:** entra el beat; ambiente diurno sutil. Voz L3 (4,75–6,55 s).
+- **Texto:** titular «Mejor publica tú lo que buscas.» («tú» con marcador verde brote).
+- **Transición → E4:** zoom hacia el celular en los últimos 0,2 s; la pantalla «crece» hasta ocupar el cuadro.
 
-### E4 · Así funciona — 6,8 → 12,0 s (5,2 s)
+### E4 · Así funciona — 6,6 → 11,6 s · CAPTURA PENDIENTE
 
-- **Fuente:** UI real (grabación de pantalla) o réplica fiel; de fondo, C03 con desenfoque fuerte (~40 px) y aclarado 10 %.
-- **Qué se ve:** tarjeta del formulario de ~880 px de ancho, centrada. Los campos se completan sincronizados con la voz:
+- **Fuente:** pantallas reales de la app (captura o grabación) sobre el clip C03 muy desenfocado.
+- **Qué debe mostrar:** el formulario real para publicar una búsqueda, completándose en sincronía con la voz con los cuatro datos del brief: tipo de propiedad, ubicación, presupuesto y características. Desde 10,8 s, el botón real para publicar y la pantalla real que aparece después.
+- **En el animatic:** marcador «CAPTURA PENDIENTE · Formulario para publicar una búsqueda». Los cuatro datos aparecen en 6,9 / 8,2 / 9,0 / 9,8 s, cuando la voz los nombra. Desde 10,8 s, un segundo marcador: «CAPTURA PENDIENTE · Botón para publicar y pantalla que aparece después».
+- **Pendiente de la captura:** nombres exactos de los campos (si la app dice «Ubicación», la voz cambia «sector» por «ubicación»), cuántos pasos tiene el formulario, si hay selector de compra o arriendo, cómo se ingresan presupuesto y características, el texto del botón y la pantalla de después. **No se agregan campos ni funciones que no estén en la captura.** Recortar o ampliar la pantalla para mostrar solo lo relevante está permitido.
+- **Sonido:** tap suave por dato, click al publicar. Voz L4 (6,90–11,10 s).
+- **Texto:** el de la propia captura. Sin subtítulos.
+- **Transición → E5:** el contenido sale por la derecha (11,35–11,6 s) y lo de E5 entra por la izquierda.
 
-  | Tiempo | Campo | Valor de ejemplo |
-  |---|---|---|
-  | 7,0 s | Tipo de propiedad | Departamento · Arriendo |
-  | 8,3 s | Sector | Cumbayá, Quito |
-  | 9,1 s | Presupuesto | Hasta $700 al mes |
-  | 9,9 s | Características | 2 habitaciones · Parqueadero · Acepta mascotas |
-  | 11,4 s | Toque en «Publicar gratis» | Indicador de toque |
-  | 11,7 s | Confirmación | «Búsqueda publicada» + check `#4DA22D` |
+### E5 · Del otro lado — 11,6 → 14,4 s · CAPTURA PENDIENTE + POR CONFIRMAR
 
-  Los valores son ejemplos. **Los rótulos, el botón y el flujo deben ser exactamente los de la app.** Se permite recortar o ampliar la pantalla para mostrar solo estos campos; no se permite agregar campos ni funciones. Si la app dice «Ubicación», la voz cambia «sector» por «ubicación».
-- **Cámara:** el fondo deriva lento; la tarjeta queda fija y cada campo aparece en 200 ms con salida suave.
-- **Iluminación:** fondo claro.
-- **Sonido:** tap suave por campo, click en el botón, chime corto y cálido en la confirmación. Voz L4.
-- **Texto:** los rótulos de la UI (la voz lee esos mismos rótulos). Sin subtítulos.
-- **Transición → E5:** la tarjeta se compacta en un resumen y sale por la derecha (8 frames); en E5 entra la misma tarjeta por la izquierda. La búsqueda «viaja» hasta el agente.
-
-### E5 · Del otro lado — 12,0 → 14,9 s (2,9 s)
-
-- **Fuente:** C04 + tarjeta UI.
-- **Qué se ve:** Andrés, agente inmobiliario, en un coworking luminoso. Mira su laptop (pantalla no visible), se inclina con interés, asiente leve y alcanza su celular. La tarjeta-resumen entra flotando y queda junto a él: «Departamento en arriendo · Cumbayá · Hasta $700 · 2 hab · Parqueadero · Mascotas». **Solo si la app lo muestra así**, una fila «Contacto» con ícono de candado. Sin nombre ni datos de Daniela.
+- **Fuente:** C04 + la vista real del agente (si se decide mostrarla).
+- **Qué se ve:** Andrés, agente inmobiliario, en una oficina luminosa, mira su laptop con interés. La pantalla no se ve.
+- **En el animatic:** «CAPTURA PENDIENTE · Cómo ve el agente una búsqueda» y «POR CONFIRMAR · ¿Los agentes ya usan la plataforma hoy?».
+- **Pendiente:** si los agentes todavía no usan la plataforma, la voz «pueden ver tu búsqueda» no se puede decir en presente y esta escena cambia. Mostrar el lado del agente es opcional: si no hay captura o se prefiere no mostrarlo, queda solo el plano de Andrés.
 - **Cámara:** plano medio en 3/4, push-in lento, 35 mm.
-- **Iluminación:** luz lateral de ventana, de día; acentos marino (silla, blazer) y verdes (plantas); montañas desenfocadas al fondo.
-- **Sonido:** ambiente de oficina muy bajo, whoosh suave de la tarjeta. Voz L5.
+- **Sonido:** ambiente de oficina muy bajo. Voz L5 (11,70–14,35 s).
 - **Texto:** subtítulos «Agentes inmobiliarios» / «pueden ver tu búsqueda».
-- **Transición → E6:** la vibración del celular de E6 se escucha 4 frames antes del corte.
+- **Transición → E6:** corte; la vibración del celular se oye 4 frames antes.
 
-### E6 · Contacto — 14,9 → 17,8 s (2,9 s)
+### E6 · Contacto — 14,4 → 17,0 s · POR CONFIRMAR
 
 - **Fuente:** C05.
-- **Qué se ve:** de día, Daniela en la terraza de un café con vista a la ciudad y a las montañas. El celular sobre la mesa vibra; lo toma, mira la pantalla (no visible), sonríe levemente y contesta.
-- **Qué NO se muestra:** nombre de quien llama, notificaciones de la app, varias llamadas o mensajes seguidos, ni una reacción eufórica. Eso sería prometer un resultado.
-- **Cámara:** plano medio casi estático, con el micro-movimiento de una cámara en mano estabilizada, 50 mm.
-- **Iluminación:** media mañana, sol suave con contraluz cálido.
-- **Sonido:** vibración (dos pulsos), ambiente exterior suave. Voz L6. Al terminar la voz, la música sube 2 dB.
-- **Texto:** subtítulos «y contactarte» / «si tienen algo para ti.»
-- **Transición → E7:** corte directo en el beat.
+- **Qué se ve:** de día, Daniela en una terraza con vista a la ciudad. El celular vibra sobre la mesa; lo toma y mira la pantalla (no visible), con una sonrisa leve.
+- **En el animatic:** «POR CONFIRMAR · Canal de contacto: llamada, WhatsApp, correo o dentro de la app».
+- **Pendiente:** el canal real define si ella contesta una llamada o lee un mensaje. La acción quedó neutral a propósito.
+- **Qué NO se muestra:** nombre de quien contacta, notificaciones de la app, varios contactos seguidos, ni una reacción eufórica.
+- **Cámara:** plano medio casi estático, 50 mm.
+- **Sonido:** vibración (dos pulsos), ambiente exterior suave. Voz L6 (14,50–16,90 s).
+- **Texto:** subtítulos «y contactarte» / «si tienen algo para ti.».
+- **Transición → E7:** corte en el beat.
 
-### E7 · Alivio + CTA — 17,8 → 20,1 s (2,3 s)
+### E7 · Alivio + CTA — 17,0 → 19,3 s
 
-- **Fuente:** C06. Si la ciudad generada no se ve como Quito, se reemplaza por una toma real de stock.
-- **Qué se ve:** plano abierto. Daniela al teléfono, relajada, apoyada en la baranda de vidrio; detrás, Quito y las laderas verdes del Pichincha. Cielo limpio en el tercio superior para el titular.
+- **Fuente:** C06, o una toma real de stock de Quito si la ciudad generada no convence.
+- **Qué se ve:** plano abierto; Daniela, tranquila, con el celular en la mano; detrás, Quito y las laderas del Pichincha. Cielo limpio en el tercio superior para el titular.
 - **Cámara:** pull-back lento con ligera subida, 24–28 mm.
-- **Iluminación:** sol de media mañana, bruma ligera, tonos cálidos y verdes.
-- **Sonido:** la música en su punto más abierto. Voz L7, primera mitad: «Publica gratis tu búsqueda».
-- **Texto:** titular grande «Publica gratis tu búsqueda» («gratis» en verde brote) sobre el cielo.
-- **Transición → E8:** barrido chevrón (segundo y último uso) que deja el fondo marfil.
+- **Sonido:** la música en su punto más abierto. Voz L7a (17,30–18,90 s).
+- **Texto:** titular «Publica gratis tu búsqueda» («gratis» con marcador verde brote), desde 17,25 s.
+- **Transición → E8:** barrido chevrón centrado en 19,3 s.
 
-### E8 · Cierre — 20,1 → 25,0 s (4,9 s)
+### E8 · Cierre — 19,3 → 22,0 s
 
 - **Fuente:** 100 % edición.
-- **Qué se ve:** fondo marfil `#FAF9F5` liso.
-  - 20,2 s: el logo horizontal entra centrado (760 px de ancho, centro en y ≈ 780 px) con fundido y escala 96 → 100 % en 12 frames, justo cuando la voz dice «en Propiedad Conecta».
-  - 21,2 s: aparece el botón «Publica gratis tu búsqueda →» (~760 px de ancho, y ≈ 1040 px).
-  - Debajo, «Ahora en Quito» (Outfit Medium 40 px, `#142A22`), **solo si se confirma**.
-  - 22,6 s: pulso sutil del botón (100 → 104 → 100 %).
-- **Cámara / iluminación:** no aplica.
-- **Sonido:** voz L7, segunda mitad. Opcional: firma sonora de dos notas (grave y aguda, como los dos círculos del logo) al aparecer el logo. Acorde final en ~23,5 s y cola hasta 25,0 s.
-- **Texto:** botón CTA + «Ahora en Quito». Sin URL, salvo que se confirme el dominio.
+- **Qué se ve:** fondo marfil `#FAF9F5`.
+  - 19,4 s: logo horizontal (archivo `marca/logo-horizontal-transparente.png` a 800 px de ancho, escala 66 %; el dibujo mide ~705 px), centrado con su centro en y ≈ 760 px. Entra con fundido y escala uniforme 96 → 100 % en 0,4 s, justo cuando la voz dice «en Propiedad Conecta».
+  - 19,9 s: botón «Publica gratis tu búsqueda →» (759 × 120 px, borde superior en y = 1000 px).
+  - 21,0 s: pulso sutil del botón (100 → 104 → 100 %).
+- **Sonido:** voz L7b (19,40–20,70 s); firma sonora opcional de dos notas al aparecer el logo; resolución de la música en ~21,0 s.
+- **Texto:** solo el botón. «Ahora en Quito» y la URL quedan fuera hasta confirmar cobertura y dominio.
 - **Transición:** ninguna. El último frame es el cierre completo y funciona como frame de loop.

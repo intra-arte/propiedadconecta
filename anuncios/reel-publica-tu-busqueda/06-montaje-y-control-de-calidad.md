@@ -4,8 +4,8 @@
 
 | Fase | Qué se hace | Se aprueba antes de seguir |
 |---|---|---|
-| **0 · Confirmaciones** | Resolver los pendientes de producto del [README](README.md#pendientes-de-confirmar-con-producto). Bloquean E4, E5 y E8. | Rótulos de la UI, cobertura, terminología. |
-| **1 · Animatic** | Voz temporal (TTS) + imágenes de referencia o bocetos + música temporal + **textos finales**, montados a los tiempos de [02](02-guion-tecnico.md). | Duración exacta de 25,0 s; cada texto se alcanza a leer; la historia se entiende sin sonido. |
+| **0 · Confirmaciones** | Responder las preguntas y enviar las capturas de [00-diagnostico.md](00-diagnostico.md#5-preguntas-para-el-proyecto-original). Bloquean E4, E5 y E6. | Rótulos de la UI, canal de contacto, agentes activos, cobertura, terminología. |
+| **1 · Animatic** | **v0 hecho:** `animatic/salida/` (22,0 s, sin audio, con marcadores de captura). v1: capturas reales en lugar de los marcadores + voz guía. Se regenera con `node animatic/generar.mjs`. | Duración exacta de 22,0 s; cada texto se alcanza a leer; la historia se entiende sin sonido. |
 | **1b · Prueba rápida** | Mostrar el animatic en un celular a 3–5 personas del público, en Quito. Preguntar: «¿Qué hace esta app?» y «¿Cuánto cuesta publicar?». | Si no lo responden, se corrige el guion, no el montaje. |
 | **2 · Imágenes** | REF-01…05 → KF01…06 (y KF07–08 para B). | Misma persona y misma paleta en todos los KF. |
 | **3 · Video IA** | Animar cada KF, 3–4 tomas por clip; elegir y escalar a 1080 × 1920. | Criterios de [03](03-prompts-ia.md#criterios-para-elegir-cada-toma). |
@@ -14,7 +14,7 @@
 | **5 · Montaje** | Montaje, color, gráficos, subtítulos, mezcla. | Lista de control (abajo). |
 | **6 · Entrega** | Exportar A y B → control de calidad → subir. | — |
 
-**Por qué este orden:** el timing se fija antes de gastar créditos de IA. Generar imagen → video desde fotogramas aprobados da control de personaje y encuadre; el texto → video directo da resultados inconsistentes entre escenas. Y como A y B comparten 18,2 s, la versión B solo cuesta 2 clips más.
+**Por qué este orden:** el timing se fija antes de gastar créditos de IA. Generar imagen → video desde fotogramas aprobados da control de personaje y encuadre; el texto → video directo da resultados inconsistentes entre escenas. Y como A y B comparten 15,4 s, la versión B solo cuesta 2 clips más.
 
 ---
 
@@ -42,20 +42,20 @@
 ### Paso a paso
 
 1. **Locución primero.** Colocar la voz final y poner un marcador al inicio de cada línea (L1–L7; LB1–LB3 en B). Todo se cuadra contra la voz.
-2. **Música.** Editarla para que el beat entre en 4,8 s y resuelva en ~23,5 s. Recortar compases, no estirar el audio.
+2. **Música.** Editarla para que el beat entre en 4,6 s y resuelva en ~21,0 s. Recortar compases, no estirar el audio.
 3. **Clips.** Montar cada escena con los tiempos de [02](02-guion-tecnico.md). Cuando el cambio de escena lo permita, cortar en el beat (±2 frames).
 4. **Color.** Primero la corrección base clip por clip (exposición, balance, piel); después un look común con dos variantes: noche (E1–E2) y día (E3–E7).
 5. **Gráficos.** Crear los componentes una sola vez (tarjeta, chip, botón, burbuja, titular, subtítulo) y reutilizarlos. Animaciones de 6–10 frames con salida suave; nada rebota más de una vez.
 6. **UI de E4.** Sincronizar cada campo con la palabra que lo nombra (±3 frames).
-7. **Subtítulos.** Importar `subtitulos/version-a.srt`, aplicar el estilo y **dejar solo los bloques 10–13**. El resto ya aparece como titular, burbuja, UI o logo (en B, bloques 2–3 y 9–12). Los SRT completos sirven de referencia de tiempos.
+7. **Subtítulos.** Importar `subtitulos/version-a.srt`, aplicar el estilo y **dejar solo los bloques 9–12**. El resto ya aparece como titular, burbuja, UI o logo (en B, bloques 2–3 y 9–12; ver [tabla de tiempos](animatic/tabla-de-tiempos.md)). Los SRT completos sirven de referencia de tiempos.
 8. **Cierre.** Logo desde `marca/`, escala uniforme, en V7.
 9. **Mezcla.** Música entre 18 y 20 dB por debajo de la voz mientras hay voz. SFX sutiles, nunca encima de una palabra. Final: −14 LUFS integrados, pico real ≤ −1 dBTP.
-10. **Versión B.** Duplicar la secuencia, reemplazar solo 0–6,8 s (B1, B2 y E3 con LB3) y no tocar nada después de 6,8 s.
+10. **Versión B.** Duplicar la secuencia, reemplazar solo 0–6,6 s (B1, B2 y E3 con LB3) y no tocar nada después de 6,6 s.
 
 ### Exportación
 
-- MP4 (H.264 High), 1080 × 1920, cadencia constante igual a la secuencia, VBR de 2 pasadas a 16–20 Mbps, audio AAC-LC 48 kHz 320 kbps estéreo, Rec.709, **duración exacta 25,0 s**.
-- Nombres: `PC_Reel_PublicaBusqueda_A-Dolor_9x16_25s_v01.mp4` y `PC_Reel_PublicaBusqueda_B-Inversion_9x16_25s_v01.mp4`.
+- MP4 (H.264 High), 1080 × 1920, cadencia constante igual a la secuencia, VBR de 2 pasadas a 16–20 Mbps, audio AAC-LC 48 kHz 320 kbps estéreo, Rec.709, **duración exacta 22,0 s**.
+- Nombres: `PC_Reel_PublicaBusqueda_A-Dolor_9x16_22s_v01.mp4` y `PC_Reel_PublicaBusqueda_B-Inversion_9x16_22s_v01.mp4`.
 - Los subtítulos van quemados en el video. **No subir los `.srt` a Meta**: se duplicarían en pantalla.
 
 ---
@@ -68,9 +68,9 @@
 - [ ] Se mantienen «pueden» y «si tienen algo para ti». No hay frases como «te contactarán», «recibirás ofertas» ni «cientos de agentes».
 - [ ] Solo aparecen un agente y una llamada.
 - [ ] La UI es la real (rótulos, botón, flujo). No aparecen funciones sin confirmar: notificaciones, chat, verificación, coincidencias.
-- [ ] El candado de E5 aparece solo si existe en la app real.
+- [ ] E4, E5 y E6 muestran solo lo que aparece en las capturas reales; no queda ningún marcador «CAPTURA PENDIENTE» ni «POR CONFIRMAR».
 - [ ] Publicar es gratis para quien busca en el momento de lanzar el anuncio.
-- [ ] «Ahora en Quito» está confirmado, o se eliminó.
+- [ ] Si se agrega «Ahora en Quito» o una URL al cierre, están confirmados.
 - [ ] «Búsqueda» es la palabra que usan el anuncio, la landing y la app.
 
 ### Gancho y comprensión
@@ -109,12 +109,12 @@
 - [ ] La voz se entiende con el celular a volumen bajo.
 - [ ] −14 LUFS integrados, pico ≤ −1 dBTP, sin saturación.
 - [ ] Música y SFX con licencia para publicidad pagada; ningún sonido de otras marcas (WhatsApp, iPhone).
-- [ ] El beat entra en el giro (4,8 s).
+- [ ] El beat entra en el giro (4,6 s).
 
 ### Técnico
 
-- [ ] 1080 × 1920, 25,0 s, cadencia constante, sin frames negros ni saltos.
-- [ ] A y B son idénticos desde 6,8 s.
+- [ ] 1080 × 1920, 22,0 s, cadencia constante, sin frames negros ni saltos.
+- [ ] A y B son idénticos desde 6,6 s.
 - [ ] Revisado en iPhone y Android, en Reels y Stories (vista previa de Ads Manager).
 
 ### Meta y conversión

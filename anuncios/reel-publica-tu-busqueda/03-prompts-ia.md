@@ -2,6 +2,8 @@
 
 ## Cómo usar estos prompts
 
+> **Todavía no se ejecutan.** Primero se aprueba el animatic v0 (`animatic/salida/`) y se reciben las capturas y confirmaciones de [00-diagnostico.md](00-diagnostico.md).
+
 El flujo es **imagen → video**, no texto → video directo. Así se controla el personaje, el encuadre y la luz antes de gastar créditos de video.
 
 1. **Referencias (REF):** generar las fichas de personaje y de locación como imágenes fijas. Aprobarlas.
@@ -80,7 +82,7 @@ Location reference photo, vertical 9:16: rooftop terrace café in north Quito, E
 
 ### C01 · E1 + E2 · Noche en el sofá
 
-Se usa de 0,0 a 4,8 s. Generar 6–8 s si la herramienta lo permite. Si solo hace 5 s, usar una toma para E1 y otra para E2.
+Se usa de 0,0 a 4,6 s. Generar 6–8 s si la herramienta lo permite. Si solo hace 5 s, usar una toma para E1 y otra para E2.
 
 **KF01 (imagen):**
 
@@ -112,7 +114,7 @@ She picks up the phone from the table with a decisive gesture, a small confident
 
 ### C03 · E4 · Fondo del formulario
 
-Se usa 5,2 s, desenfocado detrás de la UI. Generar 6 s si es posible.
+Se usa 5,0 s, desenfocado detrás de la UI. Generar 6 s si es posible.
 
 **KF03:**
 
@@ -128,7 +130,7 @@ Her thumbs tap and scroll calmly on the phone; only subtle, natural hand movemen
 
 ### C04 · E5 · El agente
 
-Se usa 2,9 s de 5 s.
+Se usa 2,8 s de 5 s.
 
 **KF04:**
 
@@ -144,7 +146,7 @@ He reads something on the laptop, leans slightly forward with genuine interest, 
 
 ### C05 · E6 · Suena el celular
 
-Se usa 2,9 s de 5 s.
+Se usa 2,6 s de 5 s. La acción es neutral a propósito, porque el canal de contacto está por confirmar. Si resulta ser una llamada, se puede agregar «and brings it to her ear to answer».
 
 **KF05:**
 
@@ -155,7 +157,7 @@ Se usa 2,9 s de 5 s.
 **Video:**
 
 ```
-The phone on the table lights up and vibrates slightly; she looks down at it, picks it up, glances at the screen with a gentle, hopeful smile and brings it to her ear to answer. Calm, natural reaction, not euphoric. Camera: static with very subtle stabilized handheld micro-movement. [STYLE]
+The phone on the table lights up and vibrates slightly; she looks down at it, picks it up, and reads the screen with a gentle, hopeful smile. Calm, natural reaction, not euphoric. Camera: static with very subtle stabilized handheld micro-movement. [STYLE]
 ```
 
 ### C06 · E7 · Plano abierto con Quito
@@ -165,13 +167,13 @@ Se usa 2,3 s de 5 s.
 **KF06:**
 
 ```
-Wide shot on [REF-05]: [Daniela, same wardrobe] standing at the glass railing, talking on the phone, relaxed, with a slight smile and a light breeze in her hair. She occupies the lower-middle third of the vertical frame; behind her, a panoramic view of Quito and the green slopes of Pichincha volcano; clean clear sky in the upper third. 24mm lens, f/4. Late-morning sun, light haze, warm and green tones. [STYLE]
+Wide shot on [REF-05]: [Daniela, same wardrobe] standing at the glass railing with her phone in her hand, relaxed, with a slight smile and a light breeze in her hair. She occupies the lower-middle third of the vertical frame; behind her, a panoramic view of Quito and the green slopes of Pichincha volcano; clean clear sky in the upper third. 24mm lens, f/4. Late-morning sun, light haze, warm and green tones. [STYLE]
 ```
 
 **Video:**
 
 ```
-She keeps talking on the phone, calm, glancing at the view. Camera: slow pull-back with a slight crane-up revealing more of the city. Smooth and steady. [STYLE]
+She holds her phone loosely, calm, glancing at the view. Camera: slow pull-back with a slight crane-up revealing more of the city. Smooth and steady. [STYLE]
 ```
 
 ---
@@ -180,7 +182,7 @@ She keeps talking on the phone, calm, glancing at the view. Camera: slow pull-ba
 
 ### C07 · B1 · Fachada con cartel en blanco
 
-Se usa 2,2 s. El cartel «SE ARRIENDA» y su giro se componen en edición, con tracking planar sobre el cartel en blanco.
+Se usa 2,4 s. El cartel «SE ARRIENDA» y su giro se componen en edición, con tracking planar sobre el cartel en blanco.
 
 **KF07:**
 
@@ -196,7 +198,7 @@ Locked-off tripod shot with a very slow push-in toward the sign. Gentle leaf sha
 
 ### C08 · B2 · Daniela en la calle
 
-Se usa 2,6 s de 5 s.
+Se usa 2,2 s de 5 s.
 
 **KF08:**
 

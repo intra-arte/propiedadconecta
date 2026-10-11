@@ -1,5 +1,7 @@
 # Diagnóstico de recursos — 11 de octubre de 2026
 
+*Actualizado tras el animatic v0 (22 s): secciones 3, 4 y 6.*
+
 ## 1. Qué hay realmente disponible
 
 | Recurso | Estado |
@@ -25,33 +27,29 @@
 
 | Documento | Estado |
 |---|---|
-| 01 · Concepto y voz en off | Terminado para **25 s**. Falta adaptarlo a ~22 s. |
-| 02 · Guion técnico (8 escenas, sistema visual) | Terminado para 25 s. **E4, E5, E6 y E8 contienen supuestos** (sección 4). |
-| 03 · Prompts IA | Terminado. **No se ejecutó ninguno** (es lo correcto en esta etapa). |
-| 04 · IA vs edición y logo | Terminado. El logo sigue siendo raster. |
-| 05 · Prueba A/B | Terminado para 25 s. |
-| 06 · Montaje y control de calidad | Terminado. Supone que la app existe y se puede grabar. |
-| Subtítulos `.srt` y guion de locución | Terminados para 25 s. Faltan los de 22 s. |
-| Animatic | **No iniciado.** |
-| Locución (guía o final), música | **No iniciado.** |
+| Animatic v0 (`animatic/`) | **Hecho:** 22,0 s, versión A (prueba y revisión) y B (revisión), sin audio, con marcadores en E4–E6. Control automático en `animatic/salida/informe-qa.md`. |
+| Línea de tiempo y tabla de tiempos | **Hechas.** `animatic/linea-de-tiempo.js` es la fuente única; la tabla, los `.srt` y la locución se generan desde ella. |
+| 01 · Concepto y voz en off | Actualizado a 22 s. |
+| 02 · Guion técnico | Reescrito a 22 s. Los supuestos de producto se retiraron y quedaron como marcadores. |
+| 03 · Prompts IA | Duraciones actualizadas; E6 y E7 con acción neutral respecto del canal de contacto. **No se ejecutó ninguno.** |
+| 04 · IA vs edición y logo | Actualizado (tamaño del logo en el cierre). El logo sigue siendo raster. |
+| 05 · Prueba A/B | Actualizado a 22 s. |
+| 06 · Montaje y control de calidad | Actualizado a 22 s. |
+| Voz guía, música | **No iniciado.** No hay voz sintética en este entorno. |
 | Imágenes y clips IA | **No iniciado** (a propósito). |
 
-## 4. Supuestos en los documentos que hay que reemplazar
+## 4. Supuestos en los documentos
 
-No salen del brief. Son marcadores que se cambian por lo que muestren las capturas.
-
-| Supuesto | Dónde | Qué falta saber |
+| Supuesto | Dónde | Estado |
 |---|---|---|
-| Rótulo «Sector» | 02 E4, voz L4 | El nombre real del campo de ubicación |
-| «Departamento · Arriendo» como un mismo campo | 02 E4 | Si compra/arriendo es un campo y cómo se elige |
-| Características como opciones («2 habitaciones», «Parqueadero»…) | 02 E4 | Si es texto libre, opciones o ambos |
-| «Hasta $700 al mes» | 02 E4 | Si el presupuesto es un máximo o un rango |
-| Botón «Publicar gratis» y pantalla «Búsqueda publicada» | 02 E4 | Botón y pantalla reales |
-| Logo en la cabecera de la app | 02 E4 | Si existe |
-| Tarjeta de la búsqueda vista por el agente, fila «Contacto» con candado, agente en laptop | 02 E5 | Cómo ve el agente la búsqueda y en qué dispositivo |
-| El agente **llama** y ella contesta | 02 E6 | El canal real de contacto |
-| «Ahora en Quito» y ejemplo «Cumbayá» | 02 E4 y E8 | La cobertura |
-| El clic va directo al formulario; botón «Registrarte» | 05, 06 | El flujo real de registro |
+| Rótulos, valores de ejemplo, botón «Publicar gratis», pantalla «Búsqueda publicada», logo en la cabecera de la app | 02 E4 | **Retirados.** E4 es un marcador «CAPTURA PENDIENTE» con los cuatro datos del brief. |
+| Tarjeta del agente con candado | 02 E5 | **Retirada.** E5 es un marcador «CAPTURA PENDIENTE». |
+| El agente llama y ella contesta | 02 E6, 03 C05/C06 | **Retirado.** La acción es neutral (el celular vibra, ella lo toma y mira); canal POR CONFIRMAR. |
+| «Ahora en Quito» | 02 E8 | **Retirado** del cierre hasta confirmar cobertura. |
+| La palabra «sector» en la voz L4 | 01, locución | Se mantiene por ser natural en Quito. Si la app dice «Ubicación», se cambia. |
+| El agente trabaja en laptop | 02 E5, 03 C04 | Es solo el plano ilustrativo. Se ajusta si los agentes usan la app en el celular. |
+| «Cumbayá · hasta $700» en el cartel de B | 05 B1 | Ejemplo de una búsqueda, no dato de la app. Se cambia si la cobertura no incluye los valles. |
+| Botón de Meta «Registrarte» y clic directo al formulario | 05, 06 | Depende del flujo real de registro (pregunta 5). |
 
 ## 5. Preguntas para el proyecto original
 
@@ -80,30 +78,11 @@ Las marcadas con ★ bloquean el guion; las demás, solo la edición.
 
 ## 6. Siguiente paso recomendado
 
-1. **Tú:** enviar las capturas y respuestas marcadas con ★. Con eso se cierra el guion.
-2. **Yo, en paralelo y sin créditos de IA:** ajustar el guion a 22 s (propuesta abajo) y armar un **animatic v0** de 1080 × 1920:
-   - tarjetas con el texto de la locución y la descripción de cada plano;
-   - los tiempos exactos de cada escena;
-   - recuadros grises «captura pendiente» en E4–E6, con solo los cuatro datos del brief y sin rótulos inventados.
-3. **Voz guía:** aquí no puedo generar voz. Puedes grabarla con el celular leyendo `locucion/guion-locucion.txt` y la sincronizo; si no, el animatic va sin audio, con el texto en pantalla.
-4. **Validación:** mostrar el animatic a 3–5 personas del público y preguntar «¿qué hace esta app?» y «¿cuánto cuesta publicar?».
-5. **Con las capturas:** reemplazar los recuadros, actualizar 02, 05, `.srt` y locución a 22 s, y aprobar el animatic v1. **Solo después** se generan fotogramas clave y clips.
-
-### Propuesta de ajuste a 22 s
-
-El concepto y el texto de la locución no cambian. Los 3 s salen de las pausas (−1,7 s) y del cierre (−1,3 s).
-
-| Escena | 25 s (actual) | 22 s (propuesta) | Locución en 22 s |
-|---|---|---|---|
-| E1 Gancho | 0,0–2,2 | 0,0–2,2 | L1 0,1–2,1 |
-| E2 Agitación | 2,2–4,8 | 2,2–4,7 | L2 2,3–4,6 |
-| E3 Giro | 4,8–6,8 | 4,7–6,5 | L3 4,8–6,4 |
-| E4 Así funciona | 6,8–12,0 | 6,5–11,3 | L4 6,7–10,8 |
-| E5 Del otro lado | 12,0–14,9 | 11,3–13,9 | L5 11,4–13,8 |
-| E6 Contacto | 14,9–17,8 | 13,9–16,4 | L6 14,0–16,3 |
-| E7 Alivio + CTA | 17,8–20,1 | 16,4–18,4 | L7a 16,6–18,2 |
-| E8 Cierre | 20,1–25,0 | 18,4–22,0 | L7b 18,5–19,8 |
-
-- La voz termina en 19,8 s y deja 2,2 s de cierre sin voz.
-- La línea más ajustada es L2 (6 sílabas por segundo). Si en la voz guía suena apurada, se usa «Deja de perseguir anuncios.».
-- **E4–E6 pueden cambiar** con las capturas: si el formulario tiene más pasos o el contacto no es una llamada, se ajustan esas escenas, no el concepto.
+1. **Hecho:** guion ajustado a 22 s y animatic v0 (ver [README](README.md#ver-el-animatic)). La propuesta de ajuste de la versión anterior de este diagnóstico se reemplazó por la [tabla de tiempos definitiva](animatic/tabla-de-tiempos.md). Para que la voz suene natural se quitó «¿Ya se vendió?» de la locución; queda como burbuja en pantalla.
+2. **Tú:**
+   - revisar `animatic/salida/animatic-A-v0.mp4` y aprobar o corregir la estructura narrativa;
+   - enviar las capturas y respuestas marcadas con ★;
+   - decidir la visibilidad del repositorio (pregunta 2).
+3. **Validación con personas:** mostrar `animatic-A-v0.mp4` en un celular a 3–5 personas del público, primero sin sonido. Preguntar «¿qué hace esta app?», «¿cuánto cuesta publicar?» y «¿qué harías después de verlo?». Explicar antes que los recuadros son partes que todavía se van a filmar o capturar.
+4. **Opcional:** grabar con el celular una voz guía leyendo `locucion/guion-locucion.txt` sobre el video, para comprobar el ritmo real.
+5. **Con las capturas:** reemplazar los marcadores en la línea de tiempo, regenerar (animatic v1, `.srt`, locución, tabla) y aprobar. **Solo después** se generan fotogramas clave y clips con IA.

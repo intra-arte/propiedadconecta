@@ -1,49 +1,54 @@
-PROPIEDAD CONECTA — Reel «Publica tu búsqueda» — Locución (25 s)
+PROPIEDAD CONECTA — Reel «Publica tu búsqueda» — Locución del animatic v0 (22,0 s)
+Generado desde animatic/linea-de-tiempo.js con «node generar.mjs». No editar a mano.
 
 Voz femenina, 25–35 años, cálida y conversacional, como una amiga que da
 un consejo práctico. Acento quiteño suave o latinoamericano neutro.
 Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, 3 tomas por línea.
-Los tiempos indican dónde empieza y termina cada línea dentro del video.
+Los tiempos marcan dónde empieza y termina cada línea dentro del video.
+Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
+
+Voz guía para el animatic: basta grabarla con el celular leyendo este texto
+sobre el video (sin música), de corrido y a ritmo natural.
 
 ==============================================================
 VERSIÓN A (principal)
 ==============================================================
 
-[0,1–2,1]  ¿Otra vez «ya se arrendó»? ¿«Ya se vendió»?
-           (empática, media ironía)
+[0,10–1,60]  ¿Otra vez «ya se arrendó»?
+               (Empática, con media ironía, como quien ya lo vivió. · 8 sílabas en 1,50 s = 5,3 síl./s, natural)
 
-[2,3–4,7]  Deja de perseguir anuncios por todo Quito.
-           (firme, sin regañar; peso en «perseguir»)
+[1,80–4,40]  Deja de perseguir anuncios por todo Quito.
+               (Firme, sin regañar. Peso en «perseguir». · 14 sílabas en 2,60 s = 5,4 síl./s, natural)
 
-[5,0–6,7]  Mejor publica tú lo que buscas.
-           (sonrisa en la voz; peso en «tú»)
+[4,75–6,55]  Mejor publica tú lo que buscas.
+               (Sonrisa en la voz. Peso en «tú». · 10 sílabas en 1,80 s = 5,6 síl./s, natural)
 
-[7,0–11,3] Tipo de propiedad, sector, presupuesto… y lo que no puede faltar.
-           (lista con ritmo, micro-pausa entre campos)
+[6,90–11,10]  Tipo de propiedad, sector, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo; micro-pausa entre datos. · 20 sílabas en 4,20 s = 4,8 síl./s, natural)
 
-[12,1–14,9] Agentes inmobiliarios pueden ver tu búsqueda
-[15,0–17,4] y contactarte si tienen algo para ti.
-           (clara, tranquila; no vender de más)
+[11,70–14,35]  Agentes inmobiliarios pueden ver tu búsqueda
+               (Clara, informativa. · 15 sílabas en 2,65 s = 5,7 síl./s, natural)
 
-[18,4–20,0] Publica gratis tu búsqueda…
-[20,2–21,6] en Propiedad Conecta.
-           (directa y cálida; «gratis» con peso; marca bien clara)
+[14,50–16,90]  y contactarte si tienen algo para ti.
+               (Tranquila, cercana. No vender de más. · 13 sílabas en 2,40 s = 5,4 síl./s, natural)
+
+[17,30–18,90]  Publica gratis tu búsqueda…
+               (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+
+[19,40–20,70]  en Propiedad Conecta.
+               (Marca bien clara; coincide con la aparición del logo. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
 
 ==============================================================
 VERSIÓN B (prueba A/B) — solo cambian las tres primeras líneas
 ==============================================================
 
-[0,1–2,1]  Esta vez, el anuncio lo pones tú.
-           (segura, con complicidad; peso en «tú»)
+[0,10–2,30]  Esta vez, el anuncio lo pones tú.
+               (Segura, con complicidad. Peso en «tú». · 11 sílabas en 2,20 s = 5,0 síl./s, natural)
 
-[2,4–4,4]  ¿Vas a comprar o arrendar en Quito?
-           (pregunta directa y cercana)
+[2,50–4,45]  ¿Vas a comprar o arrendar en Quito?
+               (Pregunta directa y cercana. · 11 sílabas en 1,95 s = 5,6 síl./s, natural)
 
-[5,0–6,7]  Publica lo que buscas.
+[4,85–6,25]  Publica lo que buscas.
+               (Igual que L3 en A. · 7 sílabas en 1,40 s = 5,0 síl./s, natural)
 
-Desde [7,0] sigue igual que la versión A.
-
---------------------------------------------------------------
-Si no entra en el tiempo, recortar en este orden (no acelerar más de 5 %):
-1. «Deja de perseguir anuncios.» (sin «por todo Quito»)
-2. «Los agentes pueden verla» en lugar de «Agentes inmobiliarios pueden ver tu búsqueda»
+Desde [6,90] sigue igual que la versión A.
