@@ -1,0 +1,50 @@
+PROPIEDAD CONECTA — «Publica lo que buscas» — Locución de la v1 de motion (16,0 s)
+Generado desde motion-v1/src/linea-de-tiempo.js con «node generar-textos.mjs». No editar a mano.
+
+ESTADO: PENDIENTE DE GRABAR. El video final no tiene voz todavía; la música ya baja 5 dB
+bajo cada línea para dejarle sitio. Al grabar, dejar cada toma dentro de su intervalo.
+
+Voz femenina o masculina, 25–40 años, cálida y segura, conversacional. Acento quiteño suave o latinoamericano neutro. Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, tres tomas por línea.
+Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
+
+«gratis» está PENDIENTE DE CONFIRMAR: grabar L4 en las dos variantes («Publica gratis tu búsqueda.» y «Publica tu búsqueda.»).
+
+==============================================================
+VERSIÓN A (directa)
+==============================================================
+
+[0,10–1,90]  Deja de perseguir anuncios.
+               (Firme y cercana, sin regañar. Peso en «perseguir». · 9 sílabas en 1,80 s = 5,0 síl./s, natural)
+
+[2,50–3,80]  Publica lo que buscas.
+               (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+
+[4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo, micro-pausa entre datos. Los rótulos se ajustan al formulario real. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+
+[11,00–12,60]  Publica gratis tu búsqueda.
+               (Directa y cálida. Si se confirma, «gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+
+[12,70–14,00]  En Propiedad Conecta.
+               (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+
+
+==============================================================
+VERSIÓN B (curiosidad) — solo cambia la primera línea
+==============================================================
+
+[0,10–2,30]  Esta vez, el anuncio lo pones tú.
+               (Segura, con complicidad. Peso en «tú». · 11 sílabas en 2,20 s = 5,0 síl./s, natural)
+
+[2,50–3,80]  Publica lo que buscas.
+               (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+
+[4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo, micro-pausa entre datos. Los rótulos se ajustan al formulario real. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+
+[11,00–12,60]  Publica gratis tu búsqueda.
+               (Directa y cálida. Si se confirma, «gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+
+[12,70–14,00]  En Propiedad Conecta.
+               (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+
