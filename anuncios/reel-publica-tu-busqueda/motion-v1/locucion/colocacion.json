@@ -27,11 +27,25 @@
   {
    "id": "L2",
    "texto": "Publica lo que buscas.",
-   "toma": null,
-   "pendiente": true,
+   "toma": "L2-publica-lo-que-buscas.mp3",
+   "pendiente": false,
    "inicio": 2.69,
-   "fin": 4.1,
-   "frases": []
+   "fin": 3.985,
+   "compresionMaxDb": 4.6,
+   "limitadorMaxDb": 4.3,
+   "frases": [
+    {
+     "texto": "Publica lo que buscas.",
+     "corte": [
+      0.3,
+      2.04
+     ],
+     "inicio": 2.69,
+     "fin": 3.985,
+     "ancla": "tilde (beat 5,50) −0,06 s",
+     "imagen": 2.75
+    }
+   ]
   },
   {
    "id": "L3",
@@ -171,11 +185,25 @@
   {
    "id": "L2",
    "texto": "Publica lo que buscas.",
-   "toma": null,
-   "pendiente": true,
+   "toma": "L2-publica-lo-que-buscas.mp3",
+   "pendiente": false,
    "inicio": 2.69,
-   "fin": 4.1,
-   "frases": []
+   "fin": 3.985,
+   "compresionMaxDb": 4.6,
+   "limitadorMaxDb": 4.3,
+   "frases": [
+    {
+     "texto": "Publica lo que buscas.",
+     "corte": [
+      0.3,
+      2.04
+     ],
+     "inicio": 2.69,
+     "fin": 3.985,
+     "ancla": "tilde (beat 5,50) −0,06 s",
+     "imagen": 2.75
+    }
+   ]
   },
   {
    "id": "L3",

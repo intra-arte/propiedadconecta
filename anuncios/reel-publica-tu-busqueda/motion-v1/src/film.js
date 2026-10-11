@@ -457,10 +457,11 @@ function frameState(t) {
   return { w, h, rad: Math.min(Math.min(w, h) / 2, lerp(r, 40, ramp(Math.min(w, h), 2 * r, 300))), open };
 }
 // ---------- el formulario real (capturas de producto) ----------
-// Coordenadas de «página» en px de las capturas de 800 × 500: las cinco se apilan según su desplazamiento medido.
+// Coordenadas de «página» en px de una captura de 800 de ancho: las cinco se apilan según su desplazamiento
+// medido comparando las filas que se solapan (las de 1440 × 900, a resolución completa: 718 y 1417 px).
 const PAGE = { x0: 218, x1: 582, cx: 400, h: 1287, bg: '#F7F8FC' };
-const OFF = [0, 0, 264, 357, 787];                     // desplazamiento de cada captura en la página
-const LLENO = [[1, 0, 357], [3, 357, 812], [4, 812, 1287]]; // [captura, desde, hasta]: el formulario lleno, sin costuras visibles
+const OFF = [0, 0, 264, 718 / 1.8, 1417 / 1.8];       // desplazamiento de cada captura en la página
+const LLENO = [[1, 0, 443], [3, 443, 812], [4, 812, 1287]]; // [captura, desde, hasta]: costuras en filas idénticas de fondo liso
 const TARJETAS = [[126, 215], [233, 330], [347, 433], [450, 725]]; // ¿Qué buscas? · Ubicación · Presupuesto · Características
 const VACIO = [[0, 118, 225], [0, 225, 340], [0, 340, 443], [2, 443, 735]]; // la misma tarjeta, vacía
 const BOTON_Y = 1250, BOTON_H = 210;

@@ -10,8 +10,8 @@ export const DURACION = 16;      // s
 // Lo que todavía no está confirmado. Cambia a 'confirmado' / 'no' cuando llegue la respuesta.
 export const PENDIENTE = {
   gratis: 'confirmado',          // confirmado por producto el 11/10/2026 · 'no' → «Publica tu búsqueda»
-  capturas: 'recibidas',         // 5 capturas reales del formulario (800 × 500, JPEG): se reemplazan por originales en alta resolución sin tocar la animación
-  voz: 'parcial',                // tomas recibidas el 11/10/2026 salvo L2 «Publica lo que buscas.»: su hueco y la música ya están
+  capturas: 'recibidas',         // capturas reales del formulario: cuatro de 1440 × 900 y la 3 de 800 × 500 (de esa no llegó versión grande)
+  voz: 'recibida',               // las seis tomas, recibidas el 11/10/2026 (locucion/tomas/)
   rotulos: 'confirmado',         // «Tipo de propiedad», «Ubicación», «Presupuesto», «Características» existen en el formulario real
 };
 
@@ -80,7 +80,7 @@ export const EV = {
 };
 
 // ---------- locución ----------
-// Tomas entregadas por el cliente el 11/10/2026 (locucion/tomas/, sin editar). Falta L2.
+// Tomas entregadas por el cliente el 11/10/2026 (locucion/tomas/, sin editar).
 // Cada línea se coloca por frases. «corte»: tramo de la toma, en segundos. «ancla»: dónde cae el
 // primer sonido de la frase, { b, s } = beat de la imagen + segundos, o { tras } = segundos después
 // del último sonido de la frase anterior. Sin «frases», la toma entera es una frase con el «ancla»
@@ -97,9 +97,11 @@ export const LOCUCION = {
     // la pausa después de «Esta vez,» baja de 0,15 a 0,10 s para que «tú.» termine antes de L2
     frases: [{ texto: 'Esta vez,', corte: [0, 0.84], ancla: { s: 0.04 } }, { texto: 'el anuncio lo pones tú.', corte: [0.84, 2.88], ancla: { tras: 0.1 } }] }],
   comun: [
-    // «bli» de «Publica» cae con el punto en la «i»
+    // «Publica» empieza cuando el punto cae en la «i»
     { id: 'L2', inicio: 2.69, fin: 4.1, texto: 'Publica lo que buscas.', direccion: 'Sonrisa en la voz. Peso en «buscas».',
-      toma: null, ancla: { b: EV.tilde, s: -0.06 } },
+      toma: 'L2-publica-lo-que-buscas.mp3',
+      // el corte deja fuera un sonido corto que precede a la frase (0,17–0,22 s de la toma)
+      frases: [{ texto: 'Publica lo que buscas.', corte: [0.3, 2.04], ancla: { b: EV.tilde, s: -0.06 } }] },
     // cada dato suena cuando la cabecera lo nombra y la cámara encuadra su tarjeta
     { id: 'L3', inicio: 4.9, fin: 9.1, texto: 'Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.', direccion: 'Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla.',
       toma: 'L3-tipo-de-propiedad-ubicacion-presupuesto-y-lo-que-no-puede-faltar.mp3',

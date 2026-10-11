@@ -1,8 +1,8 @@
 # v1 de motion — «El punto»
 
-Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: videos A y B con voz, provisionales porque falta la toma L2** («Publica lo que buscas.»). Dirección aprobada, «gratis» confirmado y formulario real integrado. La música ya deja el hueco de L2: cuando llegue, se coloca y se vuelve a renderizar sin cambiar nada más.
+Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: videos finales A y B, con voz completa y las capturas del formulario en alta resolución.** Dirección aprobada y «gratis» confirmado.
 
-**Videos:** `entregables/propiedad-conecta-v1-A-voz-provisional.mp4` y `entregables/propiedad-conecta-v1-B-voz-provisional.mp4`. En `entregables/audio/` están, en FLAC, la mezcla con voz, la mezcla sin voz y los stems de música, SFX y voz. Los subtítulos están en `subtitulos/`.
+**Videos:** `entregables/propiedad-conecta-v1-A.mp4` y `entregables/propiedad-conecta-v1-B.mp4`. En `entregables/audio/` están, en FLAC, la mezcla con voz, la mezcla sin voz y los stems de música, SFX y voz. Los subtítulos están en `subtitulos/`.
 
 - **Concepto y justificación:** [CONCEPTO.md](CONCEPTO.md)
 - **Guion técnico con tiempos exactos (generado):** [guion-tecnico.md](guion-tecnico.md)
@@ -15,6 +15,7 @@ Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en códig
 | `hoja-de-contactos-B-apertura.jpg` | Versión B, apertura (beats 0–8) cada medio beat; desde el beat 6 es igual a A |
 | `transicion-producto.jpg` | El formulario real, cada medio beat |
 | `voz-sobre-imagen-A.jpg`, `voz-sobre-imagen-B.jpg` | Un fotograma del MP4 final cuando suena cada frase, con su texto |
+| `capturas-antes-y-ahora.jpg` | El mismo recorte del video a tamaño real, con las capturas de 800 y de 1440 px |
 | `archivo-final-A-cada-1s.jpg`, `archivo-final-B-cada-1s.jpg` | Un fotograma por segundo extraído del MP4 final |
 | `transicion-giro-A.jpg`, `transicion-marco.jpg`, `transicion-cierre.jpg` | Las transiciones clave cada 1/8 o 1/4 de beat |
 | `movil-1a1.jpg` | Momentos clave a 390 px de ancho, tamaño real de un teléfono |
@@ -38,7 +39,7 @@ El v0 (`../animatic/v0/`) no se toca: esta carpeta y su rama local (`claude/prop
 | `render.mjs` | Render con Chromium sin interfaz → H.264 yuv420p CRF 16; hojas de contactos |
 | `control.mjs` | Controles sobre el MP4 exportado: formato, sonoridad, sincronía del punto, posición de cada frase de la voz en el audio exportado, voz frente a música, proporción del logo |
 | `fuentes/` | Outfit (OFL) y JetBrains Mono (OFL), con sus licencias |
-| `capturas/` | Las cinco capturas reales del formulario y su [LEEME](capturas/LEEME.md) |
+| `capturas/` | Las cinco capturas reales del formulario (cuatro de 1440 × 900 y una de 800 × 500), el PDF original y su [LEEME](capturas/LEEME.md) |
 
 El logo se lee directamente de `../marca/logo-horizontal-transparente.png`, el archivo original: no hay copia ni versión retocada.
 
@@ -61,9 +62,8 @@ node control.mjs salida/propiedad-conecta-v1-A.mp4 A
 
 Más opciones: `--rev` (zonas seguras y rótulos de revisión), `--en 1.5,3.2` (fotogramas sueltos), `--muestras 1` (vista previa rápida sin desenfoque), `--desde/--hasta/--paso/--desfase` (rango de la hoja en beats). Para ver la película en el navegador, servir la carpeta del reel (no `motion-v1`) y abrir `motion-v1/index.html?v=B`.
 
-## Cuando lleguen los pendientes
+## Cambios habituales
 
-- **Voz, toma L2:** se graba con la misma voz siguiendo `locucion/guion-locucion-v1.txt` y se guarda como `locucion/tomas/L2-publica-lo-que-buscas.mp3`. En `src/linea-de-tiempo.js`, `toma: null` de L2 pasa a ese nombre. Después se corre la secuencia de arriba desde `node voz.mjs`. Si la toma dura más de 1,5 s, `voz.mjs` avisa si pisa la línea siguiente.
-- **Cambiar una toma o su sitio:** cada frase tiene en la línea de tiempo su `corte` (tramo de la toma) y su `ancla` (evento de la imagen + segundos). `voz.mjs` no deja que dos frases queden a menos de 80 ms.
-- **Capturas en alta resolución:** se reemplazan los cinco archivos de `capturas/` con los mismos nombres y encuadres, y se vuelve a renderizar.
+- **Cambiar una toma o su sitio:** cada frase tiene en la línea de tiempo su `corte` (tramo de la toma) y su `ancla` (evento de la imagen + segundos). `voz.mjs` no deja que dos frases queden a menos de 80 ms. Después se corre la secuencia de arriba desde `node voz.mjs`.
+- **Reemplazar una captura:** mismo encuadre, mismo nombre (la extensión se ajusta en `src/main.js`). Si cambia el desplazamiento, se vuelve a medir y se actualiza `OFF` en `src/film.js` (ver [capturas/LEEME](capturas/LEEME.md)). La única que sigue en 800 × 500 es `formulario-3-presupuesto.jpg`.
 - **Cambiar «gratis»:** `PENDIENTE.gratis` en `src/linea-de-tiempo.js` (`'no'` deja «Publica tu búsqueda»).

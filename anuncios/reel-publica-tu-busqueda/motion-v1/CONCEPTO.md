@@ -1,6 +1,6 @@
 # Concepto — «El punto»
 
-**Propiedad Conecta · Reel vertical de 16 s · v1 de motion. Dirección aprobada y «gratis» confirmado el 11/10/2026. Voz integrada el mismo día, salvo la toma L2.**
+**Propiedad Conecta · Reel vertical de 16 s · v1 de motion. Dirección aprobada y «gratis» confirmado el 11/10/2026. Voz completa y capturas en alta resolución integradas el mismo día.**
 
 ## La idea en una frase
 
@@ -54,5 +54,7 @@ En el primer acto, un pulso apagado en si menor y un sello que suena en cada anu
 
 ## Lo que falta
 
-1. **La toma L2 de la voz** («Publica lo que buscas.»), con la misma voz de las demás. La música y la imagen ya le dejan el hueco, entre 2,69 y 4,10 s.
-2. **Capturas en alta resolución:** las recibidas son de 800 × 500 y se ven blandas al ampliarlas. Se reemplazan sin tocar la animación (ver `capturas/LEEME.md`).
+Nada que bloquee la publicación. Quedan dos puntos opcionales:
+
+1. **Origen de la voz.** Si es una voz generada con una herramienta, confirmar que su licencia permite publicidad pagada.
+2. **Características vacía a 1440 × 900.** Es la única captura que sigue en 800 × 500, y se ve durante medio segundo antes del último barrido (ver `capturas/LEEME.md`).

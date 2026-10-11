@@ -5,7 +5,7 @@ Generado desde [src/linea-de-tiempo.js](src/linea-de-tiempo.js) con `node genera
 **16,0 s** · 120 BPM (1 beat = 0,5 s, 32 beats = 8 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (`beats.json`: 119,87 BPM, desfase -6,3 ms).
 Zona segura para texto y logo: x 65–1015, y 270–1248 (la misma del v0).
 
-**Pendiente:** toma L2 de la voz («Publica lo que buscas.»).
+**Pendiente:** nada.
 
 A y B comparten todo desde el beat 6 (3,00 s). Solo cambia la apertura.
 
@@ -63,7 +63,7 @@ Tiempos reales de cada frase en la mezcla (`locucion/colocacion.json`). «Imagen
 | Línea | Frase | Inicio (s) | Fin (s) | Ancla | Imagen (s) | Síl./s |
 |---|---|---|---|---|---|---|
 | L1 | Deja de perseguir anuncios. | 0,10 | 1,90 | 0,10 s | — | 5,0 |
-| L2 | Publica lo que buscas. **(falta la toma)** | 2,69 | 4,10 | hueco planeado | — | — |
+| L2 | Publica lo que buscas. | 2,69 | 3,98 | tilde (beat 5,50) −0,06 s | 2,75 | 5,4 |
 | L3 | Tipo de propiedad, | 4,82 | 5,97 | rotulos[0] (beat 10,00) −0,18 s | 5,00 | 5,2 |
 | L3 | ubicación, | 6,09 | 7,05 | rotulos[1] (beat 12,00) +0,09 s | 6,00 | 4,1 |
 | L3 | presupuesto… | 7,16 | 8,05 | rotulos[2] (beat 14,00) +0,16 s | 7,00 | 4,5 |
@@ -81,7 +81,7 @@ Tiempos reales de cada frase en la mezcla (`locucion/colocacion.json`). «Imagen
 |---|---|---|---|---|---|---|
 | LB1 | Esta vez, | 0,04 | 0,80 | 0,04 s | — | 3,9 |
 | LB1 | el anuncio lo pones tú. | 0,90 | 2,54 | 0,10 s después de la frase anterior | — | 4,9 |
-| L2 | Publica lo que buscas. **(falta la toma)** | 2,69 | 4,10 | hueco planeado | — | — |
+| L2 | Publica lo que buscas. | 2,69 | 3,98 | tilde (beat 5,50) −0,06 s | 2,75 | 5,4 |
 | L3 | Tipo de propiedad, | 4,82 | 5,97 | rotulos[0] (beat 10,00) −0,18 s | 5,00 | 5,2 |
 | L3 | ubicación, | 6,09 | 7,05 | rotulos[1] (beat 12,00) +0,09 s | 6,00 | 4,1 |
 | L3 | presupuesto… | 7,16 | 8,05 | rotulos[2] (beat 14,00) +0,16 s | 7,00 | 4,5 |
