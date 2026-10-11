@@ -1,10 +1,12 @@
 // Controles automáticos sobre un video EXPORTADO (no sobre la vista previa del navegador).
 // node control.mjs salida/propiedad-conecta-v1-A.mp4 A
 // Mide: formato, duración, sonoridad integrada y pico real, sincronía del punto con los beats
-// (rastreando el verde del punto fotograma a fotograma), y proporción del logo en el último fotograma.
+// (rastreando el verde del punto fotograma a fotograma), la voz (que cada frase esté en el audio
+// exportado y en su sitio, y cuánto se separa de la música) y la proporción del logo en el último fotograma.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { EV, SEGURA } from './src/linea-de-tiempo.js';
+import { readWav } from './src/dsp.mjs';
 
 const file = process.argv[2], V = process.argv[3] || 'A';
 const out = [];
@@ -28,7 +30,7 @@ row('Audio', a ? `${a.codec_name} · ${a.sample_rate} Hz · ${a.channels} canale
 const eb = execFileSync('ffmpeg', ['-hide_banner', '-nostats', '-i', file, '-af', 'ebur128=peak=true', '-f', 'null', '-'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString() + '';
 const ebr = execFileSync('sh', ['-c', `ffmpeg -hide_banner -nostats -i "${file}" -af ebur128=peak=true -f null - 2>&1 | tail -14`]).toString();
 const I = +ebr.match(/I:\s+(-?[\d.]+) LUFS/)[1], TP = +ebr.match(/Peak:\s+(-?[\d.]+) dBFS/)[1];
-row('Sonoridad integrada', `${coma(I, 1)} LUFS`, '−14 LUFS ±1 (provisional: falta la voz)', Math.abs(I + 14) <= 1);
+row('Sonoridad integrada', `${coma(I, 1)} LUFS`, '−14 LUFS ±1', Math.abs(I + 14) <= 1);
 row('Pico real', `${coma(TP, 1)} dBTP`, '≤ −1 dBTP', TP <= -1);
 void eb;
 
@@ -55,6 +57,41 @@ for (const [name, b] of esperados) {
   const te = B(b), near = lows.reduce((best, t) => (Math.abs(t - te) < Math.abs(best - te) ? t : best), Infinity);
   const d = (near - te) * 1000;
   log(`| ${name} | ${coma(b)} | ${coma(te, 3)} | ${Number.isFinite(near) ? coma(near, 3) : '—'} | ${Number.isFinite(near) ? `${d >= 0 ? '+' : ''}${d.toFixed(0)} ms ${Math.abs(d) <= 1000 / fps + 1 ? '(OK)' : '(**REVISAR**)'}` : 'no detectado'} |`);
+}
+
+// --- voz: cada frase se busca en el audio del MP4 correlacionándola con el stem de voz
+const coloc = new URL('./locucion/colocacion.json', import.meta.url), stem = new URL(`./salida/stem-voz-${V}.wav`, import.meta.url), mez = new URL(`./salida/mezcla-${V}.json`, import.meta.url);
+if (existsSync(coloc) && existsSync(stem) && existsSync(mez)) {
+  const lineas = JSON.parse(readFileSync(coloc))[V], info = JSON.parse(readFileSync(mez));
+  const DEC = 4, SRD = 48000 / DEC; // la correlación se hace a 12 kHz: precisión de 0,08 ms
+  const dec = x => { const o = new Float32Array(Math.floor(x.length / DEC)); for (let i = 0; i < o.length; i++) { let s = 0; for (let k = 0; k < DEC; k++) s += x[i * DEC + k]; o[i] = s / DEC; } return o; };
+  const raw = execFileSync('ffmpeg', ['-v', 'error', '-i', file, '-ac', '1', '-ar', '48000', '-f', 'f32le', '-'], { maxBuffer: 1 << 28 });
+  const audio = dec(new Float32Array(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.length)));
+  const [vl, vr] = readWav(readFileSync(stem)), voz = dec(vl.map((v, i) => (v + vr[i]) / 2));
+  log('');
+  log('## Voz (buscada en el audio exportado)');
+  log('');
+  log(`Cada frase del stem de voz se correlaciona con el audio del MP4 en ±60 ms. «Imagen» es el evento al que se ancla. «Voz/música»: sonoridad de la voz menos la de música + SFX en el tramo de la frase (objetivo ${info.vmrObjetivo} dB).`);
+  log('');
+  log('| Línea | Frase | Inicio (s) | Desfase medido en el MP4 | Correlación | Frente a la imagen | Voz/música |');
+  log('|---|---|---|---|---|---|---|');
+  for (const l of lineas) {
+    if (l.pendiente) { log(`| ${l.id} | ${l.texto} | ${coma(l.inicio)} | **falta la toma** | — | — | — |`); continue; }
+    for (const f of l.frases) {
+      const a = Math.round((f.inicio - 0.03) * SRD), b = Math.round((f.fin + 0.1) * SRD), M = Math.round(0.06 * SRD);
+      let best = -2, lag = 0;
+      for (let d = -M; d <= M; d++) {
+        let sxy = 0, sxx = 0, syy = 0;
+        for (let i = a; i < b; i++) { const x = voz[i], y = audio[i + d] || 0; sxy += x * y; sxx += x * x; syy += y * y; }
+        const r = sxy / Math.sqrt(sxx * syy + 1e-20);
+        if (r > best) { best = r; lag = d; }
+      }
+      const ms = (lag / SRD) * 1000, pf = info.porFrase.find(p => Math.abs(p.t0 - f.inicio) < 0.01);
+      log(`| ${l.id} | ${f.texto} | ${coma(f.inicio, 3)} | ${ms >= 0 ? '+' : ''}${coma(ms, 1)} ms ${Math.abs(ms) <= 1 && best > 0.5 ? '(OK)' : '(**REVISAR**)'} | ${coma(best, 2)} | ${f.imagen !== undefined ? `${f.inicio - f.imagen >= 0 ? '+' : '−'}${coma(Math.abs(f.inicio - f.imagen), 2)} s` : '—'} | ${pf ? `${coma(pf.vmr, 1)} dB ${pf.vmr >= info.vmrObjetivo - 1 ? '(OK)' : '(**REVISAR**)'}` : '—'} |`);
+    }
+  }
+  log('');
+  log(`Mezcla: la voz queda en conjunto ${coma(info.vmrGlobal, 1)} dB por encima de la música; el limitador de la mezcla recorta como máximo ${coma(info.limitadorMaxDb, 1)} dB.`);
 }
 
 // --- logo en el último fotograma: proporción y posición

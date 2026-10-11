@@ -1,8 +1,8 @@
 # v1 de motion — «El punto»
 
-Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: videos finales A y B sin voz.** Dirección aprobada, «gratis» confirmado, formulario real integrado. La voz está pendiente.
+Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: videos A y B con voz, provisionales porque falta la toma L2** («Publica lo que buscas.»). Dirección aprobada, «gratis» confirmado y formulario real integrado. La música ya deja el hueco de L2: cuando llegue, se coloca y se vuelve a renderizar sin cambiar nada más.
 
-**Videos:** `entregables/propiedad-conecta-v1-A-sin-voz.mp4` y `entregables/propiedad-conecta-v1-B-sin-voz.mp4`. Los stems de música y SFX en FLAC están en `entregables/audio/`, para quien mezcle la voz.
+**Videos:** `entregables/propiedad-conecta-v1-A-voz-provisional.mp4` y `entregables/propiedad-conecta-v1-B-voz-provisional.mp4`. En `entregables/audio/` están, en FLAC, la mezcla con voz, la mezcla sin voz y los stems de música, SFX y voz. Los subtítulos están en `subtitulos/`.
 
 - **Concepto y justificación:** [CONCEPTO.md](CONCEPTO.md)
 - **Guion técnico con tiempos exactos (generado):** [guion-tecnico.md](guion-tecnico.md)
@@ -14,6 +14,7 @@ Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en códig
 | `hoja-de-contactos-A.jpg` | Versión A, un fotograma por beat (32), con desenfoque de movimiento |
 | `hoja-de-contactos-B-apertura.jpg` | Versión B, apertura (beats 0–8) cada medio beat; desde el beat 6 es igual a A |
 | `transicion-producto.jpg` | El formulario real, cada medio beat |
+| `voz-sobre-imagen-A.jpg`, `voz-sobre-imagen-B.jpg` | Un fotograma del MP4 final cuando suena cada frase, con su texto |
 | `archivo-final-A-cada-1s.jpg`, `archivo-final-B-cada-1s.jpg` | Un fotograma por segundo extraído del MP4 final |
 | `transicion-giro-A.jpg`, `transicion-marco.jpg`, `transicion-cierre.jpg` | Las transiciones clave cada 1/8 o 1/4 de beat |
 | `movil-1a1.jpg` | Momentos clave a 390 px de ancho, tamaño real de un teléfono |
@@ -29,11 +30,13 @@ El v0 (`../animatic/v0/`) no se toca: esta carpeta y su rama local (`claude/prop
 | `src/film.js` | La película: `draw(ctx, t)` pinta el fotograma *t* y depende solo de *t* |
 | `src/main.js`, `index.html` | `window.seek(t)` con desenfoque de movimiento real (subfotogramas promediados en luz lineal); parámetros `?v=A|B`, `&rev=1`, `&t=` |
 | `src/tipo.js`, `hornear-glifos.mjs` | Outfit horneado en contornos compatibles e interpolado por letra en el eje de peso |
-| `musica.mjs`, `src/dsp.mjs` | Partitura y SFX sintetizados; mezcla normalizada a −14 LUFS con pico ≤ −1 dBTP; huecos para la voz |
+| `voz.mjs` → `locucion/colocacion.json` | Corta las tomas en frases, las coloca según su ancla en la imagen y las procesa (paso alto, nivel, compresión suave, limitador de picos) |
+| `musica.mjs`, `src/dsp.mjs` | Partitura y SFX sintetizados. La música baja bajo cada frase y la voz queda 10 dB por delante. Mezcla a −14 LUFS con pico ≤ −1 dBTP |
+| `locucion/` | Tomas originales ([LEEME](locucion/tomas/LEEME.md)), guion de locución generado y tiempos reales de cada frase |
 | `medir-beats.mjs` → `beats.json` | Cuadrícula de beats **medida** sobre el audio renderizado; la película toma de aquí el tiempo de cada golpe |
 | `generar-textos.mjs` | Genera `guion-tecnico.md`, `subtitulos/v1-{A,B}.srt` y `locucion/guion-locucion-v1.txt` |
 | `render.mjs` | Render con Chromium sin interfaz → H.264 yuv420p CRF 16; hojas de contactos |
-| `control.mjs` | Controles sobre el MP4 exportado: formato, sonoridad, sincronía del punto, proporción del logo |
+| `control.mjs` | Controles sobre el MP4 exportado: formato, sonoridad, sincronía del punto, posición de cada frase de la voz en el audio exportado, voz frente a música, proporción del logo |
 | `fuentes/` | Outfit (OFL) y JetBrains Mono (OFL), con sus licencias |
 | `capturas/` | Las cinco capturas reales del formulario y su [LEEME](capturas/LEEME.md) |
 
@@ -47,11 +50,12 @@ Requisitos: Node 22, ffmpeg e ImageMagick. Chromium lo provee Playwright; en est
 cd motion-v1
 npm install
 node hornear-glifos.mjs        # solo si cambia la fuente o el juego de caracteres
-node musica.mjs                # salida/musica-{A,B}.wav + stems de música y SFX
-node medir-beats.mjs A         # beats.json (medido); «node medir-beats.mjs B» verifica que B coincida
+node voz.mjs                   # salida/voz-{A,B}.wav + locucion/colocacion.json
+node musica.mjs                # salida/musica-{A,B}.wav (sin voz), mezcla-{A,B}.wav (con voz) y stems
+node medir-beats.mjs A         # beats.json, medido sobre la música sin voz; «node medir-beats.mjs B» verifica que B coincida
 node generar-textos.mjs        # guion técnico, subtítulos y locución
 node render.mjs --hoja --v A   # salida/hoja-A.png y hoja-A-movil.png
-node render.mjs --v A          # película: salida/propiedad-conecta-v1-A.mp4 (30 fps, desenfoque de 10 subfotogramas)
+node render.mjs --v A          # película con la mezcla: salida/propiedad-conecta-v1-A.mp4 (30 fps, desenfoque de 10 subfotogramas)
 node control.mjs salida/propiedad-conecta-v1-A.mp4 A
 ```
 
@@ -59,6 +63,7 @@ Más opciones: `--rev` (zonas seguras y rótulos de revisión), `--en 1.5,3.2` (
 
 ## Cuando lleguen los pendientes
 
-- **Voz:** se graba con `locucion/guion-locucion-v1.txt`. Para mezclarla: la voz alineada a los tiempos del guion, sobre `entregables/audio/stem-musica-*.flac` y `stem-sfx-*.flac` (la música ya baja 5 dB en cada línea). Después se vuelven a medir la sonoridad (≈ −14 LUFS) y el pico (≤ −1 dBTP) con `control.mjs`.
+- **Voz, toma L2:** se graba con la misma voz siguiendo `locucion/guion-locucion-v1.txt` y se guarda como `locucion/tomas/L2-publica-lo-que-buscas.mp3`. En `src/linea-de-tiempo.js`, `toma: null` de L2 pasa a ese nombre. Después se corre la secuencia de arriba desde `node voz.mjs`. Si la toma dura más de 1,5 s, `voz.mjs` avisa si pisa la línea siguiente.
+- **Cambiar una toma o su sitio:** cada frase tiene en la línea de tiempo su `corte` (tramo de la toma) y su `ancla` (evento de la imagen + segundos). `voz.mjs` no deja que dos frases queden a menos de 80 ms.
 - **Capturas en alta resolución:** se reemplazan los cinco archivos de `capturas/` con los mismos nombres y encuadres, y se vuelve a renderizar.
 - **Cambiar «gratis»:** `PENDIENTE.gratis` en `src/linea-de-tiempo.js` (`'no'` deja «Publica tu búsqueda»).

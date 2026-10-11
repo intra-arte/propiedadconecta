@@ -1,10 +1,12 @@
-// node render.mjs --v A                 película completa → salida/propiedad-conecta-v1-A.mp4 (30 fps, desenfoque de 10 subfotogramas)
+// node render.mjs --v A                 película completa → salida/propiedad-conecta-v1-A.mp4 (30 fps, desenfoque de 10 subfotogramas,
+//                                       audio de salida/mezcla-A.wav, o de musica-A.wav si todavía no hay mezcla con voz)
 // node render.mjs --hoja --v A [--rev]  un fotograma por beat → salida/hoja-A.png y salida/hoja-A-movil.png (390 px por fotograma)
 // node render.mjs --en 1.2,3.4 --v B    fotogramas sueltos → salida/fotograma-B-<t>.png
 // opciones: --fps 30 --muestras 10 --hilos 4 --desde 0 --hasta 32 --paso 1 --desfase 0.06 --nombre hoja-A
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { spawn, execFileSync } from 'node:child_process';
 import { extname, join, dirname } from 'node:path';
 import { DURACION } from './src/linea-de-tiempo.js';
@@ -69,9 +71,12 @@ if (flag('hoja')) {
 } else {
   const n = Math.round(DURACION * FPS), times = Array.from({ length: n }, (_, i) => i / FPS);
   const out = join(OUT, opt('salida', `propiedad-conecta-v1-${V}${REV ? '-revision' : ''}.mp4`));
+  // con voz si voz.mjs y musica.mjs ya armaron la mezcla; si no, la música sola
+  const audio = [`mezcla-${V}.wav`, `musica-${V}.wav`].map(f => join(OUT, f)).find(f => existsSync(f));
+  console.log('audio:', audio.split('/').pop());
   const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
-    '-i', join(OUT, `musica-${V}.wav`), '-map', '0:v', '-map', '1:a',
+    '-i', audio, '-map', '0:v', '-map', '1:a',
     '-vf', 'scale=out_color_matrix=bt709:out_range=tv:flags=accurate_rnd+full_chroma_int,format=yuv420p',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-tune', 'animation', '-pix_fmt', 'yuv420p',
     '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',

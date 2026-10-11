@@ -1,10 +1,13 @@
 PROPIEDAD CONECTA — «Publica lo que buscas» — Locución de la v1 de motion (16,0 s)
-Generado desde motion-v1/src/linea-de-tiempo.js con «node generar-textos.mjs». No editar a mano.
+Generado desde motion-v1/src/linea-de-tiempo.js y locucion/colocacion.json con «node generar-textos.mjs». No editar a mano.
 
-ESTADO: PENDIENTE DE GRABAR. El video final no tiene voz todavía; la música ya baja 5 dB
-bajo cada línea para dejarle sitio. Al grabar, dejar cada toma dentro de su intervalo.
+ESTADO: GRABADA, SALVO L2 («Publica lo que buscas.»). Tomas entregadas el 11/10/2026 en
+locucion/tomas/. El video ya lleva las grabadas; la música ya deja el hueco de lo que falta.
 
-Voz femenina o masculina, 25–40 años, cálida y segura, conversacional. Acento quiteño suave o latinoamericano neutro. Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, tres tomas por línea.
+PARA GRABAR L2: la misma voz y el mismo tono de las otras tomas, en el mismo formato. Tres tomas, a ritmo natural.
+  L2  «Publica lo que buscas.»  (Sonrisa en la voz. Peso en «buscas».) Hueco: 2,69–4,10 s; ideal entre 1,2 y 1,5 s de voz.
+
+Casting original: Voz femenina o masculina, 25–40 años, cálida y segura, conversacional. Acento quiteño suave o latinoamericano neutro. Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, tres tomas por línea.
 Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
 
 ==============================================================
@@ -12,37 +15,47 @@ VERSIÓN A (directa)
 ==============================================================
 
 [0,10–1,90]  Deja de perseguir anuncios.
-               (Firme y cercana, sin regañar. Peso en «perseguir». · 9 sílabas en 1,80 s = 5,0 síl./s, natural)
+               (Firme y cercana, sin regañar. Peso en «perseguir». · toma L1-deja-de-perseguir-anuncios.mp3 · 9 sílabas en 1,79 s de voz = 5,0 síl./s, natural)
 
-[2,50–3,80]  Publica lo que buscas.
-               (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+[2,69–4,10]  Publica lo que buscas.   ← FALTA LA TOMA
+               (Sonrisa en la voz. Peso en «buscas».)
 
-[4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
-               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+[4,82–10,01]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · toma L3-tipo-de-propiedad-ubicacion-presupuesto-y-lo-que-no-puede-faltar.mp3 · 22 sílabas en 4,80 s de voz = 4,6 síl./s, natural)
+                 4,82–5,97  Tipo de propiedad,  (ancla: rotulos[0] (beat 10,00) −0,18 s)
+                 6,09–7,05  ubicación,  (ancla: rotulos[1] (beat 12,00) +0,09 s)
+                 7,16–8,05  presupuesto…  (ancla: rotulos[2] (beat 14,00) +0,16 s)
+                 8,22–10,01  y lo que no puede faltar.  (ancla: rotulos[3] (beat 16,00) +0,22 s)
 
-[11,00–12,60]  Publica gratis tu búsqueda.
-               (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+[11,40–13,12]  Publica gratis tu búsqueda.
+               (Directa y cálida. «Gratis» con peso. · toma L4-publica-gratis-tu-busqueda.mp3 · 9 sílabas en 1,72 s de voz = 5,2 síl./s, natural)
 
-[12,70–14,00]  En Propiedad Conecta.
-               (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+[13,24–14,63]  En Propiedad Conecta.
+               (Marca bien clara; coincide con la aparición del nombre. · toma L5-en-propiedad-conecta.mp3 · 7 sílabas en 1,39 s de voz = 5,0 síl./s, natural)
 
 
 ==============================================================
 VERSIÓN B (curiosidad) — solo cambia la primera línea
 ==============================================================
 
-[0,10–2,30]  Esta vez, el anuncio lo pones tú.
-               (Segura, con complicidad. Peso en «tú». · 11 sílabas en 2,20 s = 5,0 síl./s, natural)
+[0,04–2,54]  Esta vez, el anuncio lo pones tú.
+               (Segura, con complicidad. Peso en «tú». · toma LB1-esta-vez-el-anuncio-lo-pones-tu.mp3 · 11 sílabas en 2,40 s de voz = 4,6 síl./s, natural)
+                 0,04–0,80  Esta vez,  (ancla: 0,04 s)
+                 0,90–2,54  el anuncio lo pones tú.  (ancla: 0,10 s después de la frase anterior)
 
-[2,50–3,80]  Publica lo que buscas.
-               (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+[2,69–4,10]  Publica lo que buscas.   ← FALTA LA TOMA
+               (Sonrisa en la voz. Peso en «buscas».)
 
-[4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
-               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+[4,82–10,01]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · toma L3-tipo-de-propiedad-ubicacion-presupuesto-y-lo-que-no-puede-faltar.mp3 · 22 sílabas en 4,80 s de voz = 4,6 síl./s, natural)
+                 4,82–5,97  Tipo de propiedad,  (ancla: rotulos[0] (beat 10,00) −0,18 s)
+                 6,09–7,05  ubicación,  (ancla: rotulos[1] (beat 12,00) +0,09 s)
+                 7,16–8,05  presupuesto…  (ancla: rotulos[2] (beat 14,00) +0,16 s)
+                 8,22–10,01  y lo que no puede faltar.  (ancla: rotulos[3] (beat 16,00) +0,22 s)
 
-[11,00–12,60]  Publica gratis tu búsqueda.
-               (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+[11,40–13,12]  Publica gratis tu búsqueda.
+               (Directa y cálida. «Gratis» con peso. · toma L4-publica-gratis-tu-busqueda.mp3 · 9 sílabas en 1,72 s de voz = 5,2 síl./s, natural)
 
-[12,70–14,00]  En Propiedad Conecta.
-               (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
+[13,24–14,63]  En Propiedad Conecta.
+               (Marca bien clara; coincide con la aparición del nombre. · toma L5-en-propiedad-conecta.mp3 · 7 sílabas en 1,39 s de voz = 5,0 síl./s, natural)
 

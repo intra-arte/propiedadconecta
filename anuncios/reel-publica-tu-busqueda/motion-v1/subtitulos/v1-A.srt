@@ -1,19 +1,31 @@
 1
-00:00:00,100 --> 00:00:01,900
+00:00:00,100 --> 00:00:02,195
 Deja de perseguir anuncios.
 
 2
-00:00:02,500 --> 00:00:03,800
+00:00:02,690 --> 00:00:04,400
 Publica lo que buscas.
 
 3
-00:00:04,900 --> 00:00:09,100
-Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
+00:00:04,820 --> 00:00:06,050
+Tipo de propiedad,
 
 4
-00:00:11,000 --> 00:00:12,600
-Publica gratis tu búsqueda.
+00:00:06,090 --> 00:00:07,120
+ubicación,
 
 5
-00:00:12,700 --> 00:00:14,000
+00:00:07,160 --> 00:00:08,180
+presupuesto…
+
+6
+00:00:08,220 --> 00:00:10,310
+y lo que no puede faltar.
+
+7
+00:00:11,400 --> 00:00:13,200
+Publica gratis tu búsqueda.
+
+8
+00:00:13,240 --> 00:00:14,935
 En Propiedad Conecta.

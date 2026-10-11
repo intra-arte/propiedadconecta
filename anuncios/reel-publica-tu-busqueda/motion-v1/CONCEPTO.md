@@ -1,6 +1,6 @@
 # Concepto — «El punto»
 
-**Propiedad Conecta · Reel vertical de 16 s · v1 de motion. Dirección aprobada y «gratis» confirmado el 11/10/2026; la voz está pendiente.**
+**Propiedad Conecta · Reel vertical de 16 s · v1 de motion. Dirección aprobada y «gratis» confirmado el 11/10/2026. Voz integrada el mismo día, salvo la toma L2.**
 
 ## La idea en una frase
 
@@ -40,7 +40,9 @@ Comparten el primer fotograma (el sello), el muro, la cámara, la duración, el 
 
 ## Sonido
 
-En el primer acto, un pulso apagado en si menor y un sello que suena en cada anuncio perdido. En el giro, un freno de cinta, silencio y una cascada de clics de papel; luego abre a **re mayor**. El punto tiene voz propia, una marimba de vidrio, y firma la marca con el motivo **re–la–fa#** cuando aterriza, cuando sube el botón y cuando aparece el nombre. La música ya baja 5 dB bajo cada línea de la locución pendiente.
+En el primer acto, un pulso apagado en si menor y un sello que suena en cada anuncio perdido. En el giro, un freno de cinta, silencio y una cascada de clics de papel; luego abre a **re mayor**. El punto tiene voz propia, una marimba de vidrio, y firma la marca con el motivo **re–la–fa#** cuando aterriza, cuando sube el botón y cuando aparece el nombre.
+
+**La voz va delante.** Cada frase se ancla a lo que pasa en pantalla: «Tipo de propiedad», «ubicación», «presupuesto» y «lo que no puede faltar» suenan cuando la cabecera nombra cada tarjeta, y el CTA cuando sube el texto del botón. La música baja bajo cada frase y la voz queda unos 10 dB por encima en todas.
 
 ## Restricciones respetadas
 
@@ -52,5 +54,5 @@ En el primer acto, un pulso apagado en si menor y un sello que suena en cada anu
 
 ## Lo que falta
 
-1. **La voz:** seis líneas en total (cinco por versión), en `locucion/guion-locucion-v1.txt`. La mezcla ya les deja el espacio.
+1. **La toma L2 de la voz** («Publica lo que buscas.»), con la misma voz de las demás. La música y la imagen ya le dejan el hueco, entre 2,69 y 4,10 s.
 2. **Capturas en alta resolución:** las recibidas son de 800 × 500 y se ven blandas al ampliarlas. Se reemplazan sin tocar la animación (ver `capturas/LEEME.md`).

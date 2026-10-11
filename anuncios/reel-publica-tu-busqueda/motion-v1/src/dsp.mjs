@@ -225,15 +225,22 @@ export function room(seconds = 1.5, decay = 0.38) {
     return ir;
   });
 }
+const kpond = x => { // ponderación K de BS.1770 a 48 kHz
+  const s1 = { b: [1.53512485958697, -2.69169618940638, 1.19839281085285], a: [-1.69065929318241, 0.73248077421585] };
+  const s2 = { b: [1, -2, 1], a: [-1.99004745483398, 0.99007225036621] };
+  const run = (inp, f) => { const o = new Float64Array(inp.length); let x1 = 0, x2 = 0, y1 = 0, y2 = 0; for (let i = 0; i < inp.length; i++) { const y = f.b[0] * inp[i] + f.b[1] * x1 + f.b[2] * x2 - f.a[0] * y1 - f.a[1] * y2; x2 = x1; x1 = inp[i]; y2 = y1; y1 = y; o[i] = y; } return o; };
+  return run(run(x, s1), s2);
+};
+// sonoridad (ponderada K, sin compuertas) solo dentro de los tramos [t0, t1] en segundos
+export function sonoridadTramos([L, R], tramos) {
+  const kl = kpond(L), kr = kpond(R);
+  let e = 0, n = 0;
+  for (const [t0, t1] of tramos) for (let i = Math.max(0, Math.round(t0 * SR)); i < Math.min(L.length, Math.round(t1 * SR)); i++) { e += kl[i] * kl[i] + kr[i] * kr[i]; n++; }
+  return -0.691 + 10 * Math.log10(e / n + 1e-12);
+}
 export function lufs([L, R]) {
   const N = L.length;
-  const k = x => {
-    const s1 = { b: [1.53512485958697, -2.69169618940638, 1.19839281085285], a: [-1.69065929318241, 0.73248077421585] };
-    const s2 = { b: [1, -2, 1], a: [-1.99004745483398, 0.99007225036621] };
-    const run = (inp, f) => { const o = new Float64Array(inp.length); let x1 = 0, x2 = 0, y1 = 0, y2 = 0; for (let i = 0; i < inp.length; i++) { const y = f.b[0] * inp[i] + f.b[1] * x1 + f.b[2] * x2 - f.a[0] * y1 - f.a[1] * y2; x2 = x1; x1 = inp[i]; y2 = y1; y1 = y; o[i] = y; } return o; };
-    return run(run(x, s1), s2);
-  };
-  const kl = k(L), kr = k(R), blk = Math.round(0.4 * SR), hop = Math.round(0.1 * SR), z = [];
+  const kl = kpond(L), kr = kpond(R), blk = Math.round(0.4 * SR), hop = Math.round(0.1 * SR), z = [];
   for (let s = 0; s + blk <= N; s += hop) { let e = 0; for (let i = s; i < s + blk; i++) e += kl[i] * kl[i] + kr[i] * kr[i]; z.push(e / blk); }
   const Lk = v => -0.691 + 10 * Math.log10(v);
   const abs = z.filter(v => Lk(v) > -70), rel = Lk(abs.reduce((a, b) => a + b, 0) / abs.length) - 10;
@@ -248,6 +255,13 @@ export function limit([L, R], ceilDb) {
   for (let i = 0; i < N; i++) { let m = 1; for (let j = i; j < Math.min(N, i + W); j++) if (req[j] < m) m = req[j]; gm[i] = m; }
   let acc = 0, prev = 1;
   for (let i = 0; i < N; i++) { acc += gm[i]; if (i >= W) acc -= gm[i - W]; const g = Math.min(acc / Math.min(i + 1, W), prev + (1 - prev) * rel); prev = g; L[i] *= g; R[i] *= g; }
+}
+export function readWav(bytes) { // PCM entero → [L, R] en Float32 (mono → dos canales iguales)
+  const ch = bytes.readUInt16LE(22), bits = bytes.readUInt16LE(34), bps = bits / 8;
+  let off = 12; while (bytes.toString('ascii', off, off + 4) !== 'data') off += 8 + bytes.readUInt32LE(off + 4);
+  const N = bytes.readUInt32LE(off + 4) / (bps * ch), out = [new Float32Array(N), new Float32Array(N)];
+  for (let i = 0; i < N; i++) for (let c = 0; c < 2; c++) out[c][i] = bytes.readIntLE(off + 8 + (i * ch + Math.min(c, ch - 1)) * bps, bps) / 2 ** (bits - 1);
+  return out;
 }
 export function writeWav(path, [L, R]) {
   const N = L.length, bytes = Buffer.alloc(44 + N * 6);

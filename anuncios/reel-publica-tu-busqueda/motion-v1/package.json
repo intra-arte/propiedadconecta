@@ -5,6 +5,7 @@
   "scripts": {
     "glifos": "node hornear-glifos.mjs",
     "textos": "node generar-textos.mjs",
+    "voz": "node voz.mjs",
     "musica": "node musica.mjs",
     "beats": "node medir-beats.mjs",
     "hoja": "node render.mjs --hoja",
