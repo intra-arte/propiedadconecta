@@ -1,0 +1,38 @@
+{
+  "scale": 3,
+  "pageX": [
+    80,
+    720
+  ],
+  "pageW": 640,
+  "pageH": 857,
+  "headerH": 41,
+  "cardX": [
+    142,
+    499
+  ],
+  "cards": {
+    "que": [
+      124,
+      220
+    ],
+    "ubicacion": [
+      231,
+      334
+    ],
+    "presupuesto": [
+      345,
+      437
+    ],
+    "caracteristicas": [
+      449,
+      729
+    ]
+  },
+  "button": [
+    356,
+    31
+  ],
+  "cardRadius": 7,
+  "buttonRadius": 6
+}

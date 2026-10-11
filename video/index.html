@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Propiedad Conecta · lanzamiento 15 s</title>
+<!--
+  15 s 16:9 launch film. Shot list: docs/shotlist.md · grammar: docs/style_guide.md.
+  Every frame is a pure function of time: draw(t) sets the whole picture, so
+  video/render.mjs can step it frame by frame. Opened directly, the page plays
+  on a loop (click to pause/resume); ?t=6.5 shows a single still.
+  Run `python3 video/prep.py` first (crops the real screenshots into video/assets/).
+-->
+<style>
+  @font-face {
+    font-family: Outfit;
+    src: url(../anuncios/reel-publica-tu-busqueda/animatic/fuentes/Outfit-Variable.ttf) format('truetype');
+    font-weight: 100 900;
+  }
+  html, body { margin: 0; background: #111; }
+  body.preview { display: grid; place-items: center; min-height: 100vh; }
+  body.preview #stage { transform-origin: center; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #fff; font-family: Outfit, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  .full { width: 1920px; height: 1080px; }
+  .disc { border-radius: 50%; }
+  .line { position: absolute; left: 0; width: 1920px; text-align: center; white-space: pre; line-height: 1; }
+  .line span { display: inline-block; }
+  img { display: block; }
+  .clip { overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- 1 + 6 · gradient world -->
+  <div id="gradWorld" class="abs full">
+    <div id="sky" class="abs full"></div>
+    <div id="glow" class="abs"></div>
+    <div id="ground" class="abs"></div>
+  </div>
+  <div id="drain" class="abs full" style="background:#FAF9F5"></div>
+  <div id="typed" class="line" style="font-size:56px;font-weight:400;color:#FAF9F5"></div>
+
+  <!-- 2 · canvas (needed for the dither dissolve) -->
+  <canvas id="c2" class="abs" width="1920" height="1080"></canvas>
+
+  <!-- 4 · rolling feature words (behind the window) -->
+  <div id="list" class="abs full"></div>
+
+  <!-- 3 · floating cards, then the window -->
+  <div id="win" class="abs clip">
+    <img id="winPage" class="abs" src="assets/page.png">
+    <img id="winHeader" class="abs" src="assets/header.png">
+  </div>
+  <svg id="winStroke" class="abs" style="overflow:visible"><rect fill="none" stroke="#E2E4E3" pathLength="1" stroke-dasharray="1 1"/></svg>
+  <div id="cards"></div>
+
+  <!-- 5 -->
+  <div id="line5" class="line" style="font-size:64px;font-weight:500;letter-spacing:-0.02em"></div>
+  <div id="btn5" class="abs clip"><img src="assets/publicar.png" style="width:100%;height:100%"></div>
+
+  <!-- 7 -->
+  <div id="line7" class="line" style="font-size:84px;font-weight:500;letter-spacing:-0.02em"></div>
+  <div id="isoWrap" class="abs clip"><img id="isoImg" src="../anuncios/reel-publica-tu-busqueda/marca/isotipo-transparente.png"></div>
+  <img id="logo" class="abs" src="../anuncios/reel-publica-tu-busqueda/marca/logo-horizontal-transparente.png">
+  <div id="domain" class="line" style="font-size:40px;font-weight:400">propiedadconecta.com</div>
+
+  <!-- discs live above everything but the bloom: they travel into shot 7 -->
+  <div id="discL" class="abs disc"></div>
+  <div id="discR" class="abs disc"></div>
+  <div id="bloom" class="abs full" style="background:#fff"></div>
+</div>
+
+<script>
+'use strict';
+// ---------------------------------------------------------------- constants
+const W = 1920, H = 1080, FPS = 60, DURATION = 15;
+const C = { ink: '#142A22', pend: '#B9C2BE', listGrey: '#CBD3CF', brote: '#92CE58', marfil: '#FAF9F5', white: '#FFFFFF' };
+// Isotipo (left 465 px of the horizontal logo, identical pixels) and its two heads, in file pixels.
+const LOGO = { w: 1208, h: 431, isoW: 465, draw: { x0: 72, x1: 1136, y0: 73, y1: 358 },
+  heads: [{ x: 147.5, y: 109, d: 71, from: '#304E3F', to: '#152D25' }, { x: 320, y: 108.5, d: 72, from: '#80C449', to: '#2F8823' }] };
+const K_LOGO = 0.45;                 // logo scale in shot 7 (≤ 100 %, uniform)
+const ISO_CLIP = 457;                // the isotipo file ends with a 3 px sliver of the «P»: clip it while inline
+
+// ---------------------------------------------------------------- helpers
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const expoIn = x => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const inOut = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const smooth = x => x * x * (3 - 2 * x);
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, p) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; };
+const $ = id => document.getElementById(id);
+const show = (el, on) => { el.style.display = on ? '' : 'none'; return on; };
+function box(el, x, y, w, h) { const s = el.style; s.left = x + 'px'; s.top = y + 'px'; if (w != null) s.width = w + 'px'; if (h != null) s.height = h + 'px'; }
+
+// Word-by-word entry (style guide E2): appears at pending grey with a soft blur, settles to ink.
+function wordIn(t, start, ink = C.ink, pend = C.pend) {
+  const p = ramp(t, start, start + 0.25);
+  return { op: expoOut(ramp(t, start, start + 0.08)), blur: 5 * (1 - expoOut(p)), color: mix(pend, ink, smooth(p)) };
+}
+function styleWord(span, st) {
+  span.style.opacity = st.op;
+  span.style.color = st.color;
+  span.style.filter = st.blur > 0.05 ? `blur(${st.blur.toFixed(2)}px)` : 'none';
+}
+function buildLine(el, words) {
+  el.innerHTML = '';
+  return words.map((w, i) => {
+    if (i) el.appendChild(document.createTextNode(' '));
+    const s = document.createElement('span'); s.textContent = w; el.appendChild(s); return s;
+  });
+}
+// Deterministic per-cell noise for the dither dissolve.
+function noise(x, y) { let h = (x * 374761393 + y * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; }
+
+// ---------------------------------------------------------------- data
+let META;
+const S2 = { text: 'Publica lo que buscas.', words: ['Publica', 'lo', 'que', 'buscas.'], starts: [2.35, 2.50, 2.65, 2.80] };
+const S5 = { words: 'Si un agente tiene algo para ti, puede contactarte.'.split(' '), start: 9.55, step: 0.12 };
+const S4 = { words: ['Amoblado', 'Ascensor', 'Piscina', 'Seguridad'], steps: [7.95, 8.35, 8.75] };
+const S7 = { before: ['Publica', 'gratis'], after: ['tu', 'búsqueda'], starts: [12.45, 12.60, 12.75, 12.90] };
+const TYPED = { text: 'Deja de perseguir anuncios.', start: 0.30, perChar: 0.055, caretOff: 1.80 };
+
+// ---------------------------------------------------------------- layout built once
+const L = {};
+async function prepare() {
+  META = await (await fetch('assets/meta.json')).json();
+  await document.fonts.load('400 56px Outfit');
+  await document.fonts.load('500 90px Outfit');
+  await document.fonts.load('600 160px Outfit');
+
+  // 1 · typed line: every character laid out from the start (final centred position), revealed in place.
+  const typed = $('typed');
+  L.chars = [...TYPED.text].map(ch => { const s = document.createElement('span'); s.textContent = ch; s.style.display = 'inline'; typed.appendChild(s); return s; });
+  L.caret = document.createElement('span');
+  L.caret.style.cssText = 'display:inline-block;width:3px;height:52px;margin-left:3px;margin-right:-6px;vertical-align:-6px;background:#FAF9F5';
+  typed.appendChild(L.caret);
+  typed.style.top = (540 - 28) + 'px';
+
+  // 3 · floating cards
+  const cards = $('cards');
+  L.cards = {};
+  for (const [name, src] of [['que', ['que-lleno']], ['ubicacion', ['ubicacion-vacio', 'ubicacion-lleno']], ['presupuesto', ['presupuesto-vacio', 'presupuesto-lleno']]]) {
+    const d = document.createElement('div'); d.className = 'abs clip'; d.style.background = '#fff';
+    const imgs = src.map(s => { const i = document.createElement('img'); i.src = `assets/${s}.png`; i.className = 'abs'; i.style.width = '100%'; i.style.height = '100%'; d.appendChild(i); return i; });
+    cards.appendChild(d); L.cards[name] = { el: d, imgs };
+  }
+
+  // 4 · feature list
+  L.list = S4.words.map(w => { const d = document.createElement('div'); d.className = 'line'; d.style.fontWeight = 600; d.style.letterSpacing = '-0.03em'; d.textContent = w; $('list').appendChild(d); return d; });
+
+  // 5 · line + button
+  L.w5 = buildLine($('line5'), S5.words);
+  $('line5').style.top = (475 - 32) + 'px';
+  const bw = 840, bh = bw * META.button[1] / META.button[0];
+  L.btn = { w: bw, h: bh, x: 960 - bw / 2, y: 734 - bh / 2 };
+
+  // 7 · CTA line with the isotipo inline; measure where everything lands.
+  const l7 = $('line7');
+  l7.innerHTML = '';
+  const mk = w => { const s = document.createElement('span'); s.textContent = w; return s; };
+  L.w7 = [];
+  S7.before.forEach((w, i) => { if (i) l7.appendChild(document.createTextNode(' ')); L.w7.push(l7.appendChild(mk(w))); });
+  const isoBox = document.createElement('span');
+  isoBox.style.cssText = `display:inline-block;width:${(ISO_CLIP * K_LOGO).toFixed(1)}px;height:${(LOGO.h * K_LOGO).toFixed(1)}px;vertical-align:middle;margin:0 2px;`;
+  l7.appendChild(isoBox);
+  S7.after.forEach((w, i) => { if (i) l7.appendChild(document.createTextNode(' ')); L.w7.push(l7.appendChild(mk(w))); });
+  l7.style.top = (540 - 42) + 'px';
+  const sr = $('stage').getBoundingClientRect(), br = isoBox.getBoundingClientRect();
+  const sc = sr.width / W;                    // preview may scale the stage
+  L.isoInline = { x: (br.left - sr.left) / sc, y: (br.top - sr.top) / sc - 4 };
+  // Final lockup: horizontal logo centred on its drawing, domain below.
+  const dw = (LOGO.draw.x1 - LOGO.draw.x0) * K_LOGO, dh = (LOGO.draw.y1 - LOGO.draw.y0) * K_LOGO;
+  const groupH = dh + 56 + 30, drawTop = 540 - groupH / 2;
+  L.logoFinal = { x: 960 - (LOGO.draw.x0 + (LOGO.draw.x1 - LOGO.draw.x0) / 2) * K_LOGO, y: drawTop - LOGO.draw.y0 * K_LOGO };
+  L.domainTop = drawTop + dh + 56 - 6;
+  $('domain').style.top = L.domainTop + 'px';
+  // Heads of the inline isotipo = where the discs must land in shot 6.
+  L.headTargets = LOGO.heads.map(h => ({ x: L.isoInline.x + h.x * K_LOGO, y: L.isoInline.y + h.y * K_LOGO, d: h.d * K_LOGO }));
+  const logo = $('logo'); logo.style.width = LOGO.w * K_LOGO + 'px'; logo.style.height = LOGO.h * K_LOGO + 'px';
+  box($('isoWrap'), 0, 0, ISO_CLIP * K_LOGO, LOGO.h * K_LOGO);
+  $('isoImg').style.width = LOGO.isoW * K_LOGO + 'px'; $('isoImg').style.height = LOGO.h * K_LOGO + 'px';
+
+  // 2 · canvas font metrics
+  const ctx = $('c2').getContext('2d');
+  ctx.font = '500 90px Outfit'; ctx.letterSpacing = '-1.8px';
+  const full = ctx.measureText(S2.text).width;
+  const capH = ctx.measureText('H').actualBoundingBoxAscent;
+  L.c2 = { x0: 960 - full / 2, base: 540 + capH / 2, xs: [], ws: [] };
+  let prefix = '';
+  S2.words.forEach((w, i) => { L.c2.xs.push(L.c2.x0 + ctx.measureText(prefix).width); L.c2.ws.push(ctx.measureText(w).width); prefix += w + ' '; });
+  L.off = document.createElement('canvas'); L.off.width = 1000; L.off.height = 200;
+
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+}
+
+// ---------------------------------------------------------------- shot 1 + 6: gradient world
+function gradientWorld(h, glowScale) {
+  $('sky').style.background =
+    `linear-gradient(180deg, #142A22 ${h - 1100}px, #1E4A2C ${h - 560}px, #3F8F2E ${h - 170}px, #7DBF4C ${h - 50}px, #DCEBC6 ${h - 8}px, #F6F2E9 ${h}px)`;
+  const gw = 1900 * glowScale, gh = 560 * glowScale;
+  box($('glow'), 960 - gw / 2, h - gh / 2, gw, gh);
+  $('glow').style.background = 'radial-gradient(closest-side, rgba(246,242,233,.95), rgba(220,235,198,.7) 30%, rgba(146,206,88,.35) 62%, rgba(146,206,88,0))';
+  box($('ground'), 960 - 2160, h, 4320, 2400);
+  const g = $('ground').style;
+  g.borderRadius = '50%';
+  g.background = 'linear-gradient(180deg, #DCEBC6 0px, #7DBF4C 5px, #2B6A31 34px, #1A3A27 150px, #142A22 420px)';
+  g.boxShadow = '0 -6px 40px 6px rgba(146,206,88,.45)';
+}
+
+function disc(el, x, y, d, top, bottom, op = 1) {
+  if (!show(el, op > 0.001)) return;
+  box(el, x - d / 2, y - d / 2, d, d);
+  el.style.background = `linear-gradient(180deg, ${top}, ${bottom})`;
+  el.style.opacity = op;
+}
+
+// ---------------------------------------------------------------- shot 2: canvas card with dither dissolve
+function drawShot2(t) {
+  const cv = $('c2'), ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  if (!show(cv, t >= 2.2 && t < 4.0)) return;
+  ctx.font = '500 90px Outfit'; ctx.letterSpacing = '-1.8px'; ctx.textBaseline = 'alphabetic';
+  const P = ramp(t, 3.65, 3.95);                  // X2 dither progress for words 0-2
+  const blurOut = ramp(t, 3.80, 4.00);            // X3 for «buscas.»
+  S2.words.forEach((w, i) => {
+    const st = wordIn(t, S2.starts[i]);
+    if (st.op <= 0) return;
+    let blur = st.blur, op = st.op;
+    if (i === 3) { blur += 20 * expoOut(blurOut); op *= 1 - blurOut; }
+    if (op <= 0.001) return;
+    const x = L.c2.xs[i], y = L.c2.base;
+    if (i < 3 && P > 0) {
+      // Render the word off-screen, punch it with 2 px noise cells, right to left.
+      const o = L.off, oc = o.getContext('2d');
+      oc.clearRect(0, 0, o.width, o.height);
+      oc.font = ctx.font; oc.letterSpacing = ctx.letterSpacing; oc.fillStyle = st.color;
+      oc.fillText(w, 20, 140);
+      const img = oc.getImageData(0, 0, o.width, o.height), d = img.data;
+      const lineL = L.c2.xs[0], lineR = L.c2.xs[2] + L.c2.ws[2];
+      for (let py = 0; py < o.height; py++) for (let px = 0; px < o.width; px++) {
+        const k = (py * o.width + px) * 4; if (!d[k + 3]) continue;
+        const gx = x - 20 + px, xr = (lineR - gx) / (lineR - lineL);           // 0 at the right end
+        const local = clamp((P - clamp(xr) * 0.5) / 0.5);
+        if (noise(gx >> 1, py >> 1) < local) d[k + 3] = 0;
+      }
+      oc.putImageData(img, 0, 0);
+      ctx.globalAlpha = op; ctx.filter = blur > 0.05 ? `blur(${blur}px)` : 'none';
+      ctx.drawImage(o, x - 20, y - 140);
+    } else {
+      ctx.globalAlpha = op; ctx.filter = blur > 0.05 ? `blur(${blur}px)` : 'none';
+      ctx.fillStyle = st.color; ctx.fillText(w, x, y);
+    }
+    ctx.globalAlpha = 1; ctx.filter = 'none';
+  });
+}
+
+// ---------------------------------------------------------------- shots 3-4: camera over the real page
+// World units = pixels of the original 800 x 500 captures, page column x 0-640.
+function camera(t) {
+  const M = META.cards;
+  const mid = k => (M[k][0] + M[k][1]) / 2;
+  let S, fy = 0, ay = 540, scroll = 0;
+  const S3 = 2.8;
+  // 3a: the stack stays centred as each card arrives.
+  const top = M.que[0], two = (top + M.ubicacion[1]) / 2, three = (top + M.presupuesto[1]) / 2;
+  const f3 = t < 4.95 ? lerp(mid('que'), two, expoOut(ramp(t, 4.50, 4.95))) : lerp(two, three, expoOut(ramp(t, 4.95, 5.40)));
+  if (t < 5.90) { S = S3 * lerp(1.0, 1.04, inOut(ramp(t, 4.0, 5.9))); fy = f3; }
+  else if (t < 7.60) {
+    const p = inOut(ramp(t, 5.90, 6.90));
+    S = lerp(S3 * 1.04, 2.1, p); fy = lerp(three, 220, p);
+    scroll = 369 * expoOut(ramp(t, 6.95, 7.55));
+  } else {
+    const p = expoOut(ramp(t, 7.60, 7.95));
+    S = lerp(2.1, 1.45, p); fy = 220; ay = lerp(540, 622, p); scroll = 369;
+    ay += 900 * expoIn(ramp(t, 9.20, 9.40));
+  }
+  return { S, fx: 320.5, fy, ax: 960, ay, scroll };
+}
+const scr = (cam, x, y) => [(x - cam.fx) * cam.S + cam.ax, (y - cam.fy) * cam.S + cam.ay];
+
+function drawShots34(t) {
+  const on = t >= 4.0 && t < 9.4;
+  show($('cards'), on && t < 6.45);
+  show($('win'), on && t >= 5.95);
+  show($('winStroke'), on && t >= 5.90);
+  const listOn = show($('list'), t >= 7.6 && t < 9.4);
+  if (!on) return;
+  const cam = camera(t), M = META.cards, [cx0, cx1] = META.cardX;
+
+  // 3a · floating cards
+  const arrivals = { que: 4.05, ubicacion: 4.50, presupuesto: 4.95 };
+  const shadowFade = 1 - ramp(t, 5.95, 6.45);
+  for (const [name, c] of Object.entries(L.cards)) {
+    const a = arrivals[name], p = expoOut(ramp(t, a, a + 0.35));
+    const [x, y] = scr(cam, cx0, M[name][0]);
+    const w = (cx1 - cx0) * cam.S, h = (M[name][1] - M[name][0]) * cam.S;
+    box(c.el, x, y + 24 * (1 - p), w, h);
+    c.el.style.opacity = expoOut(ramp(t, a, a + 0.12));
+    c.el.style.filter = p < 0.995 ? `blur(${(12 * (1 - p)).toFixed(2)}px)` : 'none';
+    c.el.style.borderRadius = META.cardRadius * cam.S + 'px';
+    c.el.style.boxShadow = `0 ${18}px 70px rgba(20,42,34,${(0.10 * shadowFade).toFixed(3)})`;
+    if (c.imgs[1]) c.imgs[1].style.opacity = smooth(ramp(t, a + 0.25, a + 0.50));   // empty → filled
+  }
+
+  // 3b/4 · the window (page clipped to a rect that later tightens to the Características card)
+  const m = expoOut(ramp(t, 7.60, 7.95));
+  const cardTop = M.caracteristicas[0] - 369, cardBot = M.caracteristicas[1] - 369;
+  const R = { x0: lerp(0, cx0, m), y0: lerp(0, cardTop, m), x1: lerp(META.pageW, cx1, m), y1: lerp(440, cardBot, m), r: lerp(13, META.cardRadius, m) };
+  const [wx, wy] = scr(cam, R.x0, R.y0), ww = (R.x1 - R.x0) * cam.S, wh = (R.y1 - R.y0) * cam.S;
+  const win = $('win');
+  box(win, wx, wy, ww, wh);
+  win.style.borderRadius = R.r * cam.S + 'px';
+  win.style.opacity = smooth(ramp(t, 5.95, 6.45));
+  win.style.background = '#F7F8FC';
+  win.style.boxShadow = `0 24px 80px rgba(20,42,34,${(0.10 * smooth(ramp(t, 6.2, 6.9))).toFixed(3)})`;
+  // contents, in world units relative to the window's top-left
+  const page = $('winPage'), hdr = $('winHeader');
+  const pw = META.pageW * cam.S;
+  box(page, (0 - R.x0) * cam.S, (META.headerH - cam.scroll - R.y0) * cam.S, pw, (META.pageH - META.headerH) * cam.S);
+  const hp = expoOut(ramp(t, 6.10, 6.50));
+  box(hdr, (0 - R.x0) * cam.S, (0 - cam.scroll - R.y0) * cam.S - 16 * (1 - hp), pw, META.headerH * cam.S);
+  hdr.style.opacity = hp;
+  hdr.style.filter = hp < 0.995 ? `blur(${(8 * (1 - hp)).toFixed(2)}px)` : 'none';
+
+  // hairline frame: draws on 5.90-6.40, fades as it closes onto the card
+  const sv = $('winStroke'), rect = sv.firstElementChild;
+  box(sv, wx, wy, ww, wh);
+  sv.setAttribute('width', ww); sv.setAttribute('height', wh);
+  rect.setAttribute('x', 1); rect.setAttribute('y', 1); rect.setAttribute('width', Math.max(0, ww - 2)); rect.setAttribute('height', Math.max(0, wh - 2));
+  rect.setAttribute('rx', R.r * cam.S); rect.setAttribute('stroke-width', 2);
+  rect.setAttribute('stroke-dashoffset', 1 - inOut(ramp(t, 5.90, 6.40)));
+  sv.style.opacity = 1 - m;
+
+  // 4 · rolling feature names behind the window
+  if (listOn) {
+    const idx = S4.steps.reduce((acc, s) => acc + expoOut(ramp(t, s, s + 0.35)), 0);
+    const fadeIn = smooth(ramp(t, 7.60, 7.85)), out = ramp(t, 9.20, 9.40);
+    L.list.forEach((el, k) => {
+      const d = k - idx, a = Math.abs(d);
+      const size = lerp(160, 140, clamp(a));
+      el.style.fontSize = size + 'px';
+      el.style.top = (262 + d * 165 - size / 2) + 'px';
+      el.style.color = d < 0 ? mix(C.ink, C.listGrey, clamp(a)) : mix(C.ink, C.listGrey, smooth(clamp(a)));
+      el.style.opacity = fadeIn * (d < 0 ? clamp(1 + d * 1.6) : 1) * (1 - out);
+      el.style.filter = out > 0 ? `blur(${(20 * expoOut(out)).toFixed(2)}px)` : 'none';
+    });
+  }
+}
+
+// ---------------------------------------------------------------- shot 5
+function drawShot5(t) {
+  const on = t >= 9.4 && t < 11.6;
+  show($('line5'), on); show($('btn5'), on);
+  if (!on) return;
+  const g = smooth(ramp(t, 11.30, 11.50)), gone = ramp(t, 11.45, 11.60);
+  L.w5.forEach((s, i) => {
+    const st = wordIn(t, S5.start + i * S5.step);
+    if (g > 0) st.color = mix(C.ink, C.pend, g);
+    st.op *= 1 - gone;
+    styleWord(s, st);
+  });
+  const b = $('btn5'), p = expoOut(ramp(t, 9.40, 9.75));
+  box(b, L.btn.x, L.btn.y, L.btn.w, L.btn.h);
+  b.style.borderRadius = META.buttonRadius * (L.btn.w / META.button[0]) + 'px';
+  b.style.opacity = expoOut(ramp(t, 9.40, 9.52)) * (1 - gone) * lerp(1, 0.45, g);
+  b.style.filter = `blur(${(12 * (1 - p)).toFixed(2)}px) grayscale(${g})`;
+}
+
+// ---------------------------------------------------------------- shots 6-7
+function drawShots67(t) {
+  const lOn = show($('line7'), t >= 12.4 && t < 13.7);
+  if (lOn) {
+    const g = smooth(ramp(t, 13.45, 13.55)), gone = ramp(t, 13.55, 13.70);
+    L.w7.forEach((s, i) => {
+      const isGratis = i === 1;
+      const st = wordIn(t, S7.starts[i], isGratis ? C.brote : C.ink);
+      if (isGratis) st.color = mix(C.brote, C.ink, smooth(ramp(t, 13.0, 13.3)));
+      if (isGratis && t < S7.starts[1] + 0.25) st.color = wordIn(t, S7.starts[1], C.brote).color;
+      if (g > 0) st.color = mix(C.ink, C.pend, g);
+      st.op *= 1 - gone;
+      styleWord(s, st);
+    });
+  }
+  // logo: inline isotipo → slides to its place in the lockup → horizontal logo crossfades in (6 frames).
+  // The isotipo is the left 465 px of the horizontal file, so only the wordmark visibly changes.
+  const iso = $('isoWrap'), logo = $('logo');
+  const slide = expoOut(ramp(t, 13.70, 14.00)), swap = smooth(ramp(t, 13.98, 14.08));
+  if (show(iso, t >= 12.30 && swap < 1)) {
+    box(iso, lerp(L.isoInline.x, L.logoFinal.x, slide), lerp(L.isoInline.y, L.logoFinal.y, slide));
+    iso.style.opacity = smooth(ramp(t, 12.30, 12.40));
+  }
+  if (show(logo, swap > 0)) { box(logo, L.logoFinal.x, L.logoFinal.y); logo.style.opacity = swap; }
+  if (show($('domain'), t >= 14.0)) styleWord($('domain'), wordIn(t, 14.05));
+
+  // discs: shot 1 (rest on the horizon, float) and shot 6 (converge onto the isotipo heads)
+  const dL = $('discL'), dR = $('discR');
+  if (t < 2.3) {
+    const h = horizonAt(t), f = inOut(ramp(t, 0, 2.2));
+    const y = lerp(h - 55, 720, f);
+    const fade = clamp(t / 0.1);                   // in with the world, 6 frames from black
+    disc(dL, 960 - 111, y, 90, '#FAF9F5', '#E3EBD6', fade);
+    disc(dR, 960 + 111, y, 90, '#A6DB6E', '#6FB848', fade);
+  } else if (t >= 11.6 && t < 12.4) {
+    const p = inOut(ramp(t, 11.60, 12.30)), c = smooth(ramp(t, 11.85, 12.20)), out = 1 - smooth(ramp(t, 12.30, 12.40));
+    const [hl, hr] = L.headTargets;
+    disc(dL, lerp(-80, hl.x, p), lerp(330, hl.y, p), lerp(90, hl.d, p), mix('#FAF9F5', LOGO.heads[0].from, c), mix('#E3EBD6', LOGO.heads[0].to, c), out);
+    disc(dR, lerp(2000, hr.x, p), lerp(780, hr.y, p), lerp(90, hr.d, p), mix('#A6DB6E', LOGO.heads[1].from, c), mix('#6FB848', LOGO.heads[1].to, c), out);
+  } else { show(dL, false); show(dR, false); }
+}
+
+const horizonAt = t => lerp(850, 1230, inOut(ramp(t, 0, 2.2)));
+
+// ---------------------------------------------------------------- draw(t)
+function draw(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  const stage = $('stage');
+  stage.style.background = t >= 11.6 ? C.marfil : C.white;
+
+  // 1 · gradient opener (0-2.30) and 6 · outro (11.60-12.40)
+  const grad = (t < 2.30) || (t >= 11.6 && t < 12.4);
+  show($('gradWorld'), grad);
+  show($('drain'), t >= 11.6 && t < 12.4);
+  if (t < 2.30) {
+    gradientWorld(horizonAt(t), lerp(1, 1.35, smooth(ramp(t, 1.2, 2.05))) * lerp(1, 4, expoIn(ramp(t, 2.0, 2.3))));
+    $('gradWorld').style.transform = 'none';
+    $('gradWorld').style.opacity = t < 0.1 ? t / 0.1 : 1;          // 6 frames from black
+  } else if (t >= 11.6 && t < 12.4) {
+    gradientWorld(900, 1.1);
+    $('gradWorld').style.transform = `scale(${lerp(1, 1.06, ramp(t, 11.6, 12.4))})`;
+    $('gradWorld').style.opacity = 1;
+    $('drain').style.opacity = inOut(ramp(t, 11.70, 12.20));
+  }
+  stage.style.background = t < 0.1 ? '#000' : stage.style.background;
+
+  // typed line
+  if (show($('typed'), t < 2.30)) {
+    const n = Math.floor((t - TYPED.start) / TYPED.perChar) + 1;
+    L.chars.forEach((s, i) => { s.style.opacity = i < n ? 1 : 0; });
+    L.caret.style.opacity = t >= TYPED.start - 0.15 && t < TYPED.caretOff ? 1 : 0;
+    // caret follows the last typed character
+    L.caret.remove();
+    const last = clamp(n, 0, L.chars.length);
+    if (last >= L.chars.length) $('typed').appendChild(L.caret); else $('typed').insertBefore(L.caret, L.chars[last]);
+    $('typed').style.filter = 'none';
+  }
+
+  // bloom to white 2.05-2.30, then shot 2 on white
+  const bl = inOut(ramp(t, 2.05, 2.30));
+  show($('bloom'), t >= 2.05 && t < 2.30);
+  $('bloom').style.opacity = bl;
+
+  drawShot2(t);
+  drawShots34(t);
+  drawShot5(t);
+  drawShots67(t);
+}
+
+// ---------------------------------------------------------------- boot
+window.READY = false;
+window.draw = draw;
+prepare().then(() => {
+  window.READY = true;
+  const q = new URLSearchParams(location.search);
+  if (q.has('render')) { draw(0); return; }
+  document.body.classList.add('preview');
+  const fit = () => { $('stage').style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; };
+  fit(); addEventListener('resize', fit);
+  if (q.has('t')) { draw(parseFloat(q.get('t'))); return; }
+  let t0 = performance.now(), paused = false, pt = 0;
+  addEventListener('click', () => { paused = !paused; if (!paused) t0 = performance.now() - pt * 1000; });
+  const loop = now => { if (!paused) { pt = ((now - t0) / 1000) % DURATION; draw(pt); } requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+});
+</script>
+</body>
+</html>
