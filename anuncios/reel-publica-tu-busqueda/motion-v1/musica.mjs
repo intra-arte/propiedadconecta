@@ -77,6 +77,12 @@ function render(VAR) {
     place(musica, B(b), D.punto(m, 0.6, 0.9), 0.3, 0.25, 0.4);
     place(sfx, B(b) - 0.05, D.barrido(0.16, 900, 3800, 2.4, 'campana'), 0.16, 0, 0.1);
   });
+  // el formulario se llena tarjeta por tarjeta (capturas reales): un clic suave por tarjeta
+  EV.rellena.forEach((b, i) => place(sfx, B(b), D.clic(2300 + i * 250), 0.16, -0.2 + i * 0.13, 0.25));
+  // la ventana se estrecha y baja hasta «Publicar solicitud»
+  place(sfx, B(EV.boton) - 0.3, D.barrido(0.3, 2600, 900, 2, 'cae'), 0.18, 0, 0.2);
+  place(sfx, B(EV.boton) + 0.05, D.barrido(0.4, 2200, 450, 1.5, 'campana'), 0.3, 0, 0.25);
+  place(musica, B(EV.boton) + 0.45, D.punto(M.D5 - 12, 0.9, 0.9), 0.36, 0, 0.35);
   // ---------- puente (9,9–11 s): el marco se recoge y el punto vuela al isotipo ----------
   place(sfx, B(EV.recoge) - 0.2, D.inverso(0.45), 0.4);
   place(sfx, B(EV.recoge), D.barrido(0.3, 3000, 400, 1.6, 'cae'), 0.3, 0, 0.2);

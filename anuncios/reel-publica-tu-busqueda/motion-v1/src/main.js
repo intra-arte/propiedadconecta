@@ -34,7 +34,10 @@ window.ready = (async () => {
   const logo = new Image();
   logo.src = '../marca/logo-horizontal-transparente.png'; // el archivo original, sin copiar ni retocar
   await logo.decode();
-  configure({ beats, variant: q.get('v') === 'B' ? 'B' : 'A', revision: q.get('rev') === '1', logo });
+  // capturas reales del formulario (en orden); si llegan originales en alta resolución basta con reemplazar los archivos
+  const nombres = ['formulario-1-vacio', 'formulario-2-que-y-ubicacion', 'formulario-3-presupuesto', 'formulario-4-caracteristicas', 'formulario-5-contacto-y-publicar'];
+  const capturas = await Promise.all(nombres.map(async n => { const im = new Image(); im.src = `capturas/${n}.jpg`; await im.decode(); return im; }));
+  configure({ beats, variant: q.get('v') === 'B' ? 'B' : 'A', revision: q.get('rev') === '1', logo, capturas });
   await document.fonts.load('500 40px JB');
   await document.fonts.ready;
   return true;

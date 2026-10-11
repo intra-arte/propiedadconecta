@@ -1,6 +1,6 @@
 # Concepto — «El punto»
 
-**Propiedad Conecta · Reel vertical de 16 s · v1 de motion (borrador para revisar la dirección creativa)**
+**Propiedad Conecta · Reel vertical de 16 s · v1 de motion. Dirección aprobada y «gratis» confirmado el 11/10/2026; la voz está pendiente.**
 
 ## La idea en una frase
 
@@ -14,7 +14,7 @@ Un punto verde, la persona que busca, se pierde persiguiendo anuncios en un muro
 | 0–2 s | Buscar entre anuncios es una persecución que se pierde. | La cámara se aleja y revela un muro infinito que se desplaza. El punto salta de anuncio en anuncio y cada uno que toca queda sellado. |
 | 2–3 s | Hay otra forma. | Todo se congela en el beat. Desde el punto, una onda voltea cada anuncio y sus reversos en blanco forman una página limpia. Es la inversión del producto hecha imagen: ya no recorres anuncios, publicas el tuyo. |
 | 2,5–4 s | «Publica lo que buscas.» | El titular sube desde su línea base y el punto cae como el punto de la «i». El verbo del producto lleva literalmente al protagonista. |
-| 4–10 s | Cómo se hace. | El punto se estira hasta ser el marco donde irá **el formulario real**. Arriba, la cabecera recorre lo que la persona define. **Hoy es un espacio reservado**: no se simula ninguna interfaz. |
+| 4–10 s | Cómo se hace. | El punto se estira hasta ser el marco que se abre sobre **el formulario real** («Cuéntanos qué propiedad estás buscando · Es gratis publicar»). La cabecera nombra cada sección al ritmo de la voz mientras la cámara la encuadra y la llena con las capturas reales. Al final la ventana se estrecha sobre **«Publicar solicitud»** y se recoge en el punto. |
 | 10–16 s | Quién lo hace y qué hago ahora. | El marco se recoge en el punto, que vuela hasta la cabeza clara del isotipo original; la marca se revela desde ahí. El botón con el CTA queda 4,6 s en pantalla y el cierre completo se sostiene 3 s. |
 
 El hilo es siempre el mismo objeto. Nunca hay un corte que obligue a reorientarse: cada transición es el punto haciendo algo. Eso es lo que hace que la marca se recuerde. Al final, el punto que vimos perseguir anuncios **es** el verde de Propiedad Conecta.
@@ -44,15 +44,13 @@ En el primer acto, un pulso apagado en si menor y un sello que suena en cada anu
 
 ## Restricciones respetadas
 
-- **Sin interfaz simulada:** la escena del producto es un espacio reservado rayado y rotulado.
+- **Sin interfaz simulada:** el producto se muestra solo con las cinco capturas reales; el paso de vacío a lleno es un barrido entre dos capturas reales de la misma pantalla. No hay toques, cursores ni pantallas inventadas.
 - **Sin promesas:** no se afirma que haya agentes activos, contactos ni resultados.
-- **«gratis» pendiente:** el CTA lo lleva marcado con línea discontinua hasta que lo confirmes.
+- **«gratis»:** confirmado por producto. El formulario real también lo dice («Es gratis publicar»).
 - **Logo original sin tocar:** solo traslaciones y máscaras, nunca escala no uniforme. Escala 76–77,5 % (≤ 100 %) y siempre sobre marfil.
 - **v0 intacto:** esta versión vive en `motion-v1/`, en una rama local propia.
 
-## Lo que necesito para seguir
+## Lo que falta
 
-1. **Tu visto bueno sobre la dirección**, o qué cambiar.
-2. **Las capturas del formulario** para la escena P (pasos, listas desplegadas, botón de publicar).
-3. **Confirmar o descartar «gratis».**
-4. **Una voz** (aunque sea guía) leyendo `locucion/guion-locucion-v1.txt`.
+1. **La voz:** seis líneas en total (cinco por versión), en `locucion/guion-locucion-v1.txt`. La mezcla ya les deja el espacio.
+2. **Capturas en alta resolución:** las recibidas son de 800 × 500 y se ven blandas al ampliarlas. Se reemplazan sin tocar la animación (ver `capturas/LEEME.md`).

@@ -1,6 +1,8 @@
 # v1 de motion — «El punto»
 
-Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: borrador para revisar la dirección creativa.** La escena del formulario es un espacio reservado, la voz está pendiente y «gratis» está marcado como pendiente.
+Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en código con el motor del showreel. **Estado: videos finales A y B sin voz.** Dirección aprobada, «gratis» confirmado, formulario real integrado. La voz está pendiente.
+
+**Videos:** `entregables/propiedad-conecta-v1-A-sin-voz.mp4` y `entregables/propiedad-conecta-v1-B-sin-voz.mp4`. Los stems de música y SFX en FLAC están en `entregables/audio/`, para quien mezcle la voz.
 
 - **Concepto y justificación:** [CONCEPTO.md](CONCEPTO.md)
 - **Guion técnico con tiempos exactos (generado):** [guion-tecnico.md](guion-tecnico.md)
@@ -11,6 +13,8 @@ Reel vertical de 16 s para Propiedad Conecta, construido íntegramente en códig
 |---|---|
 | `hoja-de-contactos-A.jpg` | Versión A, un fotograma por beat (32), con desenfoque de movimiento |
 | `hoja-de-contactos-B-apertura.jpg` | Versión B, apertura (beats 0–8) cada medio beat; desde el beat 6 es igual a A |
+| `transicion-producto.jpg` | El formulario real, cada medio beat |
+| `archivo-final-A-cada-1s.jpg`, `archivo-final-B-cada-1s.jpg` | Un fotograma por segundo extraído del MP4 final |
 | `transicion-giro-A.jpg`, `transicion-marco.jpg`, `transicion-cierre.jpg` | Las transiciones clave cada 1/8 o 1/4 de beat |
 | `movil-1a1.jpg` | Momentos clave a 390 px de ancho, tamaño real de un teléfono |
 | `zonas-seguras-A.jpg` | Cada 2 beats, con la zona segura de Reels y Stories superpuesta |
@@ -31,6 +35,7 @@ El v0 (`../animatic/v0/`) no se toca: esta carpeta y su rama local (`claude/prop
 | `render.mjs` | Render con Chromium sin interfaz → H.264 yuv420p CRF 16; hojas de contactos |
 | `control.mjs` | Controles sobre el MP4 exportado: formato, sonoridad, sincronía del punto, proporción del logo |
 | `fuentes/` | Outfit (OFL) y JetBrains Mono (OFL), con sus licencias |
+| `capturas/` | Las cinco capturas reales del formulario y su [LEEME](capturas/LEEME.md) |
 
 El logo se lee directamente de `../marca/logo-horizontal-transparente.png`, el archivo original: no hay copia ni versión retocada.
 
@@ -54,6 +59,6 @@ Más opciones: `--rev` (zonas seguras y rótulos de revisión), `--en 1.5,3.2` (
 
 ## Cuando lleguen los pendientes
 
-- **«gratis»:** en `src/linea-de-tiempo.js`, `PENDIENTE.gratis = 'confirmado'` (o `'no'`, que deja «Publica tu búsqueda»). Después se regeneran textos, música y render.
-- **Capturas:** van en `motion-v1/capturas/`. La escena P (beats 9,25–19,5) es donde se encuadran; los rótulos de `COMUN[2].texto` y la línea L3 se ajustan a los rótulos reales.
-- **Voz:** se graba con `locucion/guion-locucion-v1.txt`. La música ya baja 5 dB en cada línea; con la voz incorporada se vuelve a medir la sonoridad final.
+- **Voz:** se graba con `locucion/guion-locucion-v1.txt`. Para mezclarla: la voz alineada a los tiempos del guion, sobre `entregables/audio/stem-musica-*.flac` y `stem-sfx-*.flac` (la música ya baja 5 dB en cada línea). Después se vuelven a medir la sonoridad (≈ −14 LUFS) y el pico (≤ −1 dBTP) con `control.mjs`.
+- **Capturas en alta resolución:** se reemplazan los cinco archivos de `capturas/` con los mismos nombres y encuadres, y se vuelve a renderizar.
+- **Cambiar «gratis»:** `PENDIENTE.gratis` en `src/linea-de-tiempo.js` (`'no'` deja «Publica tu búsqueda»).

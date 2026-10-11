@@ -9,10 +9,10 @@ export const DURACION = 16;      // s
 
 // Lo que todavía no está confirmado. Cambia a 'confirmado' / 'no' cuando llegue la respuesta.
 export const PENDIENTE = {
-  gratis: 'pendiente',           // 'confirmado' → «Publica gratis tu búsqueda» · 'no' → «Publica tu búsqueda»
-  capturas: 'pendiente',         // el formulario real ocupa el espacio reservado de la escena P
+  gratis: 'confirmado',          // confirmado por producto el 11/10/2026 · 'no' → «Publica tu búsqueda»
+  capturas: 'recibidas',         // 5 capturas reales del formulario (800 × 500, JPEG): se reemplazan por originales en alta resolución sin tocar la animación
   voz: 'pendiente',              // no hay voz natural en este entorno: guion y huecos listos para grabar
-  rotulos: 'pendiente',          // «Tipo de propiedad», «Ubicación»… se ajustan a los rótulos reales del formulario
+  rotulos: 'confirmado',         // «Tipo de propiedad», «Ubicación», «Presupuesto», «Características» existen en el formulario real
 };
 
 export const CTA = {
@@ -45,8 +45,8 @@ export const COMUN = [
     visual: 'Titular sostenido. El punto se agacha con la «i» y salta; las palabras viajan a su posición de cabecera.' },
   { id: 'C2', nombre: 'El punto se vuelve marco', b0: 8, b1: 9.25, texto: [],
     visual: 'El punto aterriza en el centro y se estira hasta convertirse en el marco donde irá el formulario real. El verde se abre y deja ver el espacio reservado.' },
-  { id: 'P', nombre: 'Producto · ESPACIO RESERVADO', b0: 9.25, b1: 19.5, texto: ['Tipo de propiedad', 'Ubicación', 'Presupuesto', 'Características'],
-    visual: 'Aquí va la grabación real del formulario (pendiente). Arriba, la cabecera rueda al ritmo de la voz por los datos que la persona define. Rótulos por confirmar con las capturas.', reservado: true },
+  { id: 'P', nombre: 'Producto · el formulario real', b0: 9.25, b1: 19.5, texto: ['Tipo de propiedad', 'Ubicación', 'Presupuesto', 'Características'],
+    visual: 'El marco se abre sobre el formulario real («Cuéntanos qué propiedad estás buscando · Es gratis publicar»). La cabecera rueda al ritmo de la voz y la cámara encuadra cada tarjeta mientras el resto se atenúa; cada una pasa de vacía a llena con las capturas reales. Al final la ventana se estrecha sobre el botón «Publicar solicitud».' },
   { id: 'K1', nombre: 'Puente al cierre', b0: 19.5, b1: 22, texto: [],
     visual: 'El marco se recoge en el punto. El punto vuela en arco hasta la cabeza verde clara del isotipo.' },
   { id: 'K2', nombre: 'Cierre · marca + CTA', b0: 22, b1: 32, texto: ['Publica gratis tu búsqueda'],
@@ -67,8 +67,10 @@ export const EV = {
   salto: 7.5,                      // el punto deja la «i»
   marco: 8,                        // el punto aterriza en el centro y se vuelve marco
   abre: 8.6,                       // el verde se abre: espacio reservado
-  rotulos: [10, 12, 14, 16],       // la cabecera cambia
-  rotulosFuera: 19,
+  rotulos: [10, 12, 14, 16],       // la cabecera cambia y la cámara encuadra la tarjeta
+  rellena: [10.5, 12.5, 14.5, 16.5], // la tarjeta pasa de vacía a llena (captura vacía → captura llena)
+  boton: 18,                       // la ventana se estrecha sobre «Publicar solicitud»
+  rotulosFuera: 18.25,
   recoge: 19.75,                   // el marco se recoge en el punto
   vuelo: [20.25, 22],              // el punto vuela al isotipo
   isotipo: 22,                     // aterriza: el isotipo se revela
@@ -85,8 +87,8 @@ export const LOCUCION = {
   B: [{ id: 'LB1', inicio: 0.1, fin: 2.3, texto: 'Esta vez, el anuncio lo pones tú.', direccion: 'Segura, con complicidad. Peso en «tú».' }],
   comun: [
     { id: 'L2', inicio: 2.5, fin: 3.8, texto: 'Publica lo que buscas.', direccion: 'Sonrisa en la voz. Peso en «buscas».' },
-    { id: 'L3', inicio: 4.9, fin: 9.1, texto: 'Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.', direccion: 'Lista con ritmo, micro-pausa entre datos. Los rótulos se ajustan al formulario real.' },
-    { id: 'L4', inicio: 11.0, fin: 12.6, texto: '__CTA__.', direccion: 'Directa y cálida. Si se confirma, «gratis» con peso.' },
+    { id: 'L3', inicio: 4.9, fin: 9.1, texto: 'Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.', direccion: 'Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla.' },
+    { id: 'L4', inicio: 11.0, fin: 12.6, texto: '__CTA__.', direccion: 'Directa y cálida. «Gratis» con peso.' },
     { id: 'L5', inicio: 12.7, fin: 14.0, texto: 'En Propiedad Conecta.', direccion: 'Marca bien clara; coincide con la aparición del nombre.' },
   ],
 };

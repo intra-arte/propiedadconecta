@@ -1,21 +1,21 @@
 # Informe de control de calidad — v1 de motion (borrador de dirección)
 
-Estado: **concepto, apertura A/B, giro, transición al formulario, cierre, música y SFX listos para revisar.** Todavía no hay render final con desenfoque de movimiento: se hará después de tu visto bueno. Las mediciones de abajo se tomaron sobre vistas previas **exportadas** (MP4 a 30 fps sin desenfoque, `salida/previa-{A,B}.mp4`), no sobre el navegador.
+Estado: **videos finales A y B renderizados, sin voz** (`entregables/`). Dirección aprobada, «gratis» confirmado y formulario real integrado. Las mediciones de abajo se tomaron sobre los **MP4 finales exportados** (30 fps, desenfoque de movimiento de 10 subfotogramas), no sobre el navegador.
 
 ## 1. Iteraciones (hojas de contactos, un fotograma por beat)
 
 Puntuación de 1 a 10. Un asterisco (\*) indica que la nota depende de un recurso que falta y **no puede llegar a 8 honestamente** hasta tenerlo.
 
-| Criterio | Pasada 1 | Pasada 2 | Pasada 3 | Qué la limita hoy |
-|---|---|---|---|---|
-| Gancho en los primeros 2 s | 7 | 8 | **8** | — |
-| Comprensión inmediata de la propuesta | 6\* | 7\* | **7\*** | Falta el formulario real: el «cómo» se apoya en la cabecera, no en la app |
-| Legibilidad en teléfono | 6 | 8 | **9** | — |
-| Calidad y originalidad del motion | 6 | 7 | **8** | Falta verlo con desenfoque final; las transiciones se revisaron cada 1/8 de beat |
-| Variedad visual | 7 | 7 | **7\*** | 5 s de espacio reservado estático en la escena P |
-| Precisión de marca | 8 | 8 | **9** | — |
-| Sincronía imagen–sonido | 6 | 6 | **8** | Sin voz: la sincronía con la locución queda pendiente |
-| Claridad del CTA | 7 | 8 | **8** | «gratis» pendiente de confirmar |
+| Criterio | Pasada 1 | Pasada 2 | Pasada 3 | Pasada 4 (final) | Qué la limita hoy |
+|---|---|---|---|---|---|
+| Gancho en los primeros 2 s | 7 | 8 | 8 | **8** | — |
+| Comprensión inmediata de la propuesta | 6\* | 7\* | 7\* | **8** | El formulario real muestra el «cómo»; la voz lo reforzará |
+| Legibilidad en teléfono | 6 | 8 | 9 | **8** | El texto de las capturas se lee pero se ve blando: llegaron a 800 × 500 |
+| Calidad y originalidad del motion | 6 | 7 | 8 | **8** | — |
+| Variedad visual | 7 | 7 | 7\* | **8** | — |
+| Precisión de marca | 8 | 8 | 9 | **9** | — |
+| Sincronía imagen–sonido | 6 | 6 | 8 | **8** | Sin voz: la sincronía con la locución queda pendiente |
+| Claridad del CTA | 7 | 8 | 8 | **9** | — |
 
 **Problemas corregidos en cada pasada** (los tres principales):
 
@@ -27,6 +27,9 @@ Puntuación de 1 a 10. Un asterisco (\*) indica que la nota depende de un recurs
 | 2 → 3 | A mitad del viaje del titular a la cabecera las palabras se veían desordenadas y el punto atravesaba «buscas» | Viaje más rápido y escalonado de arriba abajo; el punto pasa por detrás del texto |
 | 2 → 3 | El isotipo quedaba solo a la izquierda 1,5 s y luego el nombre aparecía encima de él | El isotipo aparece centrado; el logo entero se desliza como una pieza mientras sube el nombre |
 | 2 → 3 | En A, el punto llegaba a la «i» desde abajo: medido +155 ms tarde | Salto balístico que siempre baja sobre la «i»: medido +21 ms |
+| 3 → 4 | Al bajar al botón, la ventana alta mostraba la tarjeta de contacto entera, con el rótulo «hasta X agentes» | La ventana se estrecha antes de bajar; el rótulo nunca entra en cuadro |
+| 3 → 4 | «Publicar solicitud» se veía pequeño en el teléfono | La cámara se acerca 4× al botón |
+| 3 → 4 | El acercamiento a las tarjetas recortaba la primera letra del título del formulario | El acercamiento empieza cuando el título ya salió de cuadro |
 
 ## 2. Mediciones automáticas (`node control.mjs`)
 
@@ -34,9 +37,10 @@ Puntuación de 1 a 10. Un asterisco (\*) indica que la nota depende de un recurs
 |---|---|---|---|
 | Resolución / códec | 1080 × 1920 · h264 · yuv420p | igual | 1080 × 1920 · H.264 yuv420p |
 | Duración / fps | 16,000 s · 30 | igual | 15–20 s |
+| Tamaño | 4,0 MB | 3,9 MB | — |
 | Sonoridad integrada (sin voz) | −14,0 LUFS | −14,0 LUFS | ≈ −14 LUFS |
-| Pico real | −1,5 dBTP | −1,9 dBTP | ≤ −1 dBTP |
-| Cuadrícula de beats medida | 119,87 BPM, residuo 7,4 ms (47 ataques) | desvío máx. 5,35 ms frente a A | — |
+| Pico real | −1,4 dBTP | −1,5 dBTP | ≤ −1 dBTP |
+| Cuadrícula de beats medida | 119,88 BPM, residuo 6,6 ms | desvío máx. 12,6 ms frente a A | < 1 fotograma (33 ms) |
 
 **Sincronía del punto**, rastreado por color en el video exportado (1 fotograma = 33,3 ms):
 
@@ -44,7 +48,7 @@ Puntuación de 1 a 10. Un asterisco (\*) indica que la nota depende de un recurs
 |---|---|---|
 | Salto 1 / 2 / 3 (cada uno sella un anuncio) | A | −10 / +6 / −11 ms |
 | El punto cae en «BUSCO» | B | +6 ms |
-| El punto cae como punto de la «i» | A · B | +21 ms · +21 ms |
+| El punto cae como punto de la «i» | A · B | +22 ms · +22 ms |
 
 **Logo**, medido en el último fotograma del MP4: contenido de 825 × 220 px, proporción 3,750 frente a 3,733 del original. El desvío de 0,45 % viene del redondeo de bordes al codificar, el mismo margen que en el v0. Escala 77,5 % (≤ 100 %), dentro de la zona segura, sobre marfil.
 
@@ -58,9 +62,8 @@ Puntuación de 1 a 10. Un asterisco (\*) indica que la nota depende de un recurs
 
 | Pendiente | Qué bloquea | Qué hago cuando llegue |
 |---|---|---|
-| **Capturas del formulario** | Escena P (4,6–9,8 s) y las notas de comprensión y variedad | Reemplazo el espacio reservado por la grabación real, con encuadres y zooms sobre los campos que existan. Ajusto los rótulos de la cabecera y la línea L3 a los rótulos reales |
-| **«gratis»** | Texto del CTA y línea L4 | `PENDIENTE.gratis = 'confirmado'` o `'no'` en la línea de tiempo; el botón y la locución se regeneran solos |
-| **Voz** | Sincronía con la locución y mezcla final | Se graba con `locucion/guion-locucion-v1.txt`; la mezcla ya deja los huecos, y vuelvo a medir la sonoridad con la voz |
-| **Render final** | — | Después de tu visto bueno: 30 fps, desenfoque de 10 subfotogramas, CRF 16, y control automático sobre el archivo exportado |
+| **Voz** | Sincronía con la locución y mezcla final | Se graba con `locucion/guion-locucion-v1.txt` (seis líneas). La música ya baja 5 dB en cada línea; edito las tomas, las alineo y vuelvo a medir la sonoridad y el pico con la voz |
+| **Capturas en alta resolución** | Nitidez del formulario (hoy legible pero blando) | Reemplazo los cinco archivos de `capturas/` y vuelvo a renderizar; la animación no cambia |
+| Rótulo «hasta X agentes» en la app | Nada en el anuncio (no se muestra) | — |
 
 v0 verificado intacto: las huellas SHA-256 de los 36 archivos que ya existían (animatic v0, marca, subtítulos, locución y documentos 00–07) no cambiaron.

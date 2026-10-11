@@ -17,7 +17,7 @@ const V = opt('v', 'A'), REV = flag('rev'), FPS = +opt('fps', 30), SAMPLES = +op
 const OUT = join(HERE, 'salida');
 await mkdir(OUT, { recursive: true });
 
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
 const server = createServer(async (req, res) => {
   try {
     const p = join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));

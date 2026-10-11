@@ -2,10 +2,10 @@
 
 Generado desde [src/linea-de-tiempo.js](src/linea-de-tiempo.js) con `node generar-textos.mjs`. **No editar a mano.**
 
-**16,0 s** · 120 BPM (1 beat = 0,5 s, 32 beats = 8 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (`beats.json`: 119,87 BPM, desfase -7,7 ms).
+**16,0 s** · 120 BPM (1 beat = 0,5 s, 32 beats = 8 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (`beats.json`: 119,88 BPM, desfase -7,8 ms).
 Zona segura para texto y logo: x 65–1015, y 270–1248 (la misma del v0).
 
-**Pendiente de confirmar:** «gratis» en el CTA · capturas del formulario (escena P) · grabación de la voz · rótulos del formulario.
+**Pendiente de confirmar:** grabación de la voz.
 
 A y B comparten todo desde el beat 6 (3,00 s). Solo cambia la apertura.
 
@@ -17,7 +17,7 @@ A y B comparten todo desde el beat 6 (3,00 s). Solo cambia la apertura.
 | A2 · Giro · el muro se da la vuelta | 4,00–6,00 | 1,99 | 3,00 | «Publica lo que buscas.» | Todo se congela en el beat. Desde el punto, una onda voltea cada anuncio: sus reversos marfil se unen en una superficie limpia. «Publica lo que buscas.» sube desde su línea base y el punto cae como el punto de la «i». |
 | C1 · Titular | 6,00–8,00 | 3,00 | 4,00 | «Publica lo que buscas.» | Titular sostenido. El punto se agacha con la «i» y salta; las palabras viajan a su posición de cabecera. |
 | C2 · El punto se vuelve marco | 8,00–9,25 | 4,00 | 4,62 | — | El punto aterriza en el centro y se estira hasta convertirse en el marco donde irá el formulario real. El verde se abre y deja ver el espacio reservado. |
-| P · Producto · ESPACIO RESERVADO | 9,25–19,50 | 4,62 | 9,75 | «Tipo de propiedad» → «Ubicación» → «Presupuesto» → «Características» *(rótulos por confirmar)* | Aquí va la grabación real del formulario (pendiente). Arriba, la cabecera rueda al ritmo de la voz por los datos que la persona define. Rótulos por confirmar con las capturas. |
+| P · Producto · el formulario real | 9,25–19,50 | 4,62 | 9,75 | «Tipo de propiedad Ubicación Presupuesto Características» | El marco se abre sobre el formulario real («Cuéntanos qué propiedad estás buscando · Es gratis publicar»). La cabecera rueda al ritmo de la voz y la cámara encuadra cada tarjeta mientras el resto se atenúa; cada una pasa de vacía a llena con las capturas reales. Al final la ventana se estrecha sobre el botón «Publicar solicitud». |
 | K1 · Puente al cierre | 19,50–22,00 | 9,75 | 11,00 | — | El marco se recoge en el punto. El punto vuela en arco hasta la cabeza verde clara del isotipo. |
 | K2 · Cierre · marca + CTA | 22,00–32,00 | 11,00 | 16,00 | «Publica gratis tu búsqueda» | El punto aterriza exactamente sobre la cabeza clara del logo original; el isotipo se revela desde ahí. Sube el botón con el CTA y después el nombre. Fondo marfil del logo. Se sostiene 3 s completo. |
 
@@ -29,7 +29,7 @@ A y B comparten todo desde el beat 6 (3,00 s). Solo cambia la apertura.
 | B2 · Giro · el muro se da la vuelta | 4,00–6,00 | 1,99 | 3,00 | «Publica lo que buscas.» | La onda sale del anuncio «BUSCO» y voltea todo el muro. «Publica lo que buscas.» sube y el punto cae como el punto de la «i». |
 | C1 · Titular | 6,00–8,00 | 3,00 | 4,00 | «Publica lo que buscas.» | Titular sostenido. El punto se agacha con la «i» y salta; las palabras viajan a su posición de cabecera. |
 | C2 · El punto se vuelve marco | 8,00–9,25 | 4,00 | 4,62 | — | El punto aterriza en el centro y se estira hasta convertirse en el marco donde irá el formulario real. El verde se abre y deja ver el espacio reservado. |
-| P · Producto · ESPACIO RESERVADO | 9,25–19,50 | 4,62 | 9,75 | «Tipo de propiedad» → «Ubicación» → «Presupuesto» → «Características» *(rótulos por confirmar)* | Aquí va la grabación real del formulario (pendiente). Arriba, la cabecera rueda al ritmo de la voz por los datos que la persona define. Rótulos por confirmar con las capturas. |
+| P · Producto · el formulario real | 9,25–19,50 | 4,62 | 9,75 | «Tipo de propiedad Ubicación Presupuesto Características» | El marco se abre sobre el formulario real («Cuéntanos qué propiedad estás buscando · Es gratis publicar»). La cabecera rueda al ritmo de la voz y la cámara encuadra cada tarjeta mientras el resto se atenúa; cada una pasa de vacía a llena con las capturas reales. Al final la ventana se estrecha sobre el botón «Publicar solicitud». |
 | K1 · Puente al cierre | 19,50–22,00 | 9,75 | 11,00 | — | El marco se recoge en el punto. El punto vuela en arco hasta la cabeza verde clara del isotipo. |
 | K2 · Cierre · marca + CTA | 22,00–32,00 | 11,00 | 16,00 | «Publica gratis tu búsqueda» | El punto aterriza exactamente sobre la cabeza clara del logo original; el isotipo se revela desde ahí. Sube el botón con el CTA y después el nombre. Fondo marfil del logo. Se sostiene 3 s completo. |
 
@@ -43,8 +43,8 @@ A y B comparten todo desde el beat 6 (3,00 s). Solo cambia la apertura.
 | B: el punto cae | 3,00 | 1,49 | la tarjeta se voltea a «BUSCO» y se despega del muro | marimba si + latigazo de volteo |
 | Congela | 4,00 | 1,99 | todo se detiene | freno de cinta, silencio |
 | Onda | 4,15 | 2,07 | los anuncios se voltean desde el punto; el fondo pasa a marfil | cascada de clics de papel |
-| Titular | 5,00 | 2,50 | «Publica lo que buscas.» sube | acorde re mayor (piano FM) + bombo suave |
-| Tilde | 5,50 | 2,75 | el punto cae como punto de la «i»; onda de peso en la palabra | marimba re (la voz del punto) |
+| Titular | 5,00 | 2,49 | «Publica lo que buscas.» sube | acorde re mayor (piano FM) + bombo suave |
+| Tilde | 5,50 | 2,74 | el punto cae como punto de la «i»; onda de peso en la palabra | marimba re (la voz del punto) |
 | Salto | 7,50 | 3,75 | el punto deja la «i»; las palabras van a la cabecera | marimba la |
 | Marco | 8,00 | 4,00 | el punto se estira hasta ser el marco | grave + barrido |
 | Abre | 8,60 | 4,30 | el verde se abre: espacio reservado del formulario | arpegio re–fa#–la–re |

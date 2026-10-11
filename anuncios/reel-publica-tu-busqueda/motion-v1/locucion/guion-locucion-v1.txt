@@ -7,8 +7,6 @@ bajo cada línea para dejarle sitio. Al grabar, dejar cada toma dentro de su int
 Voz femenina o masculina, 25–40 años, cálida y segura, conversacional. Acento quiteño suave o latinoamericano neutro. Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, tres tomas por línea.
 Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
 
-«gratis» está PENDIENTE DE CONFIRMAR: grabar L4 en las dos variantes («Publica gratis tu búsqueda.» y «Publica tu búsqueda.»).
-
 ==============================================================
 VERSIÓN A (directa)
 ==============================================================
@@ -20,10 +18,10 @@ VERSIÓN A (directa)
                (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
 
 [4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
-               (Lista con ritmo, micro-pausa entre datos. Los rótulos se ajustan al formulario real. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
 
 [11,00–12,60]  Publica gratis tu búsqueda.
-               (Directa y cálida. Si se confirma, «gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+               (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
 
 [12,70–14,00]  En Propiedad Conecta.
                (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
@@ -40,10 +38,10 @@ VERSIÓN B (curiosidad) — solo cambia la primera línea
                (Sonrisa en la voz. Peso en «buscas». · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
 
 [4,90–9,10]  Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.
-               (Lista con ritmo, micro-pausa entre datos. Los rótulos se ajustan al formulario real. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
+               (Lista con ritmo, micro-pausa entre datos: cada dato coincide con la tarjeta que aparece en pantalla. · 22 sílabas en 4,20 s = 5,2 síl./s, natural)
 
 [11,00–12,60]  Publica gratis tu búsqueda.
-               (Directa y cálida. Si se confirma, «gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
+               (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
 
 [12,70–14,00]  En Propiedad Conecta.
                (Marca bien clara; coincide con la aparición del nombre. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)

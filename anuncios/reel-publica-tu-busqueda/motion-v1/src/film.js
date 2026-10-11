@@ -15,8 +15,8 @@ const MONO = 'JB, monospace';
 const ink = a => `rgba(20,42,34,${a})`, ivo = a => `rgba(249,250,245,${a})`;
 
 // ---------- configuración y cuadrícula medida ----------
-let BT = null, VAR = 'A', REV = false, LOGO = null;
-export function configure({ beats, variant = 'A', revision = false, logo }) { BT = beats.beats; VAR = variant; REV = revision; LOGO = logo; }
+let BT = null, VAR = 'A', REV = false, LOGO = null, CAPS = [];
+export function configure({ beats, variant = 'A', revision = false, logo, capturas = [] }) { BT = beats.beats; VAR = variant; REV = revision; LOGO = logo; CAPS = capturas; }
 export function B(n) {
   const P = BT[1] - BT[0], last = BT.length - 1;
   if (n <= 0) return BT[0] + n * P;
@@ -436,7 +436,7 @@ function drawTitular(ctx, t) {
 }
 
 // ======================================================================
-// MARCO, ESPACIO RESERVADO Y CABECERA (beats 8–20)
+// MARCO, FORMULARIO REAL Y CABECERA (beats 8–20)
 // ======================================================================
 const FR = { x: 90, y: 470, w: 900, h: 770 }, FC = [FR.x + FR.w / 2, FR.y + FR.h / 2];
 function frameState(t) {
@@ -445,6 +445,8 @@ function frameState(t) {
   let w = lerp(2 * r, FR.w, spring(t - B(EV.marco) - 0.05, 1.9, 0.64));
   let h = lerp(2 * r, FR.h, spring(t - B(EV.marco) - 0.13, 1.9, 0.62));
   let open = E.outCubic(ramp(t, B(EV.abre), B(EV.abre) + 0.5));
+  // se estrecha sobre el botón «Publicar solicitud»
+  h = lerp(h, BOTON_H, E.inOutCubic(ramp(t, B(EV.boton) - 0.3, B(EV.boton) + 0.02)));
   // recoge: el contenido se cierra, el marco se encoge con anticipación y vuelve a ser el punto
   const tc = B(EV.recoge);
   if (t > tc - 0.25) {
@@ -454,20 +456,60 @@ function frameState(t) {
   }
   return { w, h, rad: Math.min(Math.min(w, h) / 2, lerp(r, 40, ramp(Math.min(w, h), 2 * r, 300))), open };
 }
-function drawPlaceholder(ctx, t, x, y, w, h) {
-  ctx.fillStyle = '#ECEFE6'; ctx.fillRect(x, y, w, h);
-  ctx.strokeStyle = ink(0.07); ctx.lineWidth = 2; ctx.beginPath();
-  for (let d = -h; d < w; d += 30) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
-  ctx.stroke();
-  const cy = FC[1];
-  mono(ctx, 'ESPACIO RESERVADO', CX, cy - 150, 28, ink(0.6), 'center', 600);
-  text(ctx, 'Formulario real de', CX, cy - 70, 50, 700, INK, 'center');
-  text(ctx, 'Propiedad Conecta', CX, cy - 10, 50, 700, INK, 'center');
-  text(ctx, 'Aquí va la grabación de pantalla.', CX, cy + 52, 31, 400, ink(0.72), 'center');
-  const k = rotuloIndex(t);
-  const field = k >= 0 ? COMUN[2].texto[k] : '—';
-  mono(ctx, `→ campo: ${field}`, CX, cy + 130, 30, ink(0.85), 'center', 600);
-  mono(ctx, 'rótulos por confirmar con la captura', CX, cy + 176, 23, ink(0.5), 'center');
+// ---------- el formulario real (capturas de producto) ----------
+// Coordenadas de «página» en px de las capturas de 800 × 500: las cinco se apilan según su desplazamiento medido.
+const PAGE = { x0: 218, x1: 582, cx: 400, h: 1287, bg: '#F7F8FC' };
+const OFF = [0, 0, 264, 357, 787];                     // desplazamiento de cada captura en la página
+const LLENO = [[1, 0, 357], [3, 357, 812], [4, 812, 1287]]; // [captura, desde, hasta]: el formulario lleno, sin costuras visibles
+const TARJETAS = [[126, 215], [233, 330], [347, 433], [450, 725]]; // ¿Qué buscas? · Ubicación · Presupuesto · Características
+const VACIO = [[0, 118, 225], [0, 225, 340], [0, 340, 443], [2, 443, 735]]; // la misma tarjeta, vacía
+const BOTON_Y = 1250, BOTON_H = 210;
+function camForm(t) {
+  // la cámara se adelanta un poco al beat para que el encuadre llegue con la cabecera
+  let cy = 160;
+  const keys = [[B(EV.rotulos[0]), 170.5], [B(EV.rotulos[1]), 281.5], [B(EV.rotulos[2]), 390], [B(EV.rotulos[3]), 587.5], [B(EV.boton), BOTON_Y]];
+  keys[4][0] = B(EV.boton) + 0.15; // primero se estrecha la ventana, después baja
+  for (const [tb, y] of keys) cy = lerp(cy, y, spring(t - tb + 0.12, 2.7, 0.82));
+  return cy;
+}
+// acercamiento: la página completa al abrir, las tarjetas un poco más cerca, el botón mucho más cerca
+function kForm(t) {
+  let k = 900 / (PAGE.x1 - PAGE.x0);
+  k = lerp(k, 900 / 332, spring(t - B(EV.rotulos[1]) + 0.12, 2.7, 0.82)); // se acerca cuando el título ya salió de cuadro
+  k = lerp(k, 4.0, spring(t - B(EV.boton) - 0.03, 2.7, 0.82));
+  return k;
+}
+function drawCap(ctx, i, y0, y1, map) {
+  const im = CAPS[i]; if (!im) return;
+  const sf = im.naturalWidth / 800;           // admite originales en mayor resolución
+  const [X0, Y0] = map(PAGE.x0, y0), [X1, Y1] = map(PAGE.x1, y1);
+  ctx.drawImage(im, PAGE.x0 * sf, (y0 - OFF[i]) * sf, (PAGE.x1 - PAGE.x0) * sf, (y1 - y0) * sf, X0, Y0, X1 - X0, Y1 - Y0);
+}
+function drawForm(ctx, t, x, y, w, h) {
+  const cy = camForm(t), k = kForm(t);
+  const map = (px, py) => [x + w / 2 + (px - PAGE.cx) * k, y + h / 2 + (py - cy) * k];
+  ctx.fillStyle = PAGE.bg; ctx.fillRect(x, y, w, h);
+  const vy0 = cy - h / 2 / k - 2, vy1 = cy + h / 2 / k + 2;
+  for (const [i, a, b] of LLENO) { const y0 = Math.max(a, vy0), y1 = Math.min(b, vy1); if (y1 > y0) drawCap(ctx, i, y0, y1, map); }
+  // cada tarjeta pasa de vacía a llena: barrido de izquierda a derecha entre las dos capturas reales
+  VACIO.forEach(([i, a, b], n) => {
+    const u = E.inOutCubic(ramp(t, B(EV.rellena[n]), B(EV.rellena[n]) + 0.32));
+    if (u >= 1 || b < vy0 || a > vy1) return;
+    const [rx] = map(lerp(223, 577, u), 0);
+    ctx.save(); ctx.beginPath(); ctx.rect(rx, y, x + w - rx, h); ctx.clip();
+    drawCap(ctx, i, Math.max(a, vy0), Math.min(b, vy1), map);
+    ctx.restore();
+  });
+  // foco: la tarjeta que nombra la cabecera queda iluminada; el resto se atenúa
+  const idx = rotuloIndex(t);
+  const dim = 0.6 * ramp(t, B(EV.rotulos[0]) - 0.1, B(EV.rotulos[0]) + 0.15) * (1 - ramp(t, B(EV.boton) - 0.1, B(EV.boton) + 0.1));
+  if (dim > 0.01 && idx >= 0) {
+    let [a, b] = TARJETAS[idx];
+    if (idx > 0) { const [pa, pb] = TARJETAS[idx - 1], s2 = spring(t - B(EV.rotulos[idx]) + 0.12, 2.7, 0.82); a = lerp(pa, a, s2); b = lerp(pb, b, s2); }
+    const [fx0, fy0] = map(221, a - 3), [fx1, fy1] = map(579, b + 3);
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); rrect(ctx, fx0, fy0, fx1 - fx0, fy1 - fy0, 10 * k); ctx.clip('evenodd');
+    ctx.fillStyle = `rgba(247,248,252,${dim})`; ctx.fillRect(x, y, w, h); ctx.restore();
+  }
 }
 const rotuloIndex = t => { let k = -1; EV.rotulos.forEach((b, i) => { if (t >= B(b) - 0.06) k = i; }); return t >= B(EV.rotulosFuera) ? -1 : k; };
 function drawFrame(ctx, t) {
@@ -478,8 +520,9 @@ function drawFrame(ctx, t) {
   if (f.open > 0) {
     const iw = f.w * f.open, ih = f.h * f.open;
     ctx.save(); ctx.beginPath(); rrect(ctx, FC[0] - iw / 2, FC[1] - ih / 2, iw, ih, f.rad * f.open + 2); ctx.clip();
-    drawPlaceholder(ctx, t, x, y, f.w, f.h);
+    drawForm(ctx, t, x, y, f.w, f.h);
     ctx.restore();
+    if (f.open > 0.98) { ctx.strokeStyle = ink(0.12); ctx.lineWidth = 2; ctx.beginPath(); rrect(ctx, x + 1, y + 1, f.w - 2, f.h - 2, f.rad); ctx.stroke(); }
   }
   return f;
 }
