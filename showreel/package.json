@@ -1,0 +1,18 @@
+{
+  "name": "showreel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "glyphs": "node bake-glyphs.mjs",
+    "score": "node score.mjs",
+    "beats": "node measure-beats.mjs",
+    "sheet": "node render.mjs --sheet",
+    "render": "node render.mjs --samples 12",
+    "sync": "node sync-check.mjs out/showreel.mp4",
+    "all": "npm run score && npm run beats && npm run render && npm run sync"
+  },
+  "devDependencies": {
+    "fontkit": "2.0.4",
+    "playwright": "1.56.1"
+  }
+}
