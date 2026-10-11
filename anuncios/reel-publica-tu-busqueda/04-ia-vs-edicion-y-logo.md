@@ -42,7 +42,7 @@ El margen incluido (72 px) equivale al diámetro de un círculo-persona del isot
 
 1. **Nunca pasar el logo por la IA**, ni como referencia ni en un prompt: los modelos lo redibujan y lo deforman. Entra solo en edición, como archivo.
 2. **Escala uniforme**, con la proporción bloqueada. Comprobar en propiedades que la escala horizontal y la vertical sean idénticas.
-3. **No escalar por encima del 100 %** del archivo: el original es una imagen comprimida, no un vector. En el cierre el archivo se usa a 800 px de ancho (66 % de su tamaño; el dibujo del logo mide ~705 px) y se ve nítido. El informe del animatic (`animatic/salida/informe-qa.md`) verifica que la escala sea uniforme y mide la proporción en el video exportado.
+3. **No escalar por encima del 100 %** del archivo: el original es una imagen comprimida, no un vector. En el cierre el archivo se usa a 800 px de ancho (66 % de su tamaño; el dibujo del logo mide ~705 px) y se ve nítido. El informe del animatic (`animatic/v0/informe-qa.md`) verifica que la escala sea uniforme y mide la proporción en el video exportado.
 4. **Solo sobre blanco o marfil.** Nunca sobre video, marino ni verde: el texto `#142A22` desaparece y la casa toma el color del fondo.
 5. **Sin efectos:** sin sombras, brillos, contornos, biseles ni recoloreos. El logo va en una capa por encima del ajuste de color, para que el grading no lo altere.
 6. **No animar sus partes** (círculos, techo, letras) mientras no exista el vector y la aprobación de marca. Animación permitida: fundido + escala uniforme 96 → 100 % en 12 frames, con salida suave.

@@ -4,8 +4,8 @@
 
 | Fase | Qué se hace | Se aprueba antes de seguir |
 |---|---|---|
-| **0 · Confirmaciones** | Responder las preguntas y enviar las capturas de [00-diagnostico.md](00-diagnostico.md#5-preguntas-para-el-proyecto-original). Bloquean E4, E5 y E6. | Rótulos de la UI, canal de contacto, agentes activos, cobertura, terminología. |
-| **1 · Animatic** | **v0 hecho:** `animatic/salida/` (22,0 s, sin audio, con marcadores de captura). v1: capturas reales en lugar de los marcadores + voz guía. Se regenera con `node animatic/generar.mjs`. | Duración exacta de 22,0 s; cada texto se alcanza a leer; la historia se entiende sin sonido. |
+| **0 · Confirmaciones** | Enviar las capturas y responder las preguntas de [07-verificacion-de-producto.md](07-verificacion-de-producto.md). Bloquean E4, E5 y E6. | Rótulos de la UI, canal de contacto, agentes activos, cobertura, terminología. |
+| **1 · Animatic** | **v0 hecho y congelado:** `animatic/v0/` (22,0 s, sin audio, con marcadores de captura). v1 (en `animatic/v1/`): capturas reales en lugar de los marcadores, guion ajustado según [07](07-verificacion-de-producto.md) y voz guía. Se regenera con `node animatic/generar.mjs`. | Duración exacta de 22,0 s; cada texto se alcanza a leer; la historia se entiende sin sonido. |
 | **1b · Prueba rápida** | Mostrar el animatic en un celular a 3–5 personas del público, en Quito. Preguntar: «¿Qué hace esta app?» y «¿Cuánto cuesta publicar?». | Si no lo responden, se corrige el guion, no el montaje. |
 | **2 · Imágenes** | REF-01…05 → KF01…06 (y KF07–08 para B). | Misma persona y misma paleta en todos los KF. |
 | **3 · Video IA** | Animar cada KF, 3–4 tomas por clip; elegir y escalar a 1080 × 1920. | Criterios de [03](03-prompts-ia.md#criterios-para-elegir-cada-toma). |

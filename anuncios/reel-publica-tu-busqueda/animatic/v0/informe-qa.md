@@ -33,7 +33,7 @@ Generado por `node generar.mjs`.
 - En un celular de 390 pt de ancho (iPhone de 6,1″) el texto se ve a 18,1 pt; en uno de 360 dp, a 16,7 dp. La referencia de texto cómodo en iOS es 17 pt (OK).
 - Contraste blanco sobre verde bosque #142A22: 15,2:1 (mínimo AA para texto grande: 3:1; para texto normal: 4,5:1) OK.
 - Además, el mismo texto aparece antes como titular en E7 (96 px) mientras la voz lo dice.
-- Vista a tamaño de celular: `salida/cierre-en-movil.png` (390 × 693 px).
+- Vista a tamaño de celular: `cierre-en-movil.png` (en esta carpeta) (390 × 693 px).
 
 ## Marcadores pendientes (no son pantallas reales)
 

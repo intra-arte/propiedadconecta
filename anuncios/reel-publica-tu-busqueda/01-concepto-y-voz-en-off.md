@@ -37,6 +37,8 @@
 
 ## 1.5 Verificación de afirmaciones
 
+La revisión completa, frase por frase y con alternativas según cada respuesta, está en [07-verificacion-de-producto.md](07-verificacion-de-producto.md#3-revisión-de-promesas-del-guion).
+
 | Afirmación | Dónde | Estado |
 |---|---|---|
 | Publicar es gratis | E7 y E8 (CTA) | Confirmado en el brief. Falta confirmar que no haya límites ni cobros posteriores. |

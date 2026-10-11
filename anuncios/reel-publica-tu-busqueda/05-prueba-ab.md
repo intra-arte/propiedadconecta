@@ -9,7 +9,7 @@
 | Hipótesis | Conecta con quien ya está buscando y está cansado. Se espera mejor retención y registros más calificados. | La novedad explica el producto en un segundo. Se espera más gente que se detiene y más clics. |
 | Riesgo | Si el público aún no sufre la búsqueda, el gancho le dice poco. | Puede atraer a **propietarios** que quieren anunciar su inmueble. Lo mitiga la segunda línea, que nombra a compradores y arrendatarios. |
 
-**Solo cambian los primeros 6,6 s.** De 6,6 a 22,0 s ambas versiones son idénticas: mismo render, misma música, mismo cierre. En la línea de tiempo salen del mismo bloque, así que no pueden desincronizarse. B solo necesita 2 clips extra (C07 y C08). Su animatic de revisión es `animatic/salida/animatic-B-v0-revision.mp4`.
+**Solo cambian los primeros 6,6 s.** De 6,6 a 22,0 s ambas versiones son idénticas: mismo render, misma música, mismo cierre. En la línea de tiempo salen del mismo bloque, así que no pueden desincronizarse. B solo necesita 2 clips extra (C07 y C08). Su animatic de revisión es `animatic/v0/animatic-B-v0-revision.mp4`.
 
 ## Versión B — locución y escenas (0,0 → 6,6 s)
 
@@ -79,6 +79,8 @@ Comparar las versiones entre sí, no contra promedios de otras industrias.
 3. Voz femenina vs. masculina.
 
 ## Texto del anuncio (igual para A y B)
+
+Pendiente de verificación: la frase sobre los agentes depende de que estén activos hoy ([07](07-verificacion-de-producto.md#3-revisión-de-promesas-del-guion)), y el botón «Registrarte» del flujo real de registro.
 
 - **Texto principal:** ¿Vas a comprar o arrendar en Quito? Publica gratis lo que buscas: tipo de propiedad, sector, presupuesto y características. Agentes inmobiliarios pueden ver tu búsqueda y contactarte si tienen algo para ti.
 - **Título:** Publica gratis tu búsqueda

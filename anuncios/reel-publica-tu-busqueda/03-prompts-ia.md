@@ -2,7 +2,7 @@
 
 ## Cómo usar estos prompts
 
-> **Todavía no se ejecutan.** Primero se aprueba el animatic v0 (`animatic/salida/`) y se reciben las capturas y confirmaciones de [00-diagnostico.md](00-diagnostico.md).
+> **Todavía no se ejecutan.** Primero se aprueba el animatic v0 (`animatic/v0/`) y se reciben las capturas y confirmaciones de [00-diagnostico.md](00-diagnostico.md).
 
 El flujo es **imagen → video**, no texto → video directo. Así se controla el personaje, el encuadre y la luz antes de gastar créditos de video.
 

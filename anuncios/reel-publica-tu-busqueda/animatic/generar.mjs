@@ -4,7 +4,10 @@
  *   ../subtitulos/version-a.srt y version-b.srt
  *   ../locucion/guion-locucion.txt
  *   tabla-de-tiempos.md
- *   salida/ → animatics MP4, hojas de contactos, vista móvil del cierre e informe de control de calidad
+ *   <versión>/ (p. ej. v1/) → animatics MP4, hojas de contactos, vista móvil del cierre e informe de control de calidad
+ *
+ * Una carpeta de versión con el archivo CONGELADO (como v0/) no se sobrescribe: para una
+ * versión nueva, cambiar `version` en linea-de-tiempo.js.
  *
  * Uso:  node generar.mjs                 (todo)
  *       node generar.mjs --solo-textos   (sin video)
@@ -21,8 +24,8 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(DIR, '..');
-const SALIDA = path.join(DIR, 'salida');
 const LINEA = require('./linea-de-tiempo.js');
+const SALIDA = path.join(DIR, LINEA.version);
 const SOLO_TEXTOS = process.argv.includes('--solo-textos');
 const VERSIONES = ['A', 'B'];
 
@@ -288,9 +291,9 @@ async function video() {
   const puerto = srv.address().port;
   const navegador = await chromium.launch();
   const trabajos = [
-    { version: 'A', modo: 'prueba', archivo: 'animatic-A-v0.mp4' },
-    { version: 'A', modo: 'revision', archivo: 'animatic-A-v0-revision.mp4' },
-    { version: 'B', modo: 'revision', archivo: 'animatic-B-v0-revision.mp4' },
+    { version: 'A', modo: 'prueba', archivo: `animatic-A-${LINEA.version}.mp4` },
+    { version: 'A', modo: 'revision', archivo: `animatic-A-${LINEA.version}-revision.mp4` },
+    { version: 'B', modo: 'revision', archivo: `animatic-B-${LINEA.version}-revision.mp4` },
   ];
   const resultados = {};
   for (const j of trabajos) {
@@ -314,7 +317,7 @@ async function video() {
   await navegador.close();
   srv.close();
 
-  const principal = path.join(SALIDA, 'animatic-A-v0.mp4');
+  const principal = path.join(SALIDA, `animatic-A-${LINEA.version}.mp4`);
   const logo = medirLogoEnVideo(principal, tmp);
   execFileSync('convert', [logo.frame, '-resize', '390x693', path.join(SALIDA, 'cierre-en-movil.png')]);
   return { resultados, logo };
@@ -322,7 +325,7 @@ async function video() {
 
 function informe({ resultados, logo }, avisos) {
   const A = LINEA.armar('A');
-  const r = resultados['animatic-A-v0.mp4'];
+  const r = resultados[`animatic-A-${LINEA.version}.mp4`];
   const m = r.medidasCierre;
   const b = m.boton;
   const escala = m.logo.w / m.logo.natW, escalaV = m.logo.h / m.logo.natH;
@@ -364,7 +367,7 @@ ${r.fueraDeZona.length ? r.fueraDeZona.slice(0, 20).map(c => `- **${coma(c.t)} s
 - En un celular de 390 pt de ancho (iPhone de 6,1″) el texto se ve a ${coma(b.fontSize * 390 / LINEA.ancho, 1)} pt; en uno de 360 dp, a ${coma(b.fontSize * 360 / LINEA.ancho, 1)} dp. La referencia de texto cómodo en iOS es 17 pt (${ok(b.fontSize * 360 / LINEA.ancho >= 16)}).
 - Contraste blanco sobre verde bosque #142A22: ${coma(contraste('#FFFFFF', '#142A22'), 1)}:1 (mínimo AA para texto grande: 3:1; para texto normal: 4,5:1) ${ok(contraste('#FFFFFF', '#142A22') >= 7)}.
 - Además, el mismo texto aparece antes como titular en E7 (96 px) mientras la voz lo dice.
-- Vista a tamaño de celular: \`salida/cierre-en-movil.png\` (390 × 693 px).
+- Vista a tamaño de celular: \`cierre-en-movil.png\` en esta carpeta (390 × 693 px).
 
 ## Marcadores pendientes (no son pantallas reales)
 
@@ -388,6 +391,10 @@ for (const V of VERSIONES) for (const v of LINEA.armar(V).locucion) {
 }
 
 if (!SOLO_TEXTOS) {
+  if (fs.existsSync(path.join(SALIDA, 'CONGELADO'))) {
+    console.error(`La carpeta ${LINEA.version}/ está congelada. Cambia «version» en linea-de-tiempo.js antes de generar video.`);
+    process.exit(1);
+  }
   console.log('Video');
   const res = await video();
   escribir(path.join(SALIDA, 'informe-qa.md'), informe(res, avisos));

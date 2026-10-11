@@ -4,7 +4,7 @@ Formato 1080 × 1920 (9:16), **22,0 s**. Personajes: **Daniela** (29, busca dón
 
 > **Fuente de tiempos:** [animatic/linea-de-tiempo.js](animatic/linea-de-tiempo.js). La tabla definitiva, generada a partir de ella, está en [animatic/tabla-de-tiempos.md](animatic/tabla-de-tiempos.md). Si este documento y la tabla no coinciden, manda la tabla.
 >
-> **Sin acceso a la app:** E4, E5 y E6 usan marcadores «CAPTURA PENDIENTE» y «POR CONFIRMAR» en lugar de pantallas. No se describe ningún campo, botón, pantalla ni canal de contacto que no esté confirmado (ver [00-diagnostico.md](00-diagnostico.md)).
+> **Sin acceso a la app:** E4, E5 y E6 usan marcadores «CAPTURA PENDIENTE» y «POR CONFIRMAR» en lugar de pantallas. No se describe ningún campo, botón, pantalla ni canal de contacto que no esté confirmado. Las capturas pendientes y las frases que dependen de que los agentes estén activos están en [07-verificacion-de-producto.md](07-verificacion-de-producto.md).
 
 ## Resumen
 
@@ -76,7 +76,7 @@ Contrastes: blanco sobre marino 16:1 · blanco sobre bosque 15:1 · bosque sobre
 
 ### Zonas seguras
 
-Sin texto ni logo en los **270 px superiores, los 672 px inferiores y 65 px a cada lado** (Reels; cubre Stories). El animatic lo verifica automáticamente cada 0,1 s (ver `animatic/salida/informe-qa.md`).
+Sin texto ni logo en los **270 px superiores, los 672 px inferiores y 65 px a cada lado** (Reels; cubre Stories). El animatic lo verifica automáticamente cada 0,1 s (ver `animatic/v0/informe-qa.md`).
 
 ### Componentes gráficos
 

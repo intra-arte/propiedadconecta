@@ -2,20 +2,20 @@
 
 Anuncio vertical 9:16 de **22 s** para Instagram y Facebook (Reels y Stories). Objetivo: registros de personas que quieren comprar o arrendar en Quito.
 
-**Estado:** animatic v0 listo para validar con personas. Todavía no se generaron imágenes ni clips con IA, a propósito. **No hay acceso al código ni a la interfaz de la app:** las escenas que dependen de ella (E4–E6) usan marcadores «CAPTURA PENDIENTE» y «POR CONFIRMAR». Ver [00-diagnostico.md](00-diagnostico.md).
+**Estado:** animatic v0 terminado y congelado en [animatic/v0/](animatic/v0/LEEME.md). Antes de la v1 se verifica el producto con capturas reales ([07](07-verificacion-de-producto.md)). Todavía no se generaron imágenes ni clips con IA, a propósito. **No hay acceso al código ni a la interfaz de la app:** las escenas que dependen de ella (E4–E6) usan marcadores «CAPTURA PENDIENTE» y «POR CONFIRMAR». Ver [00-diagnostico.md](00-diagnostico.md).
 
 ## Ver el animatic
 
 | Archivo | Para qué |
 |---|---|
-| `animatic/salida/animatic-A-v0.mp4` | **Versión para mostrar a personas.** Limpia, sin datos técnicos. |
-| `animatic/salida/animatic-A-v0-revision.mp4` | Revisión interna: tiempo, escena, línea de voz y zonas seguras sobre cada frame. |
-| `animatic/salida/animatic-B-v0-revision.mp4` | Gancho B, guardado para la prueba A/B posterior. |
-| `animatic/salida/hoja-de-contactos-A.jpg` / `-B.jpg` | Un fotograma por escena, para revisar de un vistazo. |
-| `animatic/salida/informe-qa.md` | Control automático: duración, ritmo de la voz, zonas seguras, proporción del logo y tamaño del CTA. |
+| `animatic/v0/animatic-A-v0.mp4` | **Versión para mostrar a personas.** Limpia, sin datos técnicos. |
+| `animatic/v0/animatic-A-v0-revision.mp4` | Revisión interna: tiempo, escena, línea de voz y zonas seguras sobre cada frame. |
+| `animatic/v0/animatic-B-v0-revision.mp4` | Gancho B, guardado para la prueba A/B posterior. |
+| `animatic/v0/hoja-de-contactos-A.jpg` / `-B.jpg` | Un fotograma por escena, para revisar de un vistazo. |
+| `animatic/v0/informe-qa.md` | Control automático: duración, ritmo de la voz, zonas seguras, proporción del logo y tamaño del CTA. |
 | `animatic/animatic.html` | Reproductor interactivo. Se abre con doble clic en Chrome o Edge: play/pausa (barra espaciadora), línea de tiempo, versión A/B y modo prueba/revisión. |
 
-Los videos no tienen audio: v0 valida si la historia se entiende **sin sonido**. Para la v1, una voz guía grabada con el celular leyendo [locucion/guion-locucion.txt](locucion/guion-locucion.txt) se sincroniza sobre el mismo video.
+Los archivos de v0 están en `animatic/v0/` y no se sobrescriben; la v1 se generará en `animatic/v1/`. Los videos no tienen audio: v0 valida si la historia se entiende **sin sonido**. Para la v1, una voz guía grabada con el celular leyendo [locucion/guion-locucion.txt](locucion/guion-locucion.txt) se sincroniza sobre el mismo video.
 
 **Cómo cambiar algo:** todos los tiempos y textos viven en [animatic/linea-de-tiempo.js](animatic/linea-de-tiempo.js). Después de editarla se ejecuta `node animatic/generar.mjs`, que regenera:
 - los subtítulos;
@@ -38,7 +38,8 @@ Necesita Node, Playwright con Chromium, ffmpeg e ImageMagick. Con `--solo-textos
 
 | Punto | Documento |
 |---|---|
-| Diagnóstico de recursos, supuestos y preguntas | [00-diagnostico.md](00-diagnostico.md) |
+| Diagnóstico de recursos | [00-diagnostico.md](00-diagnostico.md) |
+| **Capturas necesarias, confirmado vs pendiente, revisión de promesas, plan v1** | [07-verificacion-de-producto.md](07-verificacion-de-producto.md) |
 | **Tiempos definitivos (generados)** | [animatic/tabla-de-tiempos.md](animatic/tabla-de-tiempos.md) |
 | 1 · Evaluación del concepto · 2 · Voz en off | [01-concepto-y-voz-en-off.md](01-concepto-y-voz-en-off.md) |
 | 3 · Escenas (duración, visual, cámara, luz, sonido, texto, transición) | [02-guion-tecnico.md](02-guion-tecnico.md) |
@@ -56,4 +57,4 @@ Necesita Node, Playwright con Chromium, ffmpeg e ImageMagick. Con `--solo-textos
 
 ## Pendientes de confirmar con producto
 
-Las preguntas y capturas que faltan, y qué decisión depende de cada una, están en [00-diagnostico.md](00-diagnostico.md#5-preguntas-para-el-proyecto-original).
+Las capturas y respuestas que faltan, y qué cambia en el anuncio con cada una, están en [07-verificacion-de-producto.md](07-verificacion-de-producto.md).

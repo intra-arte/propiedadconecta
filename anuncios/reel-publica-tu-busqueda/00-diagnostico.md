@@ -1,6 +1,6 @@
 # Diagnóstico de recursos — 11 de octubre de 2026
 
-*Actualizado tras el animatic v0 (22 s): secciones 3, 4 y 6.*
+*Actualizado tras el animatic v0 (22 s): secciones 3–6. Las preguntas pendientes están ahora en [07-verificacion-de-producto.md](07-verificacion-de-producto.md).*
 
 ## 1. Qué hay realmente disponible
 
@@ -27,7 +27,7 @@
 
 | Documento | Estado |
 |---|---|
-| Animatic v0 (`animatic/`) | **Hecho:** 22,0 s, versión A (prueba y revisión) y B (revisión), sin audio, con marcadores en E4–E6. Control automático en `animatic/salida/informe-qa.md`. |
+| Animatic v0 (`animatic/`) | **Hecho:** 22,0 s, versión A (prueba y revisión) y B (revisión), sin audio, con marcadores en E4–E6. Control automático en `animatic/v0/informe-qa.md`. |
 | Línea de tiempo y tabla de tiempos | **Hechas.** `animatic/linea-de-tiempo.js` es la fuente única; la tabla, los `.srt` y la locución se generan desde ella. |
 | 01 · Concepto y voz en off | Actualizado a 22 s. |
 | 02 · Guion técnico | Reescrito a 22 s. Los supuestos de producto se retiraron y quedaron como marcadores. |
@@ -53,36 +53,13 @@
 
 ## 5. Preguntas para el proyecto original
 
-Las marcadas con ★ bloquean el guion; las demás, solo la edición.
-
-**Acceso**
-
-1. ★ ¿Dónde está hoy la app: otro repositorio, Figma, Wix u otra herramienta? ¿Está publicada, en beta o solo diseñada?
-2. ¿El repositorio `propiedadconecta` debe seguir público? Hoy cualquiera puede ver el plan del anuncio y el logo.
-
-**Capturas** (desde el celular, tal como las vería un usuario)
-
-3. ★ Todas las pantallas del formulario para publicar una búsqueda, con las listas desplegadas (por ejemplo, tipos de propiedad).
-4. ★ El botón final y la pantalla que aparece después de publicar.
-5. La pantalla donde aterriza quien llega desde un enlace, y el registro: ¿va antes o después de publicar? ¿Qué datos pide?
-6. La vista del agente: cómo ve una búsqueda y cómo desbloquea el contacto. Si prefieres no mostrar ese lado en el anuncio, dímelo.
-
-**Datos**
-
-7. ★ ¿Qué dato de contacto recibe el agente y por dónde se comunica (llamada, WhatsApp, correo, dentro de la app)?
-8. ★ ¿Los agentes ya pueden usar la plataforma hoy? Si todavía no, no podemos decir en presente «pueden ver tu búsqueda».
-9. ★ ¿Publicar es gratis sin límites ni cobros posteriores para quien busca?
-10. ¿Qué cobertura tiene: Quito urbano, valles (Cumbayá, Tumbaco, Los Chillos)?
-11. ¿La app dice «búsqueda» o «solicitud»?
-12. ¿Hay logo vectorial, tipografía oficial o un dominio para el cierre?
+Se movieron, priorizadas y ampliadas, a [07-verificacion-de-producto.md](07-verificacion-de-producto.md):
+- capturas necesarias por escena y cómo obtenerlas;
+- lo confirmado frente a lo que depende de tu respuesta;
+- la revisión de promesas del guion.
 
 ## 6. Siguiente paso recomendado
 
-1. **Hecho:** guion ajustado a 22 s y animatic v0 (ver [README](README.md#ver-el-animatic)). La propuesta de ajuste de la versión anterior de este diagnóstico se reemplazó por la [tabla de tiempos definitiva](animatic/tabla-de-tiempos.md). Para que la voz suene natural se quitó «¿Ya se vendió?» de la locución; queda como burbuja en pantalla.
-2. **Tú:**
-   - revisar `animatic/salida/animatic-A-v0.mp4` y aprobar o corregir la estructura narrativa;
-   - enviar las capturas y respuestas marcadas con ★;
-   - decidir la visibilidad del repositorio (pregunta 2).
-3. **Validación con personas:** mostrar `animatic-A-v0.mp4` en un celular a 3–5 personas del público, primero sin sonido. Preguntar «¿qué hace esta app?», «¿cuánto cuesta publicar?» y «¿qué harías después de verlo?». Explicar antes que los recuadros son partes que todavía se van a filmar o capturar.
-4. **Opcional:** grabar con el celular una voz guía leyendo `locucion/guion-locucion.txt` sobre el video, para comprobar el ritmo real.
-5. **Con las capturas:** reemplazar los marcadores en la línea de tiempo, regenerar (animatic v1, `.srt`, locución, tabla) y aprobar. **Solo después** se generan fotogramas clave y clips con IA.
+1. **Hecho:** guion ajustado a 22 s y animatic v0, congelado en [animatic/v0/](animatic/v0/LEEME.md).
+2. **Ahora:** enviar las capturas 1–5 y responder las preguntas 1, 3, 4, 5 y 6 de [07](07-verificacion-de-producto.md).
+3. **Luego:** v1 con las pantallas reales y el guion ajustado a lo que hoy funciona. Solo después de aprobarla se usa IA.
