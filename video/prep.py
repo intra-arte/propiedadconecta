@@ -2,15 +2,19 @@
 
 Usage:  python3 video/prep.py
 
-Reads the original captures (800 x 500, untouched) in
-anuncios/reel-publica-tu-busqueda/animatic/capturas/originales/ and writes
+Reads the 1440 x 900 captures (untouched) in
+anuncios/reel-publica-tu-busqueda/animatic/capturas/originales-1440/ and writes
 video/assets/. Nothing is redrawn: every output is a crop of real pixels,
-upscaled x3 with Lanczos so the browser scales down instead of up.
+resampled with Lanczos to 3 px per world unit so the browser scales down
+instead of up.
 
-Coordinates below are pixels of the original captures. The page column
-runs from x = 80 to x = 720 (the width of the site header), and the "page"
-is 02 (top of the form, filled) stitched to 04 (Características, filled):
-both show the Presupuesto card, which puts 04 exactly 357 px below 02.
+World units: index.html works in the coordinates of the earlier 800 x 500
+captures (1 unit = 1.8 px of these), with x measured from the left edge of
+the page column. The page column runs from x = 144 to x = 1296 px (the width
+of the site header). The "page" is 02 (top of the form, filled) stitched to
+04 (Características, filled): both show the Presupuesto card, which puts 04
+exactly 718 px below 02. The red development badge sits at x = 19-138 px,
+outside the column, so it never appears.
 """
 import json
 from pathlib import Path
@@ -18,49 +22,51 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-ORIG = ROOT / "anuncios/reel-publica-tu-busqueda/animatic/capturas/originales"
+ORIG = ROOT / "anuncios/reel-publica-tu-busqueda/animatic/capturas/originales-1440"
 OUT = Path(__file__).resolve().parent / "assets"
-SCALE = 3
+UNIT = 1.8                  # px of these captures per world unit
+DENSITY = 3                 # px per world unit in the assets
 
-PAGE_X = (80, 720)          # page column, as wide as the site header
-HEADER_H = 41               # header incl. its bottom border (row 40)
-SEAM_02 = 442               # 02 is used above this row ...
-OFFSET_04 = 357             # ... and 04 below it (04 row = page row - 357)
-PAGE_H = 500 + OFFSET_04    # 857
+PAGE_X = (144, 1296)        # page column, as wide as the site header
+HEADER_H = 73               # header incl. its bottom border (row 72)
+SEAM = 796                  # 02 is used above this row (in the gap after Presupuesto) ...
+OFFSET_04 = 718             # ... and 04 below it (04 row = page row - 718)
+PAGE_H = 900 + OFFSET_04    # 1618
 
-# Cards: (left, top, right, bottom), exclusive right/bottom, in page rows.
-CARD_X = (222, 579)
+# Cards in page rows / capture columns (exclusive end), measured on the borders.
+CARD_X = (399, 1042)
 CARDS = {
-    "que": (124, 220),
-    "ubicacion": (231, 334),
-    "presupuesto": (345, 437),
-    "caracteristicas": (449, 729),
+    "que": (224, 394),
+    "ubicacion": (416, 600),
+    "presupuesto": (622, 786),
+    "caracteristicas": (808, 1312),
 }
-BUTTON = ("05-contacto-y-publicar.jpg", (222, 448, 578, 479))
+BUTTON = ("05-contacto-y-publicar.png", (399, 806, 1042, 862))
 
 
 def load(name):
     return Image.open(ORIG / name).convert("RGB")
 
 
-def up(img):
-    return img.resize((img.width * SCALE, img.height * SCALE), Image.LANCZOS)
-
-
 def save(img, name):
     OUT.mkdir(exist_ok=True)
-    up(img).save(OUT / name, optimize=True)
-    print("  wrote", (OUT / name).relative_to(ROOT), f"{img.width * SCALE} x {img.height * SCALE}")
+    w, h = round(img.width / UNIT * DENSITY), round(img.height / UNIT * DENSITY)
+    img.resize((w, h), Image.LANCZOS).save(OUT / name, optimize=True)
+    print("  wrote", (OUT / name).relative_to(ROOT), f"{w} x {h}")
+
+
+def unit(v, dx=0.0):
+    return round(v / UNIT - dx, 2)
 
 
 def main():
-    vacio, lleno, carac = load("01-formulario-vacio.jpg"), load("02-formulario-lleno-arriba.jpg"), load("04-caracteristicas-lleno.jpg")
+    vacio, lleno, carac = load("01-formulario-vacio.png"), load("02-formulario-lleno-arriba.png"), load("04-caracteristicas-lleno.png")
     x0, x1 = PAGE_X
 
     # Full page column (filled), stitched.
     page = Image.new("RGB", (x1 - x0, PAGE_H))
-    page.paste(lleno.crop((x0, 0, x1, SEAM_02)), (0, 0))
-    page.paste(carac.crop((x0, SEAM_02 - OFFSET_04, x1, 500)), (0, SEAM_02))
+    page.paste(lleno.crop((x0, 0, x1, SEAM)), (0, 0))
+    page.paste(carac.crop((x0, SEAM - OFFSET_04, x1, 900)), (0, SEAM))
     save(page.crop((0, 0, x1 - x0, HEADER_H)), "header.png")
     save(page.crop((0, HEADER_H, x1 - x0, PAGE_H)), "page.png")
 
@@ -76,16 +82,18 @@ def main():
     src, box = BUTTON
     save(load(src).crop(box), "publicar.png")
 
+    ox = x0 / UNIT
     meta = {
-        "scale": SCALE,
-        "pageX": PAGE_X,
-        "pageW": x1 - x0,
-        "pageH": PAGE_H,
-        "headerH": HEADER_H,
-        "cardX": [CARD_X[0] - x0, CARD_X[1] - x0],
-        "cards": CARDS,
-        "button": [box[2] - box[0], box[3] - box[1]],
-        "cardRadius": 7,
+        "source": str(ORIG.relative_to(ROOT)),
+        "unit": UNIT,
+        "density": DENSITY,
+        "pageW": unit(x1 - x0),
+        "pageH": unit(PAGE_H),
+        "headerH": unit(HEADER_H),
+        "cardX": [unit(CARD_X[0], ox), unit(CARD_X[1], ox)],
+        "cards": {k: [unit(a), unit(b)] for k, (a, b) in CARDS.items()},
+        "button": [unit(box[2] - box[0]), unit(box[3] - box[1])],
+        "cardRadius": 7.8,
         "buttonRadius": 6,
     }
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")

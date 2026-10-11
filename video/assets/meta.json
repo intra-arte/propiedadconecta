@@ -1,38 +1,36 @@
 {
-  "scale": 3,
-  "pageX": [
-    80,
-    720
-  ],
-  "pageW": 640,
-  "pageH": 857,
-  "headerH": 41,
+  "source": "anuncios/reel-publica-tu-busqueda/animatic/capturas/originales-1440",
+  "unit": 1.8,
+  "density": 3,
+  "pageW": 640.0,
+  "pageH": 898.89,
+  "headerH": 40.56,
   "cardX": [
-    142,
-    499
+    141.67,
+    498.89
   ],
   "cards": {
     "que": [
-      124,
-      220
+      124.44,
+      218.89
     ],
     "ubicacion": [
-      231,
-      334
+      231.11,
+      333.33
     ],
     "presupuesto": [
-      345,
-      437
+      345.56,
+      436.67
     ],
     "caracteristicas": [
-      449,
-      729
+      448.89,
+      728.89
     ]
   },
   "button": [
-    356,
-    31
+    357.22,
+    31.11
   ],
-  "cardRadius": 7,
+  "cardRadius": 7.8,
   "buttonRadius": 6
 }

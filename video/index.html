@@ -314,7 +314,7 @@ function drawShots34(t) {
   box(win, wx, wy, ww, wh);
   win.style.borderRadius = R.r * cam.S + 'px';
   win.style.opacity = smooth(ramp(t, 5.95, 6.45));
-  win.style.background = '#F7F8FC';
+  win.style.background = '#F7F8FB';
   win.style.boxShadow = `0 24px 80px rgba(20,42,34,${(0.10 * smooth(ramp(t, 6.2, 6.9))).toFixed(3)})`;
   // contents, in world units relative to the window's top-left
   const page = $('winPage'), hdr = $('winHeader');

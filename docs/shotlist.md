@@ -12,15 +12,15 @@
 |---|---|---|
 | Horizontal logo | `anuncios/reel-publica-tu-busqueda/marca/logo-horizontal-transparente.png` (1208 × 431) | Only on white/ivory, uniform scale, ≤ 100 %, no effects, parts never animated (logo rules in `04-ia-vs-edicion-y-logo.md`). |
 | Isotipo | `…/marca/isotipo-transparente.png` (465 × 431) | Inline icon on the CTA card. |
-| Form: "¿Qué estás buscando?" filled | `…/animatic/capturas/recortes/que-lleno.png` | Comprar una propiedad · Departamento |
-| Form: Ubicación empty → filled | `…/recortes/ubicacion-vacio.png` → `ubicacion-lleno.png` | Pichincha · Quito · Cumbayá |
-| Form: Presupuesto empty → filled | `…/recortes/presupuesto-vacio.png` → `presupuesto-lleno.png` | 120000 – 180000 USD |
-| Form: Características filled | `…/recortes/caracteristicas-lleno.png` | Amoblado ✓ · Seguridad ✓ |
-| "Publicar solicitud" button | `…/recortes/publicar.png` | |
-| Page header with logo | `…/recortes/cabecera.png` | Real site header, used inside the window frame. |
+| Form: "¿Qué estás buscando?" filled | `video/assets/que-lleno.png` | Comprar una propiedad · Departamento |
+| Form: Ubicación empty → filled | `video/assets/ubicacion-vacio.png` → `ubicacion-lleno.png` | Pichincha · Quito · Cumbayá |
+| Form: Presupuesto empty → filled | `video/assets/presupuesto-vacio.png` → `presupuesto-lleno.png` | 120000 – 160000 USD |
+| Form: Características filled | inside `video/assets/page.png` | Amoblado ✓ · Seguridad ✓ |
+| "Publicar solicitud" button | `video/assets/publicar.png` | |
+| Page header with logo | `video/assets/header.png` | Real site header, used inside the window frame. |
 | Font | `…/animatic/fuentes/Outfit-Variable.ttf` | 400/500 (600 for the list stack). |
 
-> ⚠️ **Resolution.** The captures are 800 × 500 and the crops are those pixels upscaled ×3. In a 1080p frame a card displays at ~1000 px wide and will look soft next to the crisp type. This animatic can use them, but the final render needs **fresh 2× captures of the live site** with the development badge hidden. They can't be taken from this session because `www.propiedadconecta.com` is blocked by the environment's network policy.
+> **Source captures:** 1440 × 900 screenshots of the form in `anuncios/reel-publica-tu-busqueda/animatic/capturas/originales-1440/`, cropped by `video/prep.py` without redrawing (Lanczos to 3 px per world unit, so the browser scales down). The red development badge sits outside the page column and never appears. A capture of the live site at 2× would be sharper still; re-run `prep.py` if the layout is unchanged.
 
 ---
 
