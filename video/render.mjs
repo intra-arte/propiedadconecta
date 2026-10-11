@@ -2,7 +2,8 @@
 /*
  * Renders video/index.html frame by frame into an MP4.
  *
- *   node video/render.mjs                 → video/out/propiedad-conecta-15s.mp4 + contact sheet
+ *   node video/render.mjs                 → video/out/propiedad-conecta-15s.mp4 (+ soundtrack if
+ *                                           video/music/soundtrack.wav exists) + contact sheet
  *   node video/render.mjs --stills 1,6.5  → video/out/stills/t_<s>.png only
  *
  * Needs Playwright (Chromium) and ffmpeg. Run `python3 video/prep.py` first.
@@ -80,6 +81,15 @@ async function main() {
     ff.stdin.end();
     await done;
     console.log(`\n  wrote ${path.relative(ROOT, file)}`);
+    // Soundtrack (video/music/compose.py): mux it in when it exists.
+    const music = path.join(DIR, 'music', 'soundtrack.wav');
+    if (fs.existsSync(music)) {
+      const tmp = file.replace(/\.mp4$/, '.tmp.mp4');
+      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-i', music, '-map', '0:v', '-map', '1:a',
+        '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', tmp]);
+      fs.renameSync(tmp, file);
+      console.log('  muxed soundtrack');
+    }
     // Contact sheet: one frame every 0.5 s.
     const sheet = path.join(OUT, `${NAME}-contact-sheet.jpg`);
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-vf', 'fps=2,scale=384:-1,tile=6x5:padding=4:color=0x222222', '-frames:v', '1', '-q:v', '3', sheet]);
