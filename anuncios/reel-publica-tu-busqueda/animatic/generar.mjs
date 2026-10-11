@@ -28,6 +28,8 @@ const LINEA = require('./linea-de-tiempo.js');
 const SALIDA = path.join(DIR, LINEA.version);
 const SOLO_TEXTOS = process.argv.includes('--solo-textos');
 const VERSIONES = ['A', 'B'];
+// Momento en que se mide el cierre (logo y botón ya visibles, fuera del pulso).
+const T_CIERRE = LINEA.duracion - 1;
 
 const coma = (n, d = 2) => n.toFixed(d).replace('.', ',');
 const escribir = (ruta, texto) => { fs.mkdirSync(path.dirname(ruta), { recursive: true }); fs.writeFileSync(ruta, texto); console.log('  escrito', path.relative(RAIZ, ruta)); };
@@ -102,7 +104,7 @@ VERSIÓN A (principal)
 ${A.locucion.map(linea).join('\n\n')}
 
 ==============================================================
-VERSIÓN B (prueba A/B) — solo cambian las tres primeras líneas
+VERSIÓN B (prueba A/B) — solo cambia${LINEA.ganchos.B.locucion.length > 1 ? 'n' : ''} ${['', 'la primera línea', 'las dos primeras líneas', 'las tres primeras líneas', 'las cuatro primeras líneas'][LINEA.ganchos.B.locucion.length]}
 ==============================================================
 
 ${LINEA.ganchos.B.locucion.map(linea).join('\n\n')}
@@ -111,6 +113,11 @@ Desde [${coma(LINEA.comun.locucion[0].inicio)}] sigue igual que la versión A.
 `;
 }
 
+const NOMBRES_TARJETA = {
+  cabecera: 'cabecera de la app', que: '«¿Qué estás buscando?»', ubicacion: '«Ubicación»', presupuesto: '«Presupuesto (USD)»',
+  caracteristicas: '«Características»', contacto: '«Tus datos de contacto»', publicar: 'botón «Publicar solicitud»',
+};
+
 function textoEnPantalla(L, e) {
   const t = [];
   for (const el of e.elementos) {
@@ -118,7 +125,8 @@ function textoEnPantalla(L, e) {
     else if (el.tipo === 'burbuja') t.push(`Burbuja «${el.texto}»`);
     else if (el.tipo === 'anuncios') t.push('Anuncios genéricos «NO DISPONIBLE»');
     else if (el.tipo === 'pendiente') t.push(`${el.clase === 'confirmar' ? 'POR CONFIRMAR' : 'CAPTURA PENDIENTE'}: ${el.que}`);
-    else if (el.tipo === 'cartel') t.push('Cartel «SE ARRIENDA» → «BUSCO DEPA»');
+    else if (el.tipo === 'cartel') t.push(el.dorso ? 'Cartel «SE ARRIENDA» → captura real «¿Qué estás buscando?»' : 'Cartel «SE ARRIENDA» → «BUSCO DEPA»');
+    else if (el.tipo === 'formulario') t.push('Capturas reales: ' + el.tarjetas.map(c => NOMBRES_TARJETA[c.id] || c.id).join(', ') + (el.lupa ? '; lupa sobre «1 agente · 3 agentes · 5 agentes»' : ''));
     else if (el.tipo === 'logo') t.push('Logo');
     else if (el.tipo === 'boton') t.push(`Botón «${el.texto} →»`);
   }
@@ -156,7 +164,7 @@ Ritmo: «natural» ≤ ${coma(LINEA.ritmo.natural, 1)} sílabas/s · «ágil» �
 |---|---|---|---|---|---|---|---|
 ${filasVoz(A)}
 
-**Subtítulos que se queman:** bloques ${rangos(quemados(A))} de \`subtitulos/version-a.srt\`. El resto de la voz ya aparece como titular, burbuja, marcador de captura o logo.
+**Subtítulos que se queman:** bloques ${rangos(quemados(A))} de \`subtitulos/version-a.srt\`. El resto de la voz ya aparece como titular, burbuja, captura o logo.
 
 ## Versión B — lo que cambia (0,0–${coma(LINEA.comunDesde, 1)} s)
 
@@ -171,6 +179,38 @@ ${filasEsc(gB)}
 ${filasVoz(gB)}
 
 **Subtítulos que se queman en B:** bloques ${rangos(quemados(B))} de \`subtitulos/version-b.srt\`.
+
+${hojaAudio()}`;
+}
+
+function hojaAudio() {
+  const filas = escenas => escenas.flatMap(e => (e.sonido || []).map(x => `| ${coma(x.t)} | ${e.id} | ${x.que} |`)).join('\n');
+  const voz = L => L.locucion.map(v => `| ${coma(v.inicio)}–${coma(v.fin)} | ${v.id} | ${v.texto} |`).join('\n');
+  return `## Hoja de audio (para la mezcla)
+
+Música (con licencia para pauta, sin voces, 100–110 BPM). Mientras hay voz, va de 18 a 20 dB por debajo. Mezcla final: −14 LUFS integrados, pico ≤ −1 dBTP.
+
+| Tiempo (s) | Música |
+|---|---|
+${LINEA.musica.map(m => `| ${coma(m.t)} | ${m.que} |`).join('\n')}
+
+Efectos (genéricos de librería; nunca sonidos de otras marcas):
+
+| Tiempo (s) | Escena | Efecto |
+|---|---|---|
+${filas(LINEA.armar('A').escenas)}
+
+Efectos del gancho B (reemplazan a los de E1–E2):
+
+| Tiempo (s) | Escena | Efecto |
+|---|---|---|
+${filas(LINEA.ganchos.B.escenas)}
+
+Locución A (para colocarla en la mezcla):
+
+| Tiempo (s) | Línea | Texto |
+|---|---|---|
+${voz(LINEA.armar('A'))}
 `;
 }
 
@@ -248,7 +288,7 @@ async function renderizar(navegador, puerto, version, modo, archivo, muestras) {
   let medidasCierre = null;
   for (let f = 0; f < N; f++) {
     const t = f / LINEA.fps;
-    await pagina.evaluate(x => window.dibujar(x), t);
+    await pagina.evaluate(async x => { window.dibujar(x); await window.esperarImagenes(); }, t);
     const png = await pagina.screenshot({ type: 'png' });
     if (!ff.stdin.write(png)) await new Promise(r => ff.stdin.once('drain', r));
     if (muestras && muestras.has(f)) muestras.set(f, png);
@@ -257,7 +297,7 @@ async function renderizar(navegador, puerto, version, modo, archivo, muestras) {
         if (c.x0 < x0 - 0.5 || c.x1 > x1 + 0.5 || c.y0 < y0 - 0.5 || c.y1 > y1 + 0.5) fueraDeZona.push({ t, ...c });
       }
     }
-    if (modo === 'prueba' && Math.abs(t - 21.5) < 1e-6) medidasCierre = await pagina.evaluate(() => window.medirLogoYBoton());
+    if (modo === 'prueba' && Math.abs(t - T_CIERRE) < 1e-6) medidasCierre = await pagina.evaluate(() => window.medirLogoYBoton());
   }
   ff.stdin.end();
   await terminado;
@@ -276,7 +316,7 @@ function sonda(archivo) {
 function medirLogoEnVideo(archivo, tmp) {
   // Recorta la zona del logo en un frame del cierre y mide su contenido contra el archivo original.
   const frame = path.join(tmp, 'cierre.png');
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '21.5', '-i', archivo, '-frames:v', '1', frame]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(T_CIERRE), '-i', archivo, '-frames:v', '1', frame]);
   const medir = (args) => execFileSync('convert', args).toString().trim().split(' ').map(Number);
   const [wv, hv] = medir([frame, '-crop', '1080x400+0+560', '+repage', '-fuzz', '8%', '-trim', '-format', '%w %h', 'info:']);
   const [wo, ho] = medir([path.join(RAIZ, 'marca/logo-horizontal-fondo-marfil.png'), '-fuzz', '8%', '-trim', '-format', '%w %h', 'info:']);
@@ -293,6 +333,7 @@ async function video() {
   const trabajos = [
     { version: 'A', modo: 'prueba', archivo: `animatic-A-${LINEA.version}.mp4` },
     { version: 'A', modo: 'revision', archivo: `animatic-A-${LINEA.version}-revision.mp4` },
+    { version: 'B', modo: 'prueba', archivo: `animatic-B-${LINEA.version}.mp4` },
     { version: 'B', modo: 'revision', archivo: `animatic-B-${LINEA.version}-revision.mp4` },
   ];
   const resultados = {};
@@ -358,7 +399,7 @@ ${r.fueraDeZona.length ? r.fueraDeZona.slice(0, 20).map(c => `- **${coma(c.t)} s
 
 - Archivo: \`marca/logo-horizontal-transparente.png\`, ${m.logo.natW} × ${m.logo.natH} px.
 - En el cierre: ${coma(m.logo.w, 1)} × ${coma(m.logo.h, 1)} px → escala horizontal ${coma(escala * 100, 2)} % y vertical ${coma(escalaV * 100, 2)} % (${ok(Math.abs(escala - escalaV) < 0.001)}: escala uniforme; ${ok(escala <= 1)}: no supera el 100 %).
-- Medido en el MP4 exportado (frame de 21,5 s): contenido del logo ${logo.wv} × ${logo.hv} px, proporción ${coma(logo.ratioVideo, 3)}; en el archivo original ${logo.wo} × ${logo.ho} px, proporción ${coma(logo.ratioOriginal, 3)}. Desvío ${coma(logo.desvio * 100, 2)} % (${ok(logo.desvio < 0.015)}; el margen cubre el redondeo de bordes al codificar).
+- Medido en el MP4 exportado (frame de ${coma(T_CIERRE, 1)} s): contenido del logo ${logo.wv} × ${logo.hv} px, proporción ${coma(logo.ratioVideo, 3)}; en el archivo original ${logo.wo} × ${logo.ho} px, proporción ${coma(logo.ratioOriginal, 3)}. Desvío ${coma(logo.desvio * 100, 2)} % (${ok(logo.desvio < 0.015)}; el margen cubre el redondeo de bordes al codificar).
 - Posición: x ${Math.round(m.logo.x0)}–${Math.round(m.logo.x1)}, y ${Math.round(m.logo.y0)}–${Math.round(m.logo.y1)}; solo sobre fondo marfil.
 
 ## CTA «Publica gratis tu búsqueda»
@@ -366,16 +407,30 @@ ${r.fueraDeZona.length ? r.fueraDeZona.slice(0, 20).map(c => `- **${coma(c.t)} s
 - Botón de ${Math.round(b.w)} × ${Math.round(b.h)} px, texto Outfit ${b.fontWeight} a ${b.fontSize} px.
 - En un celular de 390 pt de ancho (iPhone de 6,1″) el texto se ve a ${coma(b.fontSize * 390 / LINEA.ancho, 1)} pt; en uno de 360 dp, a ${coma(b.fontSize * 360 / LINEA.ancho, 1)} dp. La referencia de texto cómodo en iOS es 17 pt (${ok(b.fontSize * 360 / LINEA.ancho >= 16)}).
 - Contraste blanco sobre verde bosque #142A22: ${coma(contraste('#FFFFFF', '#142A22'), 1)}:1 (mínimo AA para texto grande: 3:1; para texto normal: 4,5:1) ${ok(contraste('#FFFFFF', '#142A22') >= 7)}.
-- Además, el mismo texto aparece antes como titular en E7 (96 px) mientras la voz lo dice.
+- Además, el mismo texto aparece antes como titular (96 px) mientras la voz lo dice.
 - Vista a tamaño de celular: \`cierre-en-movil.png\` en esta carpeta (390 × 693 px).
+
+## Capturas de la app
+
+${capturasUsadas()}
 
 ## Marcadores pendientes (no son pantallas reales)
 
-Versión A:
-${pendientes('A').map(p => `- ${p}`).join('\n')}
-
-Versión B: los mismos desde ${coma(LINEA.comunDesde, 1)} s.
+${pendientes('A').length ? pendientes('A').map(p => `- ${p}`).join('\n') : '- Ninguno: esta versión no muestra ninguna pantalla que no esté en las capturas.'}
 `;
+}
+
+function capturasUsadas() {
+  const F = LINEA.comun.escenas.flatMap(e => e.elementos).find(el => el.tipo === 'formulario');
+  if (!F) return '- Esta versión no usa capturas.';
+  const esc = F.ancho / F.tarjetas.find(c => c.id !== 'cabecera').w;
+  const lupa = F.lupa ? F.lupa.ancho / F.lupa.w : null;
+  return [
+    `- Recortes de \`capturas/recortes/\` (generados por \`capturas/preparar.py\` desde \`capturas/originales/\`): ${F.tarjetas.map(c => NOMBRES_TARJETA[c.id] || c.id).join(', ')}${F.lupa ? ' y la fila de opciones de agentes' : ''}.`,
+    '- No se redibuja nada. Solo se recorta, se amplía y se difumina el teléfono de ejemplo.',
+    `- Las tarjetas se muestran a ${coma(esc, 2)}× el tamaño de la captura. Un rótulo de ~11 px queda en ~${Math.round(11 * esc)} px, unos ${coma(11 * esc * 390 / LINEA.ancho, 1)} pt en un celular de 390 pt: legible como apoyo, pequeño como lectura principal.${lupa ? ` La lupa lo lleva a ~${Math.round(11 * lupa)} px (${coma(11 * lupa * 390 / LINEA.ancho, 1)} pt).` : ''}`,
+    '- Las capturas son de 800 × 500 px y muy comprimidas. Para el anuncio final hacen falta capturas en alta resolución, idealmente de la versión móvil.',
+  ].join('\n');
 }
 
 // ---------- principal ----------
@@ -383,6 +438,16 @@ console.log('Textos de producción');
 for (const V of VERSIONES) escribir(path.join(RAIZ, `subtitulos/version-${V.toLowerCase()}.srt`), srt(LINEA.armar(V)));
 escribir(path.join(RAIZ, 'locucion/guion-locucion.txt'), guionLocucion());
 escribir(path.join(DIR, 'tabla-de-tiempos.md'), tablaTiempos());
+// Copia de los textos dentro de la carpeta de la versión, para conservarlos cuando llegue la siguiente.
+if (!fs.existsSync(path.join(SALIDA, 'CONGELADO'))) {
+  const v = LINEA.version;
+  fs.mkdirSync(SALIDA, { recursive: true });
+  for (const V of VERSIONES) fs.copyFileSync(path.join(RAIZ, `subtitulos/version-${V.toLowerCase()}.srt`), path.join(SALIDA, `version-${V.toLowerCase()}-${v}.srt`));
+  fs.copyFileSync(path.join(RAIZ, 'locucion/guion-locucion.txt'), path.join(SALIDA, `guion-locucion-${v}.txt`));
+  fs.writeFileSync(path.join(SALIDA, `tabla-de-tiempos-${v}.md`), tablaTiempos().replace('[linea-de-tiempo.js](linea-de-tiempo.js)', `[linea-de-tiempo-${v}.js](linea-de-tiempo-${v}.js)`));
+  fs.copyFileSync(path.join(DIR, 'linea-de-tiempo.js'), path.join(SALIDA, `linea-de-tiempo-${v}.js`));
+  console.log(`  copias en animatic/${v}/`);
+}
 const avisos = revisarLinea();
 console.log(avisos.length ? 'Avisos:\n  ' + avisos.join('\n  ') : 'Línea de tiempo sin avisos');
 for (const V of VERSIONES) for (const v of LINEA.armar(V).locucion) {

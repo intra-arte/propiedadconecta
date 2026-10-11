@@ -1,53 +1,48 @@
-# 7 · Gancho alternativo para la prueba A/B
+# 7 · Gancho alternativo para la prueba A/B (v1)
 
 ## Las dos versiones
 
-| | **A · Dolor** (principal) | **B · Inversión** (alternativa) |
+| | **A · Dolor** (principal) | **B · Inversión** (propuesta para probar después) |
 |---|---|---|
-| Primeras palabras | «¿Otra vez “ya se arrendó”?» | «Esta vez, el anuncio lo pones tú.» |
-| Imagen del gancho | Daniela de noche, con burbujas de «ya se arrendó» | Un cartel «SE ARRIENDA» que gira y se convierte en «BUSCO DEPA · 2 hab · Cumbayá · hasta $700» |
-| Hipótesis | Conecta con quien ya está buscando y está cansado. Se espera mejor retención y registros más calificados. | La novedad explica el producto en un segundo. Se espera más gente que se detiene y más clics. |
-| Riesgo | Si el público aún no sufre la búsqueda, el gancho le dice poco. | Puede atraer a **propietarios** que quieren anunciar su inmueble. Lo mitiga la segunda línea, que nombra a compradores y arrendatarios. |
+| Primeras palabras | «¿Otra vez “ya se arrendó”? ¿“Ya se vendió”?» | «Esta vez, el anuncio lo pones tú.» |
+| Imagen del gancho | Daniela de noche, con burbujas de «ya se arrendó» y «ya se vendió» | Un cartel «SE ARRIENDA» en una ventana de Quito que gira y se convierte en la tarjeta real «¿Qué estás buscando?» de la app |
+| Hipótesis | Conecta con quien ya está buscando y está cansado. Se espera mejor retención y registros más calificados. | La novedad explica el producto en un segundo y lo une a la pantalla real. Se espera más gente que se detiene y más clics. |
+| Riesgo | Si el público aún no sufre la búsqueda, el gancho le dice poco. | Puede atraer a **propietarios** que quieren anunciar su inmueble. Lo mitiga la segunda línea, que nombra a quien compra o alquila. |
 
-**Solo cambian los primeros 6,6 s.** De 6,6 a 22,0 s ambas versiones son idénticas: mismo render, misma música, mismo cierre. En la línea de tiempo salen del mismo bloque, así que no pueden desincronizarse. B solo necesita 2 clips extra (C07 y C08). Su animatic de revisión es `animatic/v0/animatic-B-v0-revision.mp4`.
+**Solo cambian los primeros 4,7 s.** Desde 4,7 s («Publica lo que buscas») hasta 23,5 s, A y B son idénticas: mismo render, misma música, mismo cierre. En la línea de tiempo salen del mismo bloque, así que no pueden desincronizarse. B necesita 2 clips extra (C07 y C08).
 
-## Versión B — locución y escenas (0,0 → 6,6 s)
+**Animatics:**
+- `animatic/v1/animatic-B-v1.mp4`, para mostrar;
+- `animatic/v1/animatic-B-v1-revision.mp4`, para revisión.
+
+## Versión B — locución y escenas (0,0 → 4,7 s)
 
 | # | Tiempo (s) | Locución | Síl./s | Dirección |
 |---|---|---|---|---|
 | LB1 | 0,10–2,30 | Esta vez, el anuncio lo pones tú. | 5,0 | Segura, con complicidad. Peso en «tú». |
-| LB2 | 2,50–4,45 | ¿Vas a comprar o arrendar en Quito? | 5,6 | Pregunta directa y cercana. |
-| LB3 | 4,85–6,25 | Publica lo que buscas. | 5,0 | Igual que L3 en A. |
+| LB2 | 2,50–4,50 | ¿Vas a comprar o alquilar en Quito? | 5,5 | Pregunta directa y cercana. |
 
-Desde 6,90 s sigue con L4–L7 exactamente como en la versión A.
+Desde 4,90 s sigue con L3 («Publica lo que buscas.») y el resto exactamente como en la versión A. Se dice «alquilar» para que coincida con la opción de la app.
 
 ### B1 · Gancho — 0,0 → 2,4 s
 
-- **Fuente:** C07 (fachada con cartel en blanco) + carteles compuestos en edición con tracking planar.
-- **Qué se ve:** ventana de planta baja de un edificio residencial del norte de Quito, con un cartel clásico **«SE ARRIENDA»** (letras rojas sobre cartulina blanca; sin teléfono o con uno claramente ficticio, tipo 09•• ••• •••). En 0,5 s el cartel **gira en 3D** (8 frames) y se convierte en una tarjeta de la marca: **«BUSCO DEPA»** en `#142A22` y Outfit Bold, más «2 hab · Cumbayá · hasta $700» y un punto verde brote.
+- **Fuente:** C07 (fachada con un cartel en blanco), más el cartel «SE ARRIENDA» compuesto en edición con tracking planar y la captura real de la tarjeta «¿Qué estás buscando?».
+- **Qué se ve:** la ventana de planta baja de un edificio residencial del norte de Quito, con un cartel clásico «SE ARRIENDA» (letras rojas; sin teléfono, o con uno claramente ficticio). En 0,5 s el cartel gira en 3D y su dorso es la **tarjeta real del formulario**, con «Comprar una propiedad» y «Departamento». Ya no se usa un cartel «BUSCO DEPA» inventado: el giro lleva directo a la app.
 - **Cámara:** trípode con push-in muy lento.
-- **Iluminación:** mañana soleada, sombras limpias.
-- **Sonido:** ambiente de calle con tráfico lejano; sonido de cartulina + whoosh en el giro; música filtrada. Voz LB1.
-- **Texto:** titular «Esta vez, el anuncio lo pones tú.» («tú» con marcador verde brote), desde el frame 0. Sin subtítulos.
+- **Sonido:** ambiente de calle; cartulina que gira y whoosh. Voz LB1.
+- **Texto:** titular «Esta vez, el anuncio lo pones tú.» («tú» con marcador), desde el frame 0.
 - **Transición:** corte directo.
 
-### B2 · Pregunta — 2,4 → 4,6 s
+### B2 · Pregunta — 2,4 → 4,7 s
 
 - **Fuente:** C08.
-- **Qué se ve:** Daniela camina por una calle residencial arbolada del norte de Quito mirando su celular; baja el ritmo y levanta la vista, pensativa.
-- **Cámara:** gimbal retrocediendo frente a ella, plano medio, 35 mm.
-- **Iluminación:** sol suave filtrado por los árboles.
-- **Sonido:** ambiente de calle, pasos; música aún filtrada. Voz LB2.
-- **Texto:** subtítulos «¿Vas a comprar o arrendar» / «en Quito?» (bloques 2–3 de `version-b.srt`).
+- **Qué se ve:** Daniela camina por una calle arbolada del norte de Quito mirando su celular, y levanta la vista, pensativa.
+- **Cámara:** gimbal retrocediendo frente a ella.
+- **Sonido:** pasos y ambiente de calle. Voz LB2.
+- **Texto:** subtítulos «¿Vas a comprar o alquilar» / «en Quito?».
 - **Transición → E3:** barrido chevrón, igual que en A; al terminar entra el beat.
 
-### E3 en la versión B — 4,6 → 6,6 s
-
-El mismo clip C02, con la voz LB3 y el titular «Publica lo que buscas.» desde 4,85 s.
-
-«Cumbayá» y «hasta $700» en el cartel son un ejemplo de lo que alguien buscaría, no datos de la app. Se cambian si la cobertura no incluye los valles.
-
-**Subtítulos que se queman en B:** bloques 2–3 y 9–12 de `version-b.srt`.
+**Nota de honestidad:** la metáfora del cartel sugiere que la búsqueda queda «a la vista». Según la app, la ven los agentes, que pagan por desbloquear el contacto. Si se confirma que solo la ven agentes, la metáfora funciona como «un anuncio para agentes». Aun así, en la prueba con personas conviene comprobar que nadie entienda que su búsqueda o su teléfono quedan públicos. Ver [07](07-verificacion-de-producto.md#3-comprobación-de-afirmaciones-de-la-v1).
 
 ---
 
@@ -80,9 +75,9 @@ Comparar las versiones entre sí, no contra promedios de otras industrias.
 
 ## Texto del anuncio (igual para A y B)
 
-Pendiente de verificación: la frase sobre los agentes depende de que estén activos hoy ([07](07-verificacion-de-producto.md#3-revisión-de-promesas-del-guion)), y el botón «Registrarte» del flujo real de registro.
+Mismas reglas que el video: sin afirmar que hay agentes activos y con el papel del agente en condicional. El botón «Registrarte» depende del flujo real de registro, que sigue pendiente.
 
-- **Texto principal:** ¿Vas a comprar o arrendar en Quito? Publica gratis lo que buscas: tipo de propiedad, sector, presupuesto y características. Agentes inmobiliarios pueden ver tu búsqueda y contactarte si tienen algo para ti.
+- **Texto principal:** ¿Vas a comprar o alquilar en Quito? Publica gratis lo que buscas: tipo de propiedad, ubicación, presupuesto y características. Si un agente tiene algo para ti, puede contactarte, y tú eliges de hasta cuántos agentes.
 - **Título:** Publica gratis tu búsqueda
 - **Botón:** Registrarte
 - **Destino:** directo al formulario para publicar la búsqueda, no a la home. El primer texto de la página repite la promesa del anuncio. El evento de conversión se dispara al publicar la búsqueda.

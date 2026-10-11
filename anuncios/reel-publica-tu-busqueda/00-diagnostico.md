@@ -1,6 +1,6 @@
 # Diagnóstico de recursos — 11 de octubre de 2026
 
-*Actualizado tras el animatic v0 (22 s): secciones 3–6. Las preguntas pendientes están ahora en [07-verificacion-de-producto.md](07-verificacion-de-producto.md).*
+*Diagnóstico inicial, actualizado tras el animatic v0. El estado actual (v1, con capturas reales del formulario) está en el [README](README.md) y en [07-verificacion-de-producto.md](07-verificacion-de-producto.md).*
 
 ## 1. Qué hay realmente disponible
 

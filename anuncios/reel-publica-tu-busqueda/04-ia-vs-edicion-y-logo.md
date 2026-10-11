@@ -8,15 +8,14 @@
 |---|---|---|
 | Personas (Daniela, Andrés) | **IA:** referencia → fotograma clave → video | Es lo más caro de rodar; con referencias se mantiene la consistencia. |
 | Ambientes (departamento, coworking, terraza, calle, fachada) | **IA**, dentro de los mismos clips | Control total de paleta y luz. |
-| Vista de Quito (E7) | **IA, revisada por alguien de Quito.** Si no convence, stock real con licencia. | Un quiteño detecta al instante una ciudad «falsa», y eso resta confianza. |
+| Vista de Quito (E6) | **IA, revisada por alguien de Quito.** Si no convence, stock real con licencia. | Un quiteño detecta al instante una ciudad «falsa», y eso resta confianza. |
 | Fotos de anuncios genéricos (E2) | IA (imagen fija) o stock | Se ven pequeñas y desenfocadas; no deben pertenecer a nadie. |
-| Interfaz de la app (E4, E5) | **Edición:** grabación real o réplica fiel en Figma / After Effects | La IA deforma el texto y podría inventar funciones. La UI debe ser la real. |
+| Interfaz de la app (E4, E5) | **Edición:** recortes de capturas reales (`animatic/capturas/preparar.py`), animados sin redibujar | La IA deforma el texto y podría inventar funciones. La UI debe ser la real. |
 | Burbujas de chat (E1) | Edición | Texto exacto y legible, sin imitar ninguna app real. |
-| Carteles «SE ARRIENDA» / «BUSCO» (B1) | Edición, con tracking sobre el cartel en blanco | La IA no escribe texto confiable. |
+| Cartel «SE ARRIENDA» y su giro hacia la tarjeta real (B1) | Edición, con tracking sobre el cartel en blanco | La IA no escribe texto confiable. |
 | Titulares, subtítulos, botón CTA | Edición | Control de tipografía, tiempos y zonas seguras. |
 | Logo | Edición, con el archivo original | La IA lo deformaría. |
 | Barridos chevrón y animaciones de UI | Edición | Elemento de marca, preciso al frame. |
-| Vibración del celular (E6) | Luz y gesto del clip + SFX + micro-sacudida en edición | La IA no la resuelve de forma convincente. |
 | Locución | Locutora humana (recomendado) o voz IA revisada | Acento quiteño natural y buena entonación de las preguntas. |
 | Música y SFX | Librería con licencia comercial | Derechos para pauta pagada. |
 | Color | Edición | Unifica clips generados por separado. |
@@ -51,8 +50,8 @@ El margen incluido (72 px) equivale al diámetro de un círculo-persona del isot
 
 ### Dónde aparece la marca
 
-- **E4:** solo si la cabecera de la app real muestra el logo; se ve como parte de la interfaz, no se agrega encima.
-- **E8:** logo horizontal + voz «en Propiedad Conecta» en el mismo instante. Decir el nombre mientras aparece el logo refuerza el recuerdo de marca.
+- **E4:** la cabecera real de la app, con su logo, abre el formulario. Es parte de la captura, no un logo agregado encima.
+- **E7 (cierre):** logo horizontal + voz «en Propiedad Conecta» en el mismo instante. Decir el nombre mientras aparece el logo refuerza el recuerdo de marca.
 - No se usa marca de agua durante el video: Meta ya muestra el nombre y la foto de la página. La foto de perfil debería ser el isotipo sobre blanco.
 
 ### Recomendación

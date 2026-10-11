@@ -30,7 +30,7 @@
   }
   #lienzo * { box-sizing: border-box; }
   .capa { position: absolute; inset: 0; }
-  #base { z-index: 1; } #logo { z-index: 2; } #superior { z-index: 3; }
+  #base { z-index: 1; } #form { z-index: 2; } #logo { z-index: 3; } #superior { z-index: 4; }
   .fondo { position: absolute; inset: 0; }
 
   .imagen {
@@ -105,6 +105,24 @@
 
   #logo img { position: absolute; left: 140px; top: 617px; width: 800px; height: auto; transform-origin: 50% 50%; }
 
+  /* Formulario real: recortes de las capturas, sin redibujar nada. */
+  .ventana {
+    position: absolute; left: 65px; width: 950px; top: 270px; height: 978px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+  }
+  .columna { position: absolute; left: 0; top: 0; width: 950px; }
+  .tarjeta { position: absolute; left: 0; width: 950px; border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(20,42,34,.16); }
+  .tarjeta.cabecera { border-radius: 18px; }
+  .tarjeta img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+  .anillo { position: absolute; border: 5px solid var(--conecta); border-radius: 16px; box-shadow: 0 0 0 6px rgba(146,206,88,.35); }
+  .lupa { position: absolute; padding: 22px; background: #fff; border-radius: 26px; box-shadow: 0 16px 40px rgba(20,42,34,.28); transform-origin: 50% 50%; }
+  .lupa img { display: block; width: 100%; height: auto; }
+  .lupa .anillo { inset: 8px; }
+  .toque { position: absolute; border-radius: 50%; background: rgba(146,206,88,.6); }
+  .cara.dorso.captura { inset: auto; background: #fff; border-radius: 26px; overflow: hidden; }
+  .cara.dorso.captura img { width: 100%; height: 100%; display: block; }
+
   .chevron { position: absolute; left: 0; width: 1080px; }
 
   .borrador, .rev-arriba, .rev-barra, .guia { z-index: 5; }
@@ -132,7 +150,7 @@
 </style>
 </head>
 <body>
-<div id="marco"><div id="lienzo"><div id="base" class="capa"></div><div id="logo" class="capa"><img alt="Propiedad Conecta" src="../marca/logo-horizontal-transparente.png"></div><div id="superior" class="capa"></div></div></div>
+<div id="marco"><div id="lienzo"><div id="base" class="capa"></div><div id="form" class="capa"></div><div id="logo" class="capa"><img alt="Propiedad Conecta" src="../marca/logo-horizontal-transparente.png"></div><div id="superior" class="capa"></div></div></div>
 <div id="controles">
   <button id="play">▶ Reproducir</button>
   <input id="tiempo" type="range" min="0" max="22" step="0.01" value="0">
@@ -232,8 +250,15 @@ function cartel(el, t) {
   const ang = 180 * suave(rango(t, el.giro, el.giro + 0.27));
   return `<div class="cartel" data-qa="cartel">
     <div class="cara frente" style="transform:rotateY(${ang}deg)"><strong>SE ARRIENDA</strong><span>Informes: 09•• ••• •••</span></div>
-    <div class="cara dorso" style="transform:rotateY(${ang - 180}deg)"><strong>BUSCO DEPA</strong><span>2 hab · Cumbayá · hasta $700</span><em></em></div>
+    ${dorsoCartel(el, ang)}
   </div>`;
+}
+
+function dorsoCartel(el, ang) {
+  if (!el.dorso) return `<div class="cara dorso" style="transform:rotateY(${ang - 180}deg)"><strong>BUSCO DEPA</strong><span>2 hab · Cumbayá · hasta $700</span><em></em></div>`;
+  // Dorso con una captura real de la app, centrada sobre el cartel (640 × 400).
+  const w = 820, h = w * el.dorso.h / el.dorso.w;
+  return `<div class="cara dorso captura" style="left:${(640 - w) / 2}px;top:${(400 - h) / 2}px;width:${w}px;height:${h}px;transform:rotateY(${ang - 180}deg)"><img src="${RUTA(el.dorso.img)}" alt=""></div>`;
 }
 
 function boton(el, t) {
@@ -294,6 +319,119 @@ function revision(L, e, t) {
   return html;
 }
 
+// ---------- formulario real (capa persistente) ----------
+const capaForm = document.getElementById('form');
+const RUTA = n => `capturas/recortes/${n}.png`;
+const FORM = (() => {
+  const escenas = LINEA.comun.escenas.concat(...Object.values(LINEA.ganchos).map(g => g.escenas));
+  for (const e of escenas) for (const el of e.elementos) if (el.tipo === 'formulario') return el;
+  return null;
+})();
+let formDom = null;
+
+function construirFormulario() {
+  if (!FORM) return;
+  let y = 0;
+  const items = FORM.tarjetas.map(it => {
+    const esc = FORM.ancho / it.w, h = it.h * esc;
+    const r = { ...it, y, h, esc };
+    y += h + FORM.separacion;
+    return r;
+  });
+  let html = '<div class="ventana"><div class="columna">';
+  for (const it of items) {
+    html += `<div class="tarjeta ${it.id}" style="top:${it.y}px;height:${it.h}px"><img src="${RUTA(it.img)}" alt="">`;
+    if (it.lleno) html += `<img class="lleno" src="${RUTA(it.lleno)}" alt="" style="opacity:0">`;
+    FORM.anillos.forEach((a, i) => {
+      if (a.id !== it.id) return;
+      const [x0, y0, x1, y1] = a.caja;
+      html += `<div class="anillo" data-anillo="${i}" style="left:${x0 * it.esc - 6}px;top:${y0 * it.esc - 6}px;width:${(x1 - x0) * it.esc + 12}px;height:${(y1 - y0) * it.esc + 12}px;opacity:0"></div>`;
+    });
+    if (FORM.toque && FORM.toque.id === it.id) html += '<div class="toque" style="opacity:0"></div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+  if (FORM.lupa) {
+    const L = FORM.lupa, ancho = L.ancho + 44;
+    html += `<div class="lupa" style="left:${(W - ancho) / 2}px;top:${L.y}px;width:${ancho}px;opacity:0"><img src="${RUTA(L.img)}" alt=""><div class="anillo"></div></div>`;
+  }
+  capaForm.innerHTML = html;
+  formDom = {
+    items,
+    ventana: capaForm.querySelector('.ventana'),
+    columna: capaForm.querySelector('.columna'),
+    tarjetas: [...capaForm.querySelectorAll('.tarjeta')],
+    anillos: [...capaForm.querySelectorAll('[data-anillo]')],
+    lupa: capaForm.querySelector('.lupa'),
+    toque: capaForm.querySelector('.toque'),
+  };
+}
+
+function opacidadTarjeta(id, t) {
+  const L = FORM.lupa;
+  if (L && t >= L.inicio && t < L.fin) return 0.3;
+  const foco = FORM.focos.filter(f => f.t <= t).pop();
+  return !foco || foco.id === id ? 1 : 0.4;
+}
+
+function dibujarFormulario(t) {
+  if (!formDom) return;
+  const activo = t >= FORM.inicio && t < FORM.fin;
+  capaForm.style.display = activo ? 'block' : 'none';
+  formDom.ventana.dataset.qa = activo ? 'formulario' : '';
+  if (formDom.lupa) formDom.lupa.dataset.qa = '';
+  if (!activo) return;
+
+  // Desplazamiento: vista general y luego cada tarjeta en foco a la altura focoY.
+  // inicialY y focoY están en coordenadas del lienzo; la columna se mueve dentro de la ventana,
+  // que empieza en el borde superior de la zona segura.
+  const pos = id => formDom.items.find(i => i.id === id).y;
+  const tope = Z.arriba;
+  const claves = [{ t: FORM.inicio, y: FORM.inicialY - tope - formDom.items[0].y }]
+    .concat(FORM.focos.map(f => ({ t: f.t, y: FORM.focoY - tope - pos(f.id) })));
+  let y = claves[0].y;
+  for (let i = 1; i < claves.length && t >= claves[i].t; i++) {
+    y = claves[i - 1].y + (claves[i].y - claves[i - 1].y) * suave(rango(t, claves[i].t, claves[i].t + 0.35));
+  }
+  const pe = salida(rango(t, FORM.inicio, FORM.inicio + 0.35));
+  formDom.columna.style.transform = `translateY(${y + (1 - pe) * 240}px)`;
+  formDom.ventana.style.opacity = pe;
+
+  formDom.items.forEach((it, i) => {
+    const nodo = formDom.tarjetas[i];
+    let o = 0;
+    for (let k = 0; k < 6; k++) o += opacidadTarjeta(it.id, t - k * 0.05);
+    nodo.style.opacity = o / 6;
+    if (it.lleno) nodo.querySelector('.lleno').style.opacity = suave(rango(t, it.llenoEn, it.llenoEn + 0.3));
+  });
+  formDom.anillos.forEach(n => {
+    const a = FORM.anillos[+n.dataset.anillo];
+    const dentro = t >= a.inicio && t < a.fin;
+    n.style.opacity = dentro ? Math.min(suave(rango(t, a.inicio, a.inicio + 0.15)), 1 - suave(rango(t, a.fin - 0.15, a.fin))) : 0;
+  });
+  if (formDom.lupa) {
+    const L = FORM.lupa;
+    const o = t >= L.inicio && t < L.fin ? Math.min(salida(rango(t, L.inicio, L.inicio + 0.25)), 1 - suave(rango(t, L.fin - 0.2, L.fin))) : 0;
+    formDom.lupa.style.opacity = o;
+    formDom.lupa.style.transform = `scale(${0.92 + 0.08 * o})`;
+    formDom.lupa.dataset.qa = o > 0 ? 'lupa' : '';
+  }
+  if (formDom.toque) {
+    const it = formDom.items.find(i => i.id === FORM.toque.id);
+    const dt = t - FORM.toque.t;
+    const r = 20 + 160 * salida(dt / 0.4);
+    formDom.toque.style.opacity = dt >= 0 && dt < 0.4 ? 0.7 * (1 - dt / 0.4) : 0;
+    Object.assign(formDom.toque.style, { left: `${W / 2 - 65 - r}px`, top: `${it.h / 2 - r}px`, width: `${2 * r}px`, height: `${2 * r}px` });
+  }
+}
+
+// Espera a que todas las imágenes del lienzo estén decodificadas (para capturar frames completos).
+function esperarImagenes() {
+  return Promise.all([...lienzo.querySelectorAll('img')].map(i =>
+    i.complete && i.naturalWidth ? i.decode().catch(() => {})
+      : new Promise(r => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); })));
+}
+
 // ---------- dibujo de un frame ----------
 function dibujar(t) {
   const L = LINEA.armar(estado.version);
@@ -325,6 +463,7 @@ function dibujar(t) {
     }
   }
   base.innerHTML = abajo;
+  dibujarFormulario(t);
 
   logoImg.style.opacity = logoVisible;
   logoImg.style.transform = `scale(${logoEscala})`;
@@ -377,6 +516,8 @@ async function preparar() {
     document.fonts.load('500 46px Outfit'), document.fonts.load('800 30px Outfit'),
   ]);
   await logoImg.decode();
+  construirFormulario();
+  await esperarImagenes();
   dibujar(estado.t);
   window.LISTO = { fuente: document.fonts.check('700 96px Outfit') };
 }

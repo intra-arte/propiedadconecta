@@ -1,0 +1,51 @@
+1
+00:00:00,100 --> 00:00:01,200
+¿Otra vez “ya se arrendó”?
+
+2
+00:00:01,200 --> 00:00:02,300
+¿“Ya se vendió”?
+
+3
+00:00:02,550 --> 00:00:04,250
+Deja de perseguir anuncios.
+
+4
+00:00:04,900 --> 00:00:06,200
+Publica lo que buscas.
+
+5
+00:00:06,800 --> 00:00:07,900
+Comprar o alquilar,
+
+6
+00:00:07,900 --> 00:00:09,000
+tipo de propiedad,
+
+7
+00:00:09,000 --> 00:00:10,450
+sector, presupuesto…
+
+8
+00:00:10,450 --> 00:00:11,700
+y lo que no puede faltar.
+
+9
+00:00:12,100 --> 00:00:13,900
+Si un agente tiene algo para ti,
+
+10
+00:00:13,900 --> 00:00:15,300
+puede contactarte.
+
+11
+00:00:15,550 --> 00:00:16,950
+Tú eliges hasta cuántos.
+
+12
+00:00:17,850 --> 00:00:19,450
+Publica gratis tu búsqueda
+
+13
+00:00:20,150 --> 00:00:21,450
+en Propiedad Conecta.

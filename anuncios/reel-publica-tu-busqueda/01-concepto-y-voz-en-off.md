@@ -20,65 +20,61 @@
 
 - El enemigo pasa a ser **perseguir anuncios**, no buscar casa: es concreto, reconocible y no promete resultados.
 - **«Lo que buscas»** conecta en espejo con el CTA **«Publica gratis tu búsqueda»**.
-- El mecanismo se explica sin exagerar: *«Agentes inmobiliarios pueden ver tu búsqueda y contactarte si tienen algo para ti.»*
+- El mecanismo se explica sin exagerar ni afirmar que haya agentes activos: *«Si un agente tiene algo para ti, puede contactarte. Tú eliges hasta cuántos.»*
 
-**Arco de 22 s:** dolor reconocible (0–4,6 s) → giro: publica tú (4,6–6,6 s) → cómo funciona con los 4 datos (6,6–11,6 s) → qué pasa después (11,6–17,0 s) → CTA y marca (17,0–22,0 s).
+**Arco de la v1 (23,5 s):** dolor reconocible (0–4,7 s) → giro: «Publica lo que buscas» (4,7–6,4 s) → el formulario real con los 4 datos (6,4–11,9 s) → tus datos y tu control (11,9–17,6 s) → CTA y marca (17,6–23,5 s).
 
-## 1.4 Decisiones de mensaje
+## 1.4 Decisiones de mensaje (v1)
 
 | Decisión | Por qué |
 |---|---|
-| Español de Quito con tuteo: *arriendo/arrendar* (no «alquilar»), *depa*, *sector*, *parqueadero* | Suena local sin forzar modismos. El tuteo funciona para 25–40 años; «usted» queda como prueba futura para compradores mayores. |
-| **No se mencionan los créditos** | Los créditos son del lado del agente. En un anuncio para quien busca solo generan dudas («¿me van a cobrar?»). |
-| **Un solo agente y una sola llamada en pantalla** | Mostrar varios agentes o varias llamadas sugeriría un volumen que no podemos afirmar. |
-| Lenguaje condicional: «pueden ver», «si tienen algo para ti» | Describe el mecanismo sin prometer contactos ni ofertas. |
-| «Gratis» aparece en el CTA (titular de E7 y botón del cierre) | Es donde pesa en la decisión. Se deja fuera de los ganchos para que la prueba A/B compare solo el ángulo. |
-| Una sola palabra para el objeto: **búsqueda** | No alternar con «solicitud», «requerimiento» o «pedido». Si el producto usa «solicitud», elegir una y usarla igual en anuncio, landing y app. |
+| Español de Quito con tuteo. En el problema, las palabras de la calle («ya se arrendó»); al describir el formulario, las palabras de la pantalla («comprar o alquilar», «sector») | La voz suena local y, al mismo tiempo, coincide con lo que la persona ve en la app. |
+| **El anuncio se centra en quien busca** | No hay escena de agente ni de contacto. No se afirma que haya agentes activos ni se dramatiza un resultado. |
+| El papel del agente se dice en condicional: «Si un agente tiene algo para ti, puede contactarte.» | Describe el mecanismo confirmado («Los agentes pagan por desbloquear tu contacto», texto de la app) sin prometer contactos, rapidez ni que encontrará propiedad. |
+| Se muestra «Tus datos de contacto» y la opción de 1, 3 o 5 agentes | Es transparente: al publicar se comparte un teléfono o WhatsApp con agentes, y la persona elige de hasta cuántos quiere recibir contacto. |
+| **No se mencionan los créditos** | Son del lado del agente. Para quien busca, lo relevante es que publicar es gratis. |
+| «Gratis» solo en el CTA | La página lo confirma («Es gratis publicar»). Se deja fuera de los ganchos para que la prueba A/B compare solo el ángulo. |
+| CTA «Publica gratis tu búsqueda» aunque el botón de la app diga «Publicar solicitud» | Se mantiene por tu indicación y porque «búsqueda» es más natural. Conviene unificar a futuro ([08](08-capturas-y-secuencia-v1.md)). |
 
 ## 1.5 Verificación de afirmaciones
 
-La revisión completa, frase por frase y con alternativas según cada respuesta, está en [07-verificacion-de-producto.md](07-verificacion-de-producto.md#3-revisión-de-promesas-del-guion).
-
-| Afirmación | Dónde | Estado |
-|---|---|---|
-| Publicar es gratis | E7 y E8 (CTA) | Confirmado en el brief. Falta confirmar que no haya límites ni cobros posteriores. |
-| Se indica tipo de propiedad, ubicación, presupuesto y características | E4 (voz L4) | Confirmado. **Cómo se ve en la app: CAPTURA PENDIENTE.** |
-| Agentes inmobiliarios pueden ver tu búsqueda | E5 (voz L5) | Confirmado por el brief. **POR CONFIRMAR que ya estén activos hoy**; si no, cambia L5. |
-| … y contactarte si tienen algo para ti | E6 (voz L6) | Confirmado como posibilidad, no como resultado. **Canal POR CONFIRMAR.** |
-| Vista del agente (cómo ve y desbloquea una búsqueda) | E5 | **CAPTURA PENDIENTE.** Se muestra solo lo que muestre la captura. |
-| «Ahora en Quito» | — | Fuera del animatic hasta confirmar cobertura. |
-| Cifras, testimonios, cantidad de agentes, rapidez, agentes verificados, notificaciones, chat interno, coincidencias automáticas | — | **No se usan** |
+La comprobación frase por frase de la v1 está en [07-verificacion-de-producto.md](07-verificacion-de-producto.md#3-comprobación-de-afirmaciones-de-la-v1).
 
 ---
 
-## 2 · Voz en off — Versión A (principal, 22 s)
+## 2 · Locución definitiva — Versión A (v1, 23,5 s)
 
-Los tiempos salen de [animatic/linea-de-tiempo.js](animatic/linea-de-tiempo.js); la tabla completa está en [animatic/tabla-de-tiempos.md](animatic/tabla-de-tiempos.md).
+Los tiempos salen de [animatic/linea-de-tiempo.js](animatic/linea-de-tiempo.js); la tabla completa está en [animatic/tabla-de-tiempos.md](animatic/tabla-de-tiempos.md). Los subtítulos sincronizados están en `subtitulos/version-a.srt`.
 
 | # | Tiempo (s) | Locución | Síl./s | Dirección |
 |---|---|---|---|---|
-| L1 | 0,10–1,60 | ¿Otra vez «ya se arrendó»? | 5,3 | Empática, con media ironía, como quien ya lo vivió. |
-| L2 | 1,80–4,40 | Deja de perseguir anuncios por todo Quito. | 5,4 | Firme, sin regañar. Peso en «perseguir». |
-| L3 | 4,75–6,55 | Mejor publica tú lo que buscas. | 5,6 | Sonrisa en la voz. Peso en «tú». |
-| L4 | 6,90–11,10 | Tipo de propiedad, sector, presupuesto… y lo que no puede faltar. | 4,8 | Lista con ritmo; micro-pausa entre datos. |
-| L5 | 11,70–14,35 | Agentes inmobiliarios pueden ver tu búsqueda | 5,7 | Clara, informativa. |
-| L6 | 14,50–16,90 | y contactarte si tienen algo para ti. | 5,4 | Tranquila, cercana. No vender de más. |
-| L7a | 17,30–18,90 | Publica gratis tu búsqueda… | 5,6 | Directa y cálida. «Gratis» con peso. |
-| L7b | 19,40–20,70 | en Propiedad Conecta. | 5,4 | Marca bien clara; coincide con la aparición del logo. |
+| L1 | 0,10–2,30 | ¿Otra vez «ya se arrendó»? ¿«Ya se vendió»? | 5,5 | Empática, con media ironía; pausa breve entre las dos preguntas. |
+| L2 | 2,55–4,25 | Deja de perseguir anuncios. | 5,3 | Firme, sin regañar. Peso en «perseguir». |
+| L3 | 4,90–6,20 | Publica lo que buscas. | 5,4 | Sonrisa en la voz; es la solución. |
+| L4 | 6,80–11,70 | Comprar o alquilar, tipo de propiedad, sector, presupuesto… y lo que no puede faltar. | 5,3 | Lista con ritmo; cada dato cuando aparece su tarjeta. |
+| L5 | 12,10–15,30 | Si un agente tiene algo para ti, puede contactarte. | 5,6 | Clara y tranquila: es una posibilidad, no una promesa. |
+| L6 | 15,55–16,95 | Tú eliges hasta cuántos. | 5,7 | Cercana; peso en «tú». |
+| L7a | 17,85–19,45 | Publica gratis tu búsqueda… | 5,6 | Directa y cálida. «Gratis» con peso. |
+| L7b | 20,15–21,45 | en Propiedad Conecta. | 5,4 | Marca bien clara; coincide con la aparición del logo. |
 
-**¿Suena natural en 22 s?** Son 49 palabras y 96 sílabas. Se midió cada línea en sílabas por segundo, con un criterio estricto: el conteo no une vocales entre palabras, así que el ritmo real será igual o más tranquilo que el medido.
-- Hasta 5,8 síl./s suena tranquilo; hasta 6,3, ágil; más rápido, apurado.
-- Todas las líneas quedan entre 4,8 y 5,7: **ninguna exige hablar rápido.**
-- La voz termina en 20,7 s y deja 1,3 s de cierre sin voz, para que el loop no corte una palabra.
+**Ritmo:** 50 palabras y 96 sílabas. Todas las líneas quedan entre 5,3 y 5,7 síl./s, un ritmo natural (el conteo es estricto: no une vocales entre palabras). La voz termina en 21,45 s y deja 2 s de cierre sin voz.
 
-**Qué cambió respecto de la versión de 25 s:** se quitó «¿Ya se vendió?» de la voz. Con esa pregunta, la propuesta inicial de 22 s dejaba cuatro líneas (L1, L2, L3 y L5) entre 6,0 y 6,3 síl./s, en el límite de lo apurado. La idea no se pierde: sigue en pantalla como la segunda burbuja («Ese ya se vendió.»), y la versión B nombra a los compradores en la voz. El resto del texto es el mismo; los 3 s salieron de las pausas y del cierre.
+**Qué cambió respecto de la v0:**
+- Vuelve «¿Ya se vendió?», porque la demostración muestra una compra y hay tiempo.
+- L2 y L3 dicen exactamente el concepto: «Deja de perseguir anuncios. Publica lo que buscas.»
+- L4 usa las palabras del formulario real.
+- L5 deja de afirmar que los agentes «pueden ver tu búsqueda» y pasa al condicional.
+- L6 es nueva y se basa en una opción visible en la app.
+- Salieron las escenas del agente y del contacto.
+
+**Antes de grabar la final,** confirmar que el límite de 1, 3 o 5 agentes se aplica de verdad. Si no, L6 se quita (−1,4 s) y la lupa también.
 
 ### Si la voz guía suena apurada
 
 Recortar en este orden y **no acelerar la voz en edición más de un 5 %**:
 
-1. L2 → «Deja de perseguir anuncios.» (−0,9 s; se pierde la mención de Quito en la voz).
-2. L5 → «Los agentes pueden verla» (−0,6 s).
+1. L1 → «¿Otra vez «ya se arrendó»?» (−0,9 s; «Ya se vendió» queda como burbuja).
+2. L4 → «Tipo de propiedad, sector, presupuesto… y lo que no puede faltar.» (−1 s).
 
 ### Casting y grabación
 

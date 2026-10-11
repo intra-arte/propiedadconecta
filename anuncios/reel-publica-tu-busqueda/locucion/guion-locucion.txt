@@ -1,4 +1,4 @@
-PROPIEDAD CONECTA — Reel «Publica tu búsqueda» — Locución del animatic v0 (22,0 s)
+PROPIEDAD CONECTA — Reel «Publica tu búsqueda» — Locución del animatic v1 (23,5 s)
 Generado desde animatic/linea-de-tiempo.js con «node generar.mjs». No editar a mano.
 
 Voz femenina, 25–35 años, cálida y conversacional, como una amiga que da
@@ -14,28 +14,28 @@ sobre el video (sin música), de corrido y a ritmo natural.
 VERSIÓN A (principal)
 ==============================================================
 
-[0,10–1,60]  ¿Otra vez «ya se arrendó»?
-               (Empática, con media ironía, como quien ya lo vivió. · 8 sílabas en 1,50 s = 5,3 síl./s, natural)
+[0,10–2,30]  ¿Otra vez «ya se arrendó»? ¿«Ya se vendió»?
+               (Empática, con media ironía, como quien ya lo vivió. Pausa breve entre las dos preguntas. · 12 sílabas en 2,20 s = 5,5 síl./s, natural)
 
-[1,80–4,40]  Deja de perseguir anuncios por todo Quito.
-               (Firme, sin regañar. Peso en «perseguir». · 14 sílabas en 2,60 s = 5,4 síl./s, natural)
+[2,55–4,25]  Deja de perseguir anuncios.
+               (Firme, sin regañar. Peso en «perseguir». · 9 sílabas en 1,70 s = 5,3 síl./s, natural)
 
-[4,75–6,55]  Mejor publica tú lo que buscas.
-               (Sonrisa en la voz. Peso en «tú». · 10 sílabas en 1,80 s = 5,6 síl./s, natural)
+[4,90–6,20]  Publica lo que buscas.
+               (Sonrisa en la voz; es la solución. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
 
-[6,90–11,10]  Tipo de propiedad, sector, presupuesto… y lo que no puede faltar.
-               (Lista con ritmo; micro-pausa entre datos. · 20 sílabas en 4,20 s = 4,8 síl./s, natural)
+[6,80–11,70]  Comprar o alquilar, tipo de propiedad, sector, presupuesto… y lo que no puede faltar.
+               (Lista con ritmo; micro-pausa entre datos, cada uno cuando aparece su tarjeta. · 26 sílabas en 4,90 s = 5,3 síl./s, natural)
 
-[11,70–14,35]  Agentes inmobiliarios pueden ver tu búsqueda
-               (Clara, informativa. · 15 sílabas en 2,65 s = 5,7 síl./s, natural)
+[12,10–15,30]  Si un agente tiene algo para ti, puede contactarte.
+               (Clara y tranquila. Es una posibilidad, no una promesa: sin énfasis de venta. · 18 sílabas en 3,20 s = 5,6 síl./s, natural)
 
-[14,50–16,90]  y contactarte si tienen algo para ti.
-               (Tranquila, cercana. No vender de más. · 13 sílabas en 2,40 s = 5,4 síl./s, natural)
+[15,55–16,95]  Tú eliges hasta cuántos.
+               (Cercana; peso en «tú». · 8 sílabas en 1,40 s = 5,7 síl./s, natural)
 
-[17,30–18,90]  Publica gratis tu búsqueda…
+[17,85–19,45]  Publica gratis tu búsqueda…
                (Directa y cálida. «Gratis» con peso. · 9 sílabas en 1,60 s = 5,6 síl./s, natural)
 
-[19,40–20,70]  en Propiedad Conecta.
+[20,15–21,45]  en Propiedad Conecta.
                (Marca bien clara; coincide con la aparición del logo. · 7 sílabas en 1,30 s = 5,4 síl./s, natural)
 
 ==============================================================
@@ -45,10 +45,7 @@ VERSIÓN B (prueba A/B) — solo cambian las tres primeras líneas
 [0,10–2,30]  Esta vez, el anuncio lo pones tú.
                (Segura, con complicidad. Peso en «tú». · 11 sílabas en 2,20 s = 5,0 síl./s, natural)
 
-[2,50–4,45]  ¿Vas a comprar o arrendar en Quito?
-               (Pregunta directa y cercana. · 11 sílabas en 1,95 s = 5,6 síl./s, natural)
+[2,50–4,50]  ¿Vas a comprar o alquilar en Quito?
+               (Pregunta directa y cercana. · 11 sílabas en 2,00 s = 5,5 síl./s, natural)
 
-[4,85–6,25]  Publica lo que buscas.
-               (Igual que L3 en A. · 7 sílabas en 1,40 s = 5,0 síl./s, natural)
-
-Desde [6,90] sigue igual que la versión A.
+Desde [4,90] sigue igual que la versión A.
