@@ -1,0 +1,55 @@
+1
+00:00:00,100 --> 00:00:02,100
+Esta vez, el anuncio lo pones tú.
+
+2
+00:00:02,400 --> 00:00:03,600
+¿Vas a comprar o arrendar
+
+3
+00:00:03,600 --> 00:00:04,400
+en Quito?
+
+4
+00:00:05,000 --> 00:00:06,700
+Publica lo que buscas.
+
+5
+00:00:07,000 --> 00:00:08,300
+Tipo de propiedad,
+
+6
+00:00:08,300 --> 00:00:09,100
+sector,
+
+7
+00:00:09,100 --> 00:00:09,900
+presupuesto…
+
+8
+00:00:09,900 --> 00:00:11,300
+y lo que no puede faltar.
+
+9
+00:00:12,100 --> 00:00:13,400
+Agentes inmobiliarios
+
+10
+00:00:13,400 --> 00:00:14,900
+pueden ver tu búsqueda
+
+11
+00:00:15,000 --> 00:00:15,900
+y contactarte
+
+12
+00:00:15,900 --> 00:00:17,400
+si tienen algo para ti.
+
+13
+00:00:18,400 --> 00:00:20,000
+Publica gratis tu búsqueda
+
+14
+00:00:20,200 --> 00:00:21,600
+en Propiedad Conecta.

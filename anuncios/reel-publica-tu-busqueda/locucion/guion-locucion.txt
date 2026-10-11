@@ -1,0 +1,49 @@
+PROPIEDAD CONECTA — Reel «Publica tu búsqueda» — Locución (25 s)
+
+Voz femenina, 25–35 años, cálida y conversacional, como una amiga que da
+un consejo práctico. Acento quiteño suave o latinoamericano neutro.
+Sin tono de locutor de radio. Grabación seca, 48 kHz / 24 bit, 3 tomas por línea.
+Los tiempos indican dónde empieza y termina cada línea dentro del video.
+
+==============================================================
+VERSIÓN A (principal)
+==============================================================
+
+[0,1–2,1]  ¿Otra vez «ya se arrendó»? ¿«Ya se vendió»?
+           (empática, media ironía)
+
+[2,3–4,7]  Deja de perseguir anuncios por todo Quito.
+           (firme, sin regañar; peso en «perseguir»)
+
+[5,0–6,7]  Mejor publica tú lo que buscas.
+           (sonrisa en la voz; peso en «tú»)
+
+[7,0–11,3] Tipo de propiedad, sector, presupuesto… y lo que no puede faltar.
+           (lista con ritmo, micro-pausa entre campos)
+
+[12,1–14,9] Agentes inmobiliarios pueden ver tu búsqueda
+[15,0–17,4] y contactarte si tienen algo para ti.
+           (clara, tranquila; no vender de más)
+
+[18,4–20,0] Publica gratis tu búsqueda…
+[20,2–21,6] en Propiedad Conecta.
+           (directa y cálida; «gratis» con peso; marca bien clara)
+
+==============================================================
+VERSIÓN B (prueba A/B) — solo cambian las tres primeras líneas
+==============================================================
+
+[0,1–2,1]  Esta vez, el anuncio lo pones tú.
+           (segura, con complicidad; peso en «tú»)
+
+[2,4–4,4]  ¿Vas a comprar o arrendar en Quito?
+           (pregunta directa y cercana)
+
+[5,0–6,7]  Publica lo que buscas.
+
+Desde [7,0] sigue igual que la versión A.
+
+--------------------------------------------------------------
+Si no entra en el tiempo, recortar en este orden (no acelerar más de 5 %):
+1. «Deja de perseguir anuncios.» (sin «por todo Quito»)
+2. «Los agentes pueden verla» en lugar de «Agentes inmobiliarios pueden ver tu búsqueda»
