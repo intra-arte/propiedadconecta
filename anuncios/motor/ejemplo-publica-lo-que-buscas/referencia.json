@@ -1,0 +1,69 @@
+{
+ "nota": "Huellas del anuncio aprobado (motion-v1). «anuncio.mjs probar» vuelve a generar el ejemplo con el motor y las compara. Fotogramas: firma de píxeles (identify -format %#) con 3 subfotogramas de desenfoque (1 en el de revisión). Si cambia la versión de Chromium puede haber diferencias mínimas de rasterizado: en ese caso, comparar a ojo con entregables/ del original.",
+ "muestras": 3,
+ "fotogramas": [
+  {
+   "v": "A",
+   "t": 1.25,
+   "rev": false,
+   "firma": "7cf28897e9d6dd509dfd081b3583f499440a0915ef530a0ebb1fdac28e5dd0d9"
+  },
+  {
+   "v": "A",
+   "t": 2.75,
+   "rev": false,
+   "firma": "1255503d9576d14d3b47f2df13d9b16fc3ddd716bb779b8d08d1a83dfef801fb"
+  },
+  {
+   "v": "A",
+   "t": 5.3,
+   "rev": false,
+   "firma": "427630977b9f8a0100c2558585bafd078391ce7be681616f4076db9a372511be"
+  },
+  {
+   "v": "A",
+   "t": 8.4,
+   "rev": false,
+   "firma": "8e6e6f976d01396133ea4ee883414fe860cf87b74afe4e7c4185004b86bd3cb7"
+  },
+  {
+   "v": "A",
+   "t": 11.6,
+   "rev": false,
+   "firma": "1560da3548a4f785f231f329ada0cce816ec461c7efbae54d4fd54da3a8132ad"
+  },
+  {
+   "v": "A",
+   "t": 15.5,
+   "rev": false,
+   "firma": "ca118b740895ebb6a835a56af99824e5cb14488cb9de64f080a82525f68a112a"
+  },
+  {
+   "v": "B",
+   "t": 1.5,
+   "rev": false,
+   "firma": "3fb857ec526c52607f07b26163894a842db74ea32675ef1745bd6d70c0c61180"
+  },
+  {
+   "v": "B",
+   "t": 2.1,
+   "rev": false,
+   "firma": "8888f1f04d488e60471d4fcdc068f21a8236ee2f3beaee87083662a01de8ffe7"
+  },
+  {
+   "v": "A",
+   "t": 9.1,
+   "rev": true,
+   "firma": "267ae6f3fa0b13066a07ba539f0b84a469ae48238ff56eeab9892d4145320506",
+   "muestras": 1
+  }
+ ],
+ "audio": {
+  "voz-A": "708822c173aa6a9e892b32906c0fa97273257bb0ffc162ad5a78b929d5be33dd",
+  "voz-B": "332fb660a97f6962c20fe18fda0ca3ab38ba4bb249fab397361b13bc3fed50e4",
+  "musica-A": "083cd92c1eebd5d99ec8fd1c126fa9073d9197347793e0db57a5b6f14df3aaf9",
+  "musica-B": "cb0bcfeabb7504d479731503d608e7a41d59e3a9fd1214b74e17a1ecd3403552",
+  "mezcla-A": "d5b14ce2e3cf169f3d34460550b5a8596fbc9ccf14e0c140abc9d5134718fd90",
+  "mezcla-B": "0d0a5ee6969bef2dd0e3440b49e332bd0f05c413580ec25168bdea1e712188b2"
+ }
+}
