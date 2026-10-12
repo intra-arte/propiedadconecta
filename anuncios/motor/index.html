@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Propiedad Conecta · motor de anuncios</title>
+<!-- los anuncios importan el motor como «motor/…», estén en la carpeta que estén -->
+<script type="importmap">{ "imports": { "motor/": "/motor/" } }</script>
+<style>
+  @font-face { font-family: 'JB'; src: url(/motor/fuentes/JetBrainsMono.woff2) format('woff2'); font-weight: 100 800; }
+  html, body { margin: 0; background: #0b0b0b; overflow: hidden; }
+  canvas { display: block; height: 100vh; width: auto; margin: 0 auto; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script type="module" src="/motor/main.js"></script>
+</body>
+</html>

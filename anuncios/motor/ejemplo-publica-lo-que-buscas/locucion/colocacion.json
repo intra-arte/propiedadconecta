@@ -1,0 +1,310 @@
+{
+ "generado": "node voz.mjs — no editar a mano",
+ "nivelLinea": -20,
+ "A": [
+  {
+   "id": "L1",
+   "texto": "Deja de perseguir anuncios.",
+   "toma": "L1-deja-de-perseguir-anuncios.mp3",
+   "pendiente": false,
+   "inicio": 0.1,
+   "fin": 1.895,
+   "compresionMaxDb": 3.1,
+   "limitadorMaxDb": 2.4,
+   "frases": [
+    {
+     "texto": "Deja de perseguir anuncios.",
+     "corte": [
+      0,
+      2
+     ],
+     "inicio": 0.1,
+     "fin": 1.895,
+     "ancla": "0,10 s"
+    }
+   ]
+  },
+  {
+   "id": "L2",
+   "texto": "Publica lo que buscas.",
+   "toma": "L2-publica-lo-que-buscas.mp3",
+   "pendiente": false,
+   "inicio": 2.69,
+   "fin": 3.985,
+   "compresionMaxDb": 4.6,
+   "limitadorMaxDb": 4.3,
+   "frases": [
+    {
+     "texto": "Publica lo que buscas.",
+     "corte": [
+      0.3,
+      2.04
+     ],
+     "inicio": 2.69,
+     "fin": 3.985,
+     "ancla": "tilde (beat 5,50) −0,06 s",
+     "imagen": 2.75
+    }
+   ]
+  },
+  {
+   "id": "L3",
+   "texto": "Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.",
+   "toma": "L3-tipo-de-propiedad-ubicacion-presupuesto-y-lo-que-no-puede-faltar.mp3",
+   "pendiente": false,
+   "inicio": 4.82,
+   "fin": 10.01,
+   "compresionMaxDb": 4.4,
+   "limitadorMaxDb": 5.3,
+   "frases": [
+    {
+     "texto": "Tipo de propiedad,",
+     "corte": [
+      0,
+      1.25
+     ],
+     "inicio": 4.82,
+     "fin": 5.975,
+     "ancla": "rotulos[0] (beat 10,00) −0,18 s",
+     "imagen": 5
+    },
+    {
+     "texto": "ubicación,",
+     "corte": [
+      1.25,
+      2.335
+     ],
+     "inicio": 6.09,
+     "fin": 7.055,
+     "ancla": "rotulos[1] (beat 12,00) +0,09 s",
+     "imagen": 6
+    },
+    {
+     "texto": "presupuesto…",
+     "corte": [
+      2.335,
+      3.42
+     ],
+     "inicio": 7.16,
+     "fin": 8.05,
+     "ancla": "rotulos[2] (beat 14,00) +0,16 s",
+     "imagen": 7
+    },
+    {
+     "texto": "y lo que no puede faltar.",
+     "corte": [
+      3.6,
+      5.6
+     ],
+     "inicio": 8.22,
+     "fin": 10.01,
+     "ancla": "rotulos[3] (beat 16,00) +0,22 s",
+     "imagen": 8
+    }
+   ]
+  },
+  {
+   "id": "L4",
+   "texto": "Publica gratis tu búsqueda.",
+   "toma": "L4-publica-gratis-tu-busqueda.mp3",
+   "pendiente": false,
+   "inicio": 11.4,
+   "fin": 13.12,
+   "compresionMaxDb": 4.1,
+   "limitadorMaxDb": 5.7,
+   "frases": [
+    {
+     "texto": "Publica gratis tu búsqueda.",
+     "corte": [
+      0,
+      2.16
+     ],
+     "inicio": 11.4,
+     "fin": 13.12,
+     "ancla": "cta (beat 22,50) +0,15 s",
+     "imagen": 11.25
+    }
+   ]
+  },
+  {
+   "id": "L5",
+   "texto": "En Propiedad Conecta.",
+   "toma": "L5-en-propiedad-conecta.mp3",
+   "pendiente": false,
+   "inicio": 13.24,
+   "fin": 14.635,
+   "compresionMaxDb": 4.4,
+   "limitadorMaxDb": 3.5,
+   "frases": [
+    {
+     "texto": "En Propiedad Conecta.",
+     "corte": [
+      0,
+      1.6
+     ],
+     "inicio": 13.24,
+     "fin": 14.635,
+     "ancla": "0,12 s después de la frase anterior"
+    }
+   ]
+  }
+ ],
+ "B": [
+  {
+   "id": "LB1",
+   "texto": "Esta vez, el anuncio lo pones tú.",
+   "toma": "LB1-esta-vez-el-anuncio-lo-pones-tu.mp3",
+   "pendiente": false,
+   "inicio": 0.04,
+   "fin": 2.545,
+   "compresionMaxDb": 4,
+   "limitadorMaxDb": 3.4,
+   "frases": [
+    {
+     "texto": "Esta vez,",
+     "corte": [
+      0,
+      0.84
+     ],
+     "inicio": 0.04,
+     "fin": 0.8,
+     "ancla": "0,04 s"
+    },
+    {
+     "texto": "el anuncio lo pones tú.",
+     "corte": [
+      0.84,
+      2.88
+     ],
+     "inicio": 0.9,
+     "fin": 2.545,
+     "ancla": "0,10 s después de la frase anterior"
+    }
+   ]
+  },
+  {
+   "id": "L2",
+   "texto": "Publica lo que buscas.",
+   "toma": "L2-publica-lo-que-buscas.mp3",
+   "pendiente": false,
+   "inicio": 2.69,
+   "fin": 3.985,
+   "compresionMaxDb": 4.6,
+   "limitadorMaxDb": 4.3,
+   "frases": [
+    {
+     "texto": "Publica lo que buscas.",
+     "corte": [
+      0.3,
+      2.04
+     ],
+     "inicio": 2.69,
+     "fin": 3.985,
+     "ancla": "tilde (beat 5,50) −0,06 s",
+     "imagen": 2.75
+    }
+   ]
+  },
+  {
+   "id": "L3",
+   "texto": "Tipo de propiedad, ubicación, presupuesto… y lo que no puede faltar.",
+   "toma": "L3-tipo-de-propiedad-ubicacion-presupuesto-y-lo-que-no-puede-faltar.mp3",
+   "pendiente": false,
+   "inicio": 4.82,
+   "fin": 10.01,
+   "compresionMaxDb": 4.4,
+   "limitadorMaxDb": 5.3,
+   "frases": [
+    {
+     "texto": "Tipo de propiedad,",
+     "corte": [
+      0,
+      1.25
+     ],
+     "inicio": 4.82,
+     "fin": 5.975,
+     "ancla": "rotulos[0] (beat 10,00) −0,18 s",
+     "imagen": 5
+    },
+    {
+     "texto": "ubicación,",
+     "corte": [
+      1.25,
+      2.335
+     ],
+     "inicio": 6.09,
+     "fin": 7.055,
+     "ancla": "rotulos[1] (beat 12,00) +0,09 s",
+     "imagen": 6
+    },
+    {
+     "texto": "presupuesto…",
+     "corte": [
+      2.335,
+      3.42
+     ],
+     "inicio": 7.16,
+     "fin": 8.05,
+     "ancla": "rotulos[2] (beat 14,00) +0,16 s",
+     "imagen": 7
+    },
+    {
+     "texto": "y lo que no puede faltar.",
+     "corte": [
+      3.6,
+      5.6
+     ],
+     "inicio": 8.22,
+     "fin": 10.01,
+     "ancla": "rotulos[3] (beat 16,00) +0,22 s",
+     "imagen": 8
+    }
+   ]
+  },
+  {
+   "id": "L4",
+   "texto": "Publica gratis tu búsqueda.",
+   "toma": "L4-publica-gratis-tu-busqueda.mp3",
+   "pendiente": false,
+   "inicio": 11.4,
+   "fin": 13.12,
+   "compresionMaxDb": 4.1,
+   "limitadorMaxDb": 5.7,
+   "frases": [
+    {
+     "texto": "Publica gratis tu búsqueda.",
+     "corte": [
+      0,
+      2.16
+     ],
+     "inicio": 11.4,
+     "fin": 13.12,
+     "ancla": "cta (beat 22,50) +0,15 s",
+     "imagen": 11.25
+    }
+   ]
+  },
+  {
+   "id": "L5",
+   "texto": "En Propiedad Conecta.",
+   "toma": "L5-en-propiedad-conecta.mp3",
+   "pendiente": false,
+   "inicio": 13.24,
+   "fin": 14.635,
+   "compresionMaxDb": 4.4,
+   "limitadorMaxDb": 3.5,
+   "frases": [
+    {
+     "texto": "En Propiedad Conecta.",
+     "corte": [
+      0,
+      1.6
+     ],
+     "inicio": 13.24,
+     "fin": 14.635,
+     "ancla": "0,12 s después de la frase anterior"
+    }
+   ]
+  }
+ ]
+}
