@@ -29,6 +29,16 @@ export class Biquad {
 }
 
 // ---------- voces ----------
+// La moneda: dos parciales metálicos inarmónicos que se apagan rápido, más un golpe de ruido muy corto.
+export function moneda(f = 2350, len = 0.5) {
+  const x = buf(len), hp = new Biquad('hp', 1800);
+  for (let i = 0; i < x.length; i++) {
+    const t = i / SR, e = Math.exp(-t / 0.09), e2 = Math.exp(-t / 0.035);
+    x[i] = 0.55 * Math.sin(TAU * f * t) * e + 0.35 * Math.sin(TAU * f * 1.507 * t + 1) * e2 + 0.18 * Math.sin(TAU * f * 2.73 * t) * e2
+      + (t < 0.004 ? hp.run(noise()) * (1 - t / 0.004) * 0.6 : 0);
+  }
+  return x;
+}
 // El «punto»: marimba de vidrio (FM 1:2 con un parcial de campana que se apaga rápido).
 export function punto(m, len = 1.2, bright = 1) {
   const o = buf(len), f = hz(m);

@@ -3,7 +3,7 @@
 //                                  audio de salida/mezcla-A.wav, o de musica-A.wav si todavía no hay mezcla con voz)
 // render.mjs --hoja --v A [--rev]  un fotograma por beat → salida/hoja-A.png y salida/hoja-A-movil.png (390 px por fotograma)
 // render.mjs --en 1.2,3.4 --v B    fotogramas sueltos → salida/fotograma-B-<t>.png
-// opciones: --fps 30 --muestras 10 --hilos 4 --desde 0 --hasta 32 --paso 1 --desfase 0.06 --nombre hoja-A
+// opciones: --fps 30 --muestras 10 --hilos 4 --desde 0 --hasta <BEATS> --paso 1 --desfase 0.06 --nombre hoja-A
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
@@ -53,7 +53,7 @@ const P = beats[1] - beats[0];
 const coma = (n, d = 2) => n.toFixed(d).replace('.', ',');
 
 if (flag('hoja')) {
-  const off = +opt('desfase', 0.06), from = +opt('desde', 0), to = +opt('hasta', 32), step = +opt('paso', 1);
+  const off = +opt('desfase', 0.06), from = +opt('desde', 0), to = +opt('hasta', G.BEATS), step = +opt('paso', 1);
   const times = [];
   for (let b = from; b < to - 1e-9; b += step) times.push(+(beats[0] + b * P + off).toFixed(4));
   const files = [];

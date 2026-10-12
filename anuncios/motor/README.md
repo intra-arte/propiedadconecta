@@ -13,7 +13,8 @@ El motor con el que se hizo «Publica lo que buscas», separado del anuncio para
 | `nucleo/tipo.js` y `glifos.js`: Outfit con peso interpolado letra por letra | `partitura.mjs`: `componer()`, las notas y los SFX sobre los eventos |
 | `nucleo/dsp.mjs`: síntesis, voces de la marca, reverb, sonoridad, limitador | `capturas/`, `locucion/tomas/`: materiales reales, sin editar |
 | `escenas/punto.js`: el punto verde (estiramiento, impactos, aro) | `beats.json`, `locucion/colocacion.json`: generados, se versionan |
-| `escenas/producto.js`: marco + página de capturas + cabecera + foco + barridos + botón | `guion-tecnico.md`, `subtitulos/`, `locucion/guion-locucion.txt`: generados |
+| `escenas/producto.js`: marco + página de capturas apiladas + cabecera + foco + barridos + botón | `guion-tecnico.md`, `subtitulos/`, `locucion/guion-locucion.txt`: generados |
+| `escenas/pantallas.js`: marco + pantallas sueltas (un recorte por paso, en el orden del flujo) + cabecera | |
 | `escenas/cierre.js`: punto → isotipo, nombre, botón CTA | `salida/`: renders (no se versiona) |
 | `escenas/revision.js`, `main.js`, `index.html`: desenfoque de movimiento y carga del anuncio | `entregables/`, `revision/`, `informe-qa.md`: lo que se entrega |
 | `herramientas/`: voz, música, beats, textos, render, controles | |
@@ -49,13 +50,16 @@ Vista previa en el navegador: servir `anuncios/` y abrir `/motor/index.html?anun
 
 ```js
 const PRODUCTO = crearProducto({ marco, ev, pagina, desplazamientos, lleno, tarjetas, vacio, camara, boton, barrido, foco, rotulos, cabecera });
-const CIERRE = crearCierre({ ev: { isotipo, cta, nombre, empujes, fin }, escala, yLogo, anclaZoom, cta, marcarGratis });
+const PANTALLAS = crearPantallas({ centro, max, escalaMax, ev, pasos: [{ b, captura, recorte, acerca?, corte?, rotulo }], fondo, cabecera });
+const CIERRE = crearCierre({ ev: { isotipo, cta, nombre, empujes, fin }, escala, yLogo, anclaZoom, cta, marcarGratis, nota? });
 dibujarPunto(ctx, t, trayectoria, { estirarHasta, aro });   // la trayectoria del punto es del anuncio
 ```
 
 `draw()` tiene que ser una función pura del tiempo: nada de estado entre fotogramas, `setTimeout`, `requestAnimationFrame` ni azar sin semilla (`hash`, `mulberry32`). Todos los tiempos salen de `B(beat)`.
 
 **`partitura.mjs`**: `componer({ VAR, place, B, D, M, EV, rnd, musica, ritmo, sfx })` coloca las voces de `nucleo/dsp.mjs` sobre los eventos. La mezcla es del motor: cesión ante la voz, reverb, −14 LUFS, limitador, voz 10 dB delante con ganancia por frase y stems.
+
+**¿`producto` o `pantallas`?** `crearProducto` sirve cuando las capturas son una sola página que se recorre (el formulario del ejemplo). `crearPantallas` sirve para un flujo de pantallas distintas (el anuncio para agentes: marketplace → detalle → confirmación → lead). Ahí cada paso es un recorte, el marco toma su tamaño y la pantalla nueva entra desde abajo.
 
 **Capturas en la escena del producto.** Las coordenadas de página están en px de una captura de 800 de ancho (`pagina.unidad`); cada captura se escala según su propio ancho. Los `desplazamientos` se miden comparando las filas que se solapan, a resolución completa, y las costuras de `lleno` van en filas de fondo liso que sean idénticas en ambas capturas. Ver `reel-publica-tu-busqueda/motion-v1/capturas/LEEME.md`.
 

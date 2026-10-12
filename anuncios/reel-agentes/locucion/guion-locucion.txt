@@ -1,0 +1,55 @@
+LOCUCIÓN — Propiedad Conecta · «Paga solo por clientes interesados» · agentes (18,0 s)
+Generado desde guion.js y locucion/colocacion.json con generar-textos.mjs del motor. No editar a mano.
+
+ESTADO: PENDIENTE DE GRABAR. El video todavía no tiene voz; la música ya baja en cada hueco.
+
+PARA GRABAR L1, L2, L3, L4, L5, LB1: una toma por línea, mejor tres, en un cuarto silencioso. A ritmo natural: no hace falta clavar los tiempos.
+  L1  «Deja de pagar por aparecer.»  (Firme y cercana, de colega. Peso en «aparecer».) Hueco: 0,10–1,90 s, 1,8 s para 10 sílabas.
+  L2  «Paga solo por clientes interesados.»  (Clara y segura. Peso en «interesados».) Hueco: 2,70–4,90 s, 2,2 s para 12 sílabas.
+  L3  «Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.»  (Lista con ritmo; cada parte coincide con la pantalla que aparece.) Hueco: 5,00–9,40 s, 4,4 s para 21 sílabas.
+  L4  «Si no responde, puedes recuperar tus créditos.»  (Tranquila, que dé confianza. Peso en «recuperar».) Hueco: 10,10–12,90 s, 2,8 s para 15 sílabas.
+  L5  «Regístrate gratis en Propiedad Conecta.»  (Directa y cálida. Marca bien clara.) Hueco: 13,40–15,90 s, 2,5 s para 13 sílabas.
+  LB1  «Esta vez, el cliente ya está buscando.»  (Con complicidad. Peso en «buscando».) Hueco: 0,10–2,40 s, 2,3 s para 12 sílabas.
+
+Voz: La misma voz del anuncio para compradores: cálida y segura, conversacional, sin tono de locutor. Grabación seca, tres tomas por línea.
+Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
+
+==============================================================
+VERSIÓN A (directa)
+==============================================================
+
+[0,10–1,90]  Deja de pagar por aparecer.   ← FALTA LA TOMA
+               (Firme y cercana, de colega. Peso en «aparecer».)
+
+[2,70–4,90]  Paga solo por clientes interesados.   ← FALTA LA TOMA
+               (Clara y segura. Peso en «interesados».)
+
+[5,00–9,40]  Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.   ← FALTA LA TOMA
+               (Lista con ritmo; cada parte coincide con la pantalla que aparece.)
+
+[10,10–12,90]  Si no responde, puedes recuperar tus créditos.   ← FALTA LA TOMA
+               (Tranquila, que dé confianza. Peso en «recuperar».)
+
+[13,40–15,90]  Regístrate gratis en Propiedad Conecta.   ← FALTA LA TOMA
+               (Directa y cálida. Marca bien clara.)
+
+
+==============================================================
+VERSIÓN B (curiosidad) — solo cambia la primera línea
+==============================================================
+
+[0,10–2,40]  Esta vez, el cliente ya está buscando.   ← FALTA LA TOMA
+               (Con complicidad. Peso en «buscando».)
+
+[2,70–4,90]  Paga solo por clientes interesados.   ← FALTA LA TOMA
+               (Clara y segura. Peso en «interesados».)
+
+[5,00–9,40]  Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.   ← FALTA LA TOMA
+               (Lista con ritmo; cada parte coincide con la pantalla que aparece.)
+
+[10,10–12,90]  Si no responde, puedes recuperar tus créditos.   ← FALTA LA TOMA
+               (Tranquila, que dé confianza. Peso en «recuperar».)
+
+[13,40–15,90]  Regístrate gratis en Propiedad Conecta.   ← FALTA LA TOMA
+               (Directa y cálida. Marca bien clara.)
+

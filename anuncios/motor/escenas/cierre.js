@@ -11,6 +11,7 @@ import { B, LOGO_IMG } from '../nucleo/reloj.js';
 //   escala: escala del logo (≤ 1) · yLogo: dónde queda el borde superior del contenido del logo
 //   cta: { texto(), y, w, h, size } · anclaZoom: y del acercamiento lento final
 //   marcarGratis: true mientras «gratis» no esté confirmado (lo marca como pendiente en pantalla)
+//   nota (opcional): { texto, y, size, ev } una línea bajo el botón que sube desde su línea base en el beat ev
 export function crearCierre(cfg) {
   const { ev } = cfg, LOGO_S = cfg.escala, C = LOGO.contenido, HEAD_L = LOGO.cabeza;
   const LOGO_X = CX - ((C.x0 + C.x1) / 2) * LOGO_S, LOGO_Y = cfg.yLogo - C.y0 * LOGO_S;
@@ -65,6 +66,12 @@ export function crearCierre(cfg) {
       }
       ctx.restore();
       if (cfg.marcarGratis && t > tc + 0.3) mono(ctx, '«gratis» · pendiente de confirmar', CX, by + bh / 2 + 54, 26, ink(0.62), 'center', 600);
+    }
+    if (cfg.nota && t > B(cfg.nota.ev)) {
+      const { texto, y, size } = cfg.nota, u = spring(t - B(cfg.nota.ev), 2.8, 0.72);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, y - size * 1.1, CX * 2, size * 1.45); ctx.clip();
+      text(ctx, texto, CX, y + (1 - u) * size * 1.2, size, 500, ink(0.72), 'center');
+      ctx.restore();
     }
     ctx.restore();
   }

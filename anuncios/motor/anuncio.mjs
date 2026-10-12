@@ -32,7 +32,9 @@ const sinV = () => resto.filter((a, i) => a !== '--v' && resto[i - 1] !== '--v')
 if (paso === 'nuevo') {
   const dir = resolve(carpeta);
   if (!dir.startsWith(ANUNCIOS + '/')) { console.error('El anuncio tiene que estar dentro de anuncios/ (la carpeta que sirve el render).'); process.exit(1); }
-  if (existsSync(dir)) { console.error(`Ya existe ${dir}: no se sobrescribe nada.`); process.exit(1); }
+  // la carpeta puede existir (con el concepto o las capturas), pero no se pisa ningún archivo del anuncio
+  const pisaria = ['guion.js', 'pelicula.js', 'partitura.mjs', 'beats.json', 'README.md', 'capturas/LEEME.md', 'locucion/tomas/LEEME.md'].filter(f => existsSync(join(dir, f)));
+  if (pisaria.length) { console.error(`${relative(process.cwd(), dir)} ya tiene ${pisaria.join(', ')}: no se sobrescribe nada.`); process.exit(1); }
   const slug = relative(ANUNCIOS, dir).split('/').pop();
   mkdirSync(join(dir, 'capturas'), { recursive: true }); mkdirSync(join(dir, 'locucion', 'tomas'), { recursive: true });
   // parte del ejemplo para empezar desde algo que ya renderiza; sus materiales siguen apuntando al original

@@ -7,7 +7,7 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { ruta, G, coma } from './comun.mjs';
 import { SEGURA } from '../nucleo/marca.js';
 
-const { BPM, DURACION, PENDIENTE, APERTURA, COMUN, LOCUCION, lineasVoz, ctaTexto, TITULO, ARCHIVO, EVENTOS } = G;
+const { BPM, BEATS, DURACION, PENDIENTE, APERTURA, COMUN, LOCUCION, lineasVoz, ctaTexto, TITULO, ARCHIVO, EVENTOS } = G;
 
 const beats = JSON.parse(readFileSync(ruta('beats.json'))).beats, P = beats[1] - beats[0];
 const S = b => Math.min(DURACION, Math.max(0, beats[0] + b * P)); // beat → segundos, con la cuadrícula medida
@@ -39,7 +39,7 @@ let md = `# Guion técnico — ${TITULO}
 
 Generado desde [guion.js](guion.js) con \`generar-textos.mjs\` del motor. **No editar a mano.**
 
-**${coma(DURACION, 1)} s** · ${BPM} BPM (1 beat = 0,5 s, 32 beats = 8 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (\`beats.json\`: ${coma(60 / P, 2)} BPM, desfase ${coma(beats[0] * 1000, 1)} ms).
+**${coma(DURACION, 1)} s** · ${BPM} BPM (1 beat = ${coma(60 / BPM)} s, ${BEATS} beats = ${BEATS / 4} compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (\`beats.json\`: ${coma(60 / P, 2)} BPM, desfase ${coma(beats[0] * 1000, 1)} ms).
 Zona segura para texto y logo: x ${SEGURA.x0}–${SEGURA.x1}, y ${SEGURA.y0}–${SEGURA.y1} (la de la marca, en \`motor/nucleo/marca.js\`).
 
 **Pendiente:** ${pend.length ? pend.join(' · ') : 'nada'}.
@@ -79,19 +79,23 @@ for (const v of ['A', 'B']) {
 }
 
 // ---------- guion de locución ----------
-const estado = faltan.length
-  ? `ESTADO: GRABADA, SALVO ${faltan.map(l => `${l.id} («${l.texto}»)`).join(', ')}. Tomas entregadas el 11/10/2026 en
-locucion/tomas/. El video ya lleva las grabadas; la música ya deja el hueco de lo que falta.`
-  : 'ESTADO: GRABADA. Tomas entregadas el 11/10/2026 en locucion/tomas/.';
+const lineaDe = id => linea('A', id) || linea('B', id);
+const hayGrabadas = ['A', 'B'].some(v => voz(v).some(l => !l.pendiente));
+const estado = !faltan.length
+  ? 'ESTADO: GRABADA. Las tomas están en locucion/tomas/ (ver su LEEME).'
+  : hayGrabadas
+    ? `ESTADO: GRABADA, SALVO ${faltan.map(l => `${l.id} («${l.texto}»)`).join(', ')}. Las tomas están en locucion/tomas/.
+El video ya lleva las grabadas; la música ya deja el hueco de lo que falta.`
+    : `ESTADO: PENDIENTE DE GRABAR. El video todavía no tiene voz; la música ya baja en cada hueco.`;
 let loc = `LOCUCIÓN — ${TITULO} (${coma(DURACION, 1)} s)
 Generado desde guion.js y locucion/colocacion.json con generar-textos.mjs del motor. No editar a mano.
 
 ${estado}
 ${faltan.length ? `
-PARA GRABAR ${faltan.map(l => l.id).join(', ')}: la misma voz y el mismo tono de las otras tomas, en el mismo formato. Tres tomas, a ritmo natural.
-${faltan.map(l => `  ${l.id}  «${l.texto}»  (${linea('A', l.id).direccion}) Hueco: ${coma(l.inicio)}–${coma(l.fin)} s; ideal entre 1,2 y 1,5 s de voz.`).join('\n')}
+PARA GRABAR ${faltan.map(l => l.id).join(', ')}: ${hayGrabadas ? 'la misma voz y el mismo tono de las otras tomas, en el mismo formato' : 'una toma por línea, mejor tres, en un cuarto silencioso'}. A ritmo natural: no hace falta clavar los tiempos.
+${faltan.map(l => `  ${l.id}  «${l.texto}»  (${lineaDe(l.id).direccion}) Hueco: ${coma(l.inicio)}–${coma(l.fin)} s, ${coma(l.fin - l.inicio, 1)} s para ${silabas(l.texto)} sílabas.`).join('\n')}
 ` : ''}
-Casting original: ${LOCUCION.voz}
+Voz: ${LOCUCION.voz}
 Ritmo: hasta ${coma(LOCUCION.ritmo.natural, 1)} sílabas por segundo suena tranquilo; más de ${coma(LOCUCION.ritmo.agil, 1)} se oye apurado.
 ${PENDIENTE.gratis === 'pendiente' ? '\n«gratis» está PENDIENTE DE CONFIRMAR: grabar L4 en las dos variantes («Publica gratis tu búsqueda.» y «Publica tu búsqueda.»).\n' : ''}`;
 for (const v of ['A', 'B']) {

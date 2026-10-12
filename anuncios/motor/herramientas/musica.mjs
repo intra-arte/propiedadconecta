@@ -4,7 +4,7 @@
 // Escribe salida/musica-{A,B}.wav (sin voz: de aquí se miden los beats), salida/mezcla-{A,B}.wav
 // (con voz: la que lleva el video), los stems a la escala de la mezcla y salida/mezcla-{A,B}.json.
 // Uso: node motor/herramientas/musica.mjs --anuncio <carpeta> [A|B]   (sin variante genera las dos)
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { ruta, G, sueltos } from './comun.mjs';
 import { mulberry32 } from '../nucleo/lib.js';
@@ -75,7 +75,7 @@ function render(VAR) {
   const normalizar = x => { let total = 0; for (let pass = 0; pass < 4; pass++) { const d = -14 - D.lufs(x); total += d; gainDb(x, d); D.limit(x, -2.4); } return total; };
   const out = new URL(pathToFileURL(ruta('salida')).href + '/');
   mkdirSync(out, { recursive: true });
-  normalizar(mix);
+  const totalSinVoz = normalizar(mix);
   writeFileSync(new URL(`musica-${VAR}.wav`, out), D.writeWav(null, mix));
   console.log(`musica-${VAR}.wav   ${D.lufs(mix).toFixed(2)} LUFS  pico ${pico(mix).toFixed(2)} dBFS  (sin voz)`);
 
@@ -84,6 +84,14 @@ function render(VAR) {
   if (!existsSync(vozWav)) { console.log('  sin salida/voz-' + VAR + '.wav: corre «node voz.mjs» para la mezcla con voz'); return; }
   const voz = D.readWav(readFileSync(vozWav));
   const conVoz = tramos.filter(([t0, t1]) => D.sonoridadTramos(voz, [[t0, t1]]) > -60);
+  if (!conVoz.length) { // todavía no hay ninguna toma: el video lleva la música sin voz y los stems van a su escala
+    for (const f of [`mezcla-${VAR}.wav`, `mezcla-${VAR}.json`, `stem-voz-${VAR}.wav`]) rmSync(new URL(f, out), { force: true });
+    for (const x of [stM, stS]) gainDb(x, totalSinVoz);
+    writeFileSync(new URL(`stem-musica-${VAR}.wav`, out), D.writeWav(null, stM));
+    writeFileSync(new URL(`stem-sfx-${VAR}.wav`, out), D.writeWav(null, stS));
+    console.log(`  sin tomas de voz todavía: el video usa musica-${VAR}.wav (la música ya deja los huecos de la voz)`);
+    return;
+  }
   const gV = VMR - (D.sonoridadTramos(voz, conVoz) - D.sonoridadTramos(cama, conVoz));
   gainDb(voz, gV);
   // ganancia por frase, como un fader: cada frase se acerca al objetivo (entre −2 y +3 dB),

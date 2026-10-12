@@ -27,7 +27,7 @@ const row = (k, r, e, ok) => log(`| ${k} | ${r} | ${e} | ${ok ? 'OK' : '**REVISA
 row('Resolución', `${v.width} × ${v.height}`, '1080 × 1920', v.width === 1080 && v.height === 1920);
 row('Códec / píxel', `${v.codec_name} · ${v.pix_fmt}`, 'h264 · yuv420p', v.codec_name === 'h264' && v.pix_fmt === 'yuv420p');
 row('Fotogramas por segundo', coma(fps, 0), '30', Math.abs(fps - 30) < 0.01);
-row('Duración', `${coma(+probe.format.duration, 3)} s`, '16,000 s', Math.abs(probe.format.duration - 16) < 0.05);
+row('Duración', `${coma(+probe.format.duration, 3)} s`, `${coma(G.DURACION, 3)} s`, Math.abs(probe.format.duration - G.DURACION) < 0.05);
 row('Audio', a ? `${a.codec_name} · ${a.sample_rate} Hz · ${a.channels} canales` : 'sin audio', 'aac · 48000 Hz · 2', !!a);
 const eb = execFileSync('ffmpeg', ['-hide_banner', '-nostats', '-i', file, '-af', 'ebur128=peak=true', '-f', 'null', '-'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString() + '';
 const ebr = execFileSync('sh', ['-c', `ffmpeg -hide_banner -nostats -i "${file}" -af ebur128=peak=true -f null - 2>&1 | tail -14`]).toString();

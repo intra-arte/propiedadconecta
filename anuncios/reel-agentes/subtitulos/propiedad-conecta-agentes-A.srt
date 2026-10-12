@@ -1,0 +1,19 @@
+1
+00:00:00,100 --> 00:00:02,200
+Deja de pagar por aparecer.
+
+2
+00:00:02,700 --> 00:00:04,960
+Paga solo por clientes interesados.
+
+3
+00:00:05,000 --> 00:00:09,700
+Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.
+
+4
+00:00:10,100 --> 00:00:13,200
+Si no responde, puedes recuperar tus créditos.
+
+5
+00:00:13,400 --> 00:00:16,200
+Regístrate gratis en Propiedad Conecta.

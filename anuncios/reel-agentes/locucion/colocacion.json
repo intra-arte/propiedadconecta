@@ -1,0 +1,98 @@
+{
+ "generado": "node voz.mjs — no editar a mano",
+ "nivelLinea": -20,
+ "A": [
+  {
+   "id": "L1",
+   "texto": "Deja de pagar por aparecer.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 0.1,
+   "fin": 1.9,
+   "frases": []
+  },
+  {
+   "id": "L2",
+   "texto": "Paga solo por clientes interesados.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 2.7,
+   "fin": 4.9,
+   "frases": []
+  },
+  {
+   "id": "L3",
+   "texto": "Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 5,
+   "fin": 9.4,
+   "frases": []
+  },
+  {
+   "id": "L4",
+   "texto": "Si no responde, puedes recuperar tus créditos.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 10.1,
+   "fin": 12.9,
+   "frases": []
+  },
+  {
+   "id": "L5",
+   "texto": "Regístrate gratis en Propiedad Conecta.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 13.4,
+   "fin": 15.9,
+   "frases": []
+  }
+ ],
+ "B": [
+  {
+   "id": "LB1",
+   "texto": "Esta vez, el cliente ya está buscando.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 0.1,
+   "fin": 2.4,
+   "frases": []
+  },
+  {
+   "id": "L2",
+   "texto": "Paga solo por clientes interesados.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 2.7,
+   "fin": 4.9,
+   "frases": []
+  },
+  {
+   "id": "L3",
+   "texto": "Ves qué busca y cuánto quiere invertir… y eliges a quién contactar.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 5,
+   "fin": 9.4,
+   "frases": []
+  },
+  {
+   "id": "L4",
+   "texto": "Si no responde, puedes recuperar tus créditos.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 10.1,
+   "fin": 12.9,
+   "frases": []
+  },
+  {
+   "id": "L5",
+   "texto": "Regístrate gratis en Propiedad Conecta.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 13.4,
+   "fin": 15.9,
+   "frases": []
+  }
+ ]
+}
