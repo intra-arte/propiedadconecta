@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Monedas al aire · 32 s</title>
+<!--
+  «Monedas al aire»: 32 s 3D animation (docs/monedas/idea.md). Three.js (MIT) in vendor/.
+  Every frame is a pure function of time: draw(t). 140 BPM grid: one beat = 60/140 s, cuts on bar lines.
+  Render: node video/render.mjs --gl --page video/monedas/index.html … (see video/monedas/README.md).
+  Everything on screen is drawn in code (coins, machine, people, cards, pieces); the only brand asset is the real logo.
+-->
+<style>
+  @font-face { font-family: Outfit; src: url(../../anuncios/reel-publica-tu-busqueda/animatic/fuentes/Outfit-Variable.ttf) format('truetype'); font-weight: 100 900; }
+  @font-face { font-family: 'Barlow Condensed'; src: url(../explicativo/fuentes/BarlowCondensed-800.woff2) format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #111; }
+  body.preview { display: grid; place-items: center; min-height: 100vh; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0B1712; font-family: Outfit, sans-serif; }
+  #gl { position: absolute; inset: 0; }
+  #over { position: absolute; inset: 0; pointer-events: none; }
+  .o { position: absolute; display: none; }
+  .t { font-family: 'Barlow Condensed'; font-weight: 800; text-transform: uppercase; line-height: .9; letter-spacing: -0.01em; white-space: pre; }
+  .s { font-weight: 500; white-space: pre; }
+  .pill { transform: translate(-50%, -50%); font-weight: 600; font-size: 26px; letter-spacing: .05em; padding: 11px 24px; border-radius: 999px; white-space: nowrap; }
+  .bubble { font-size: 32px; font-weight: 500; color: #142A22; background: #fff; padding: 18px 28px; border-radius: 26px 26px 26px 6px; box-shadow: 0 18px 40px rgba(11,23,18,.18); white-space: nowrap; transform-origin: 0% 100%; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="gl" width="1920" height="1080"></canvas><div id="over"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ------------------------------------------------------------------ constants & helpers
+const W = 1920, H = 1080, DURATION = 32, B = 60 / 140, BAR = 4 * B;
+const C = { black: '#0B1712', acc: '#92CE58', grey: '#E4E7E2', marfil: '#FAF9F5', ink: '#142A22', pend: '#B9C2BE' };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const expoIn = x => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const inOut = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const smooth = x => x * x * (3 - 2 * x);
+const backOut = (x, s = 1.4) => { x = clamp(x); const c3 = s + 1; return 1 + c3 * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2); };
+const beat = n => n * B;
+const hash = i => { let h = Math.imul(i + 1, 2654435761) ^ 0x9e3779b9; h = Math.imul(h ^ (h >>> 15), 2246822519); return ((h ^ (h >>> 13)) >>> 0) / 4294967295; };
+
+// ------------------------------------------------------------------ renderer
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H, false); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const ENV = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ------------------------------------------------------------------ overlays (DOM)
+const over = document.getElementById('over');
+const O = [];
+function ov(cls, css, html, shot) { const d = document.createElement('div'); d.className = 'o ' + cls; d.style.cssText += css; d.innerHTML = html; d.dataset.shot = shot; over.appendChild(d); O.push(d); return d; }
+function showO(d, op = 1, extra = '') { d.style.display = op > 0.001 ? 'block' : 'none'; d.style.opacity = op; if (extra) d.style.transform = extra; }
+function screenOf(v, cam) { const p = v.clone().project(cam); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; }
+
+// ------------------------------------------------------------------ textures drawn in code
+function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function tex(c, srgb = true) { const t = new THREE.CanvasTexture(c); t.anisotropy = 8; if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; }
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+const FACE_ROT = Math.PI / 2;
+function faceFix(t, flip = 1) { t.center.set(0.5, 0.5); t.rotation = FACE_ROT; t.wrapS = THREE.RepeatWrapping; t.repeat.set(flip, 1); return t; }
+
+let faceBump, clockBump, reeding, clockCanvas, clockTexF, clockTexB;
+function makeTextures() {
+  // agent coin face (bump): rim, beads, roof chevron with a small window, name around
+  const c1 = canvas(1024, 1024), g = c1.getContext('2d'), s = 1024, c = 512;
+  g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, s, s);
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(c, c, s * 0.5, 0, 7); g.arc(c, c, s * 0.445, 0, 7, true); g.fill('evenodd');
+  for (let i = 0; i < 72; i++) { const a = i / 72 * Math.PI * 2; g.beginPath(); g.arc(c + Math.cos(a) * s * 0.415, c + Math.sin(a) * s * 0.415, 5.5, 0, 7); g.fill(); }
+  g.strokeStyle = '#fff'; g.lineWidth = 62; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(c - 210, c + 120); g.lineTo(c, c - 95); g.lineTo(c + 210, c + 120); g.stroke();
+  g.fillRect(c - 52, c + 40, 104, 104);
+  g.font = '600 46px Outfit'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const txt = 'PROPIEDAD · CONECTA · PROPIEDAD · CONECTA · ';
+  for (let i = 0; i < txt.length; i++) { const a = -Math.PI / 2 + i / txt.length * Math.PI * 2; g.save(); g.translate(c + Math.cos(a) * s * 0.36, c + Math.sin(a) * s * 0.36); g.rotate(a + Math.PI / 2); g.fillText(txt[i], 0, 0); g.restore(); }
+  faceBump = faceFix(tex(c1, false));
+  const c2 = canvas(1024, 1024), h = c2.getContext('2d');
+  h.fillStyle = '#6a6a6a'; h.fillRect(0, 0, s, s); h.fillStyle = '#fff'; h.beginPath(); h.arc(c, c, s * 0.5, 0, 7); h.arc(c, c, s * 0.445, 0, 7, true); h.fill('evenodd');
+  clockBump = faceFix(tex(c2, false));
+  const c3 = canvas(256, 256), r = c3.getContext('2d');
+  for (let x = 0; x < 256; x += 8) { r.fillStyle = (x / 8) % 2 ? '#fff' : '#555'; r.fillRect(x, 0, 8, 256); }
+  reeding = tex(c3, false); reeding.wrapS = THREE.RepeatWrapping; reeding.repeat.set(28, 1);
+  clockCanvas = canvas(1024, 1024);
+  clockTexF = faceFix(tex(clockCanvas)); clockTexB = faceFix(tex(clockCanvas), 1);
+  drawClock(0);
+}
+// The clock face is redrawn every frame: the second hand ticks on the beat.
+function drawClock(t) {
+  const g = clockCanvas.getContext('2d'), s = 1024, c = 512;
+  g.fillStyle = '#1C3A2B'; g.fillRect(0, 0, s, s);
+  g.fillStyle = '#2B5A40'; g.beginPath(); g.arc(c, c, s * 0.5, 0, 7); g.arc(c, c, s * 0.445, 0, 7, true); g.fill('evenodd');
+  g.strokeStyle = C.marfil; g.lineCap = 'round';
+  for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2, big = i % 5 === 0; g.lineWidth = big ? 16 : 6; g.beginPath(); g.moveTo(c + Math.cos(a) * s * (big ? 0.31 : 0.35), c + Math.sin(a) * s * (big ? 0.31 : 0.35)); g.lineTo(c + Math.cos(a) * s * 0.395, c + Math.sin(a) * s * 0.395); g.stroke(); }
+  const k = Math.floor(t / B), f = backOut(clamp((t - k * B) / 0.09), 2.2);
+  const sec = (k + f) / 60 * Math.PI * 2;
+  const hand = (a, len, w, col) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(c, c); g.lineTo(c + Math.cos(a) * len, c + Math.sin(a) * len); g.stroke(); };
+  const minute = -Math.PI / 2 + 1.05 + t * 0.06, hour = -Math.PI / 2 - 1.05 + t * 0.005;
+  hand(hour, s * 0.2, 30, C.marfil); hand(minute, s * 0.29, 20, C.marfil); hand(-Math.PI / 2 + sec, s * 0.32, 8, C.acc);
+  g.fillStyle = C.acc; g.beginPath(); g.arc(c, c, 26, 0, 7); g.fill();
+  clockTexF.needsUpdate = true; clockTexB.needsUpdate = true;
+}
+
+// ------------------------------------------------------------------ objects
+const METAL = { agente: { color: new THREE.Color('#86C94F'), metalness: 1, roughness: 0.3 }, reloj: { color: new THREE.Color('#2A4A38'), metalness: 0.85, roughness: 0.38 } };
+function faceMat(kind, back = false) {
+  return kind === 'agente'
+    ? new THREE.MeshPhysicalMaterial({ ...METAL.agente, bumpMap: faceBump, bumpScale: 4, clearcoat: 0.5, clearcoatRoughness: 0.2 })
+    : new THREE.MeshPhysicalMaterial({ color: '#ffffff', map: back ? clockTexB : clockTexF, metalness: 0.35, roughness: 0.45, bumpMap: clockBump, bumpScale: 3, clearcoat: 0.6 });
+}
+function coin(front = 'agente', back = front, r = 1) {
+  const geo = new THREE.CylinderGeometry(r, r, r * 0.15, 128, 1); geo.rotateX(Math.PI / 2);
+  const side = new THREE.MeshPhysicalMaterial({ ...METAL[front], bumpMap: reeding, bumpScale: 1.2, clearcoat: 0.4 });
+  const m = new THREE.Mesh(geo, [side, faceMat(front), faceMat(back, true)]);
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function textPlane(lines, px, color, worldW) {
+  const probe = canvas(10, 10).getContext('2d'); probe.font = `800 ${px}px 'Barlow Condensed'`;
+  const c = canvas(Math.ceil(Math.max(...lines.map(l => probe.measureText(l).width)) + px * 0.2), Math.ceil(lines.length * px * 0.92 + px * 0.25));
+  const g = c.getContext('2d'); g.font = `800 ${px}px 'Barlow Condensed'`; g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'top';
+  lines.forEach((l, i) => g.fillText(l, c.width / 2, px * 0.12 + i * px * 0.92));
+  return new THREE.Mesh(new THREE.PlaneGeometry(worldW, worldW * c.height / c.width), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, toneMapped: false }));
+}
+function pillSprite(text, bg = C.black, fg = C.marfil, h = 0.42) {
+  const probe = canvas(10, 10).getContext('2d'); probe.font = '600 64px Outfit';
+  const c = canvas(Math.ceil(probe.measureText(text).width + 90), 110), g = c.getContext('2d');
+  g.fillStyle = bg; roundRect(g, 0, 0, c.width, c.height, 55); g.fill();
+  g.font = '600 64px Outfit'; g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, c.width / 2, 58);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(c), toneMapped: false, depthWrite: false }));
+  sp.scale.set(h * c.width / c.height, h, 1); return sp;
+}
+function studio(scene, color) {
+  scene.background = new THREE.Color(color);
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity: 0.16 }));
+  f.rotation.x = -Math.PI / 2; f.receiveShadow = true; scene.add(f);
+}
+function keyLight(scene, pos, intensity = 2, shadow = true, span = 12) {
+  const l = new THREE.DirectionalLight('#ffffff', intensity); l.position.set(...pos);
+  if (shadow) { l.castShadow = true; l.shadow.mapSize.set(2048, 2048); Object.assign(l.shadow.camera, { left: -span, right: span, top: span, bottom: -span }); l.shadow.radius = 8; l.shadow.bias = -0.0005; }
+  scene.add(l); return l;
+}
+const rim = (scene, pos, color = C.acc, i = 3) => { const l = new THREE.DirectionalLight(color, i); l.position.set(...pos); scene.add(l); return l; };
+function composer(scene, cam, { bloom = 0.15, bokeh = null } = {}) {
+  const comp = new EffectComposer(renderer); comp.setSize(W, H);
+  comp.addPass(new RenderPass(scene, cam));
+  if (bokeh) comp.addPass(new BokehPass(scene, cam, bokeh));
+  if (bloom) comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), bloom, 0.4, 0.9));
+  comp.addPass(new OutputPass());
+  return comp;
+}
+function houseShape(s = 1, notches = true) {
+  const sh = new THREE.Shape(), w = 1.25 * s, b = -1.0 * s, top = 0.35 * s, apex = 1.35 * s, n = 0.22 * s;
+  sh.moveTo(-w, b); sh.lineTo(w, b);
+  if (notches) { sh.lineTo(w, -0.55 * s); sh.lineTo(w - n, -0.55 * s); sh.lineTo(w - n, -0.15 * s); sh.lineTo(w, -0.15 * s); }
+  sh.lineTo(w, top); sh.lineTo(0, apex); sh.lineTo(-w, top);
+  if (notches) { sh.lineTo(-w, 0.05 * s); sh.lineTo(-w + n * 1.4, 0.05 * s); sh.lineTo(-w + n * 1.4, -0.35 * s); sh.lineTo(-w, -0.35 * s); }
+  sh.lineTo(-w, b); return sh;
+}
+function tube(points, r, color, closed = false) {
+  const g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, closed, 'catmullrom', 0), 400, r, 8, closed);
+  return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, toneMapped: false }));
+}
+
+// ------------------------------------------------------------------ scenes
+const S = {};
+
+function buildToss() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.9;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100); cam.position.set(0, 0, 12);
+  const title = textPlane(['CARA O CRUZ.'], 260, C.acc, 13.2); title.position.set(0, -0.2, -5); scene.add(title);
+  const hero = coin('agente', 'agente', 1.25); scene.add(hero);
+  const ghosts = [0, 1].map(() => { const g = coin('agente', 'agente', 1.25); g.material = g.material.map(m => { const c = m.clone(); c.transparent = true; c.depthWrite = false; return c; }); scene.add(g); return g; });
+  keyLight(scene, [-4, 5, 8], 2.2, false); rim(scene, [3, 4, -6], C.acc, 3.2); rim(scene, [-5, -2, -4], '#ffffff', 1.2);
+  const pose = lt => {
+    const y = lt < 1.714 ? lerp(-5.5, 0.55, expoOut(lt / 1.714) * 0.98 + 0.02 * (lt / 1.714)) : lt < 2.8 ? 0.55 + 0.08 * Math.sin((lt - 1.714) * 2) : 0.6 - 9 * Math.pow(lt - 2.8, 2) * 1.6;
+    const ang = 0.6 * lt + 6 * (1 - Math.exp(-2 * lt)) + (lt > 2.8 ? 10 * Math.pow(lt - 2.8, 2) : 0);
+    return { y, ang };
+  };
+  S.toss = {
+    scene, cam, comp: composer(scene, cam, { bloom: 0.18 }),
+    update(lt) {
+      title.visible = lt >= beat(4);
+      const p = pose(lt);
+      hero.position.set(1.0, p.y, 2.2); hero.rotation.set(-0.35 + p.ang, 0.55, 0.3);
+      const speed = Math.abs(pose(lt).ang - pose(lt - 0.05).ang) / 0.05;
+      ghosts.forEach((g, i) => { const q = pose(lt - 0.045 * (i + 1)); g.position.set(1.0, q.y, 2.2); g.rotation.set(-0.35 + q.ang, 0.55, 0.3); g.material.forEach(m => { m.opacity = clamp(speed / 14) * (0.22 - i * 0.08); }); g.visible = speed > 1.5; });
+      cam.position.z = lerp(12, 11.3, lt / beat(8));
+    },
+  };
+}
+
+// machine scene: shared by the cascade (shots 2-3) and the rewind (shot 5)
+function buildMachine() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.45;
+  studio(scene, C.grey);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200);
+  const M = new THREE.Group(); M.position.set(3.7, 0, 0); scene.add(M);
+  const shape = new THREE.Shape(), w = 4.2, h = 4.6, r = 0.5;
+  shape.moveTo(-w / 2 + r, 0); shape.lineTo(w / 2 - r, 0); shape.quadraticCurveTo(w / 2, 0, w / 2, r); shape.lineTo(w / 2, h - r); shape.quadraticCurveTo(w / 2, h, w / 2 - r, h); shape.lineTo(-w / 2 + r, h); shape.quadraticCurveTo(-w / 2, h, -w / 2, h - r); shape.lineTo(-w / 2, r); shape.quadraticCurveTo(-w / 2, 0, -w / 2 + r, 0);
+  const body = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 2.6, bevelEnabled: true, bevelSize: 0.08, bevelThickness: 0.08, bevelSegments: 6 }),
+    new THREE.MeshPhysicalMaterial({ color: '#0E1D16', metalness: 0.1, roughness: 0.45, clearcoat: 0.6, clearcoatRoughness: 0.3, envMapIntensity: 0.35 }));
+  body.position.set(0, 0, -1.3); body.castShadow = true; body.receiveShadow = true; M.add(body);
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 0.28), new THREE.MeshBasicMaterial({ color: '#020504' })); slot.position.set(0, 4.69, 0); M.add(slot);
+  // reels: a vertical strip of symbols; the visible window scrolls
+  const strip = canvas(256, 1024), g = strip.getContext('2d');
+  g.fillStyle = '#13261C'; g.fillRect(0, 0, 256, 1024);
+  g.fillStyle = C.acc; g.font = "800 190px 'Barlow Condensed'"; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('?', 128, 136); g.fillText('$', 128, 392); g.fillText('?', 128, 904);
+  g.strokeStyle = C.acc; g.lineWidth = 22; g.lineJoin = 'round'; g.beginPath(); g.moveTo(68, 700); g.lineTo(128, 600); g.lineTo(188, 700); g.stroke(); g.strokeRect(92, 690, 72, 70);
+  const reels = [0, 1, 2].map(i => {
+    const t = tex(strip); t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 0.25); t.offset.y = 0.75;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.15), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }));
+    m.position.set((i - 1) * 1.15, 2.7, 1.39); M.add(m); return t;
+  });
+  const label = textPlane(['PORTALES · PUBLICIDAD'], 90, C.marfil, 3.0); label.position.set(0, 1.45, 1.39); M.add(label);
+  // the stream
+  const N = 36, coins = [];
+  for (let i = 0; i < N; i++) {
+    const c = coin('agente', 'agente', 0.42); scene.add(c);
+    coins.push({ c, s: 0.3 + i * 0.07, z: (hash(i) - 0.5) * 0.8, y0: 2.2 + hash(i + 50) * 1.4, r: [hash(i + 9) * 6, hash(i + 19) * 6, hash(i + 29) * 6] });
+  }
+  const floorCoins = [[1.2, 2.6, 0.4, 1.95], [2.0, 3.6, 1.9, 2.35], [0.2, 1.6, 2.7, 2.75]].map(([x, z, ry, t0]) => { const c = coin('agente', 'agente', 0.42); scene.add(c); return { c, x, z, ry, t0 }; });
+  const hero = coin('agente', 'agente', 0.42); scene.add(hero);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.25));
+  keyLight(scene, [-6, 12, 9], 1.8); rim(scene, [6, 8, -8], '#ffffff', 1.2);
+  const arc = (p, z, y0) => new THREE.Vector3(lerp(-8.4, 3.7, p), lerp(y0, 4.75, p) + 6.2 * p * (1 - p), z * (1 - p));
+  const reelPos = (o, i) => { reels[i].offset.y = o; };
+  S.machine = {
+    scene, cam, comp: composer(scene, cam, { bloom: 0.12 }), M, coins, hero, floorCoins, reels, arc, reelPos,
+    // shots 2-3 (u = 0..3.43)
+    cascade(u) {
+      M.visible = true; M.scale.set(1, 1, 1);
+      cam.position.set(-1.0, 3.4, 17 - u * 0.25); cam.lookAt(0.4, 2.9, 0);
+      // the tossed coin drops straight into the slot first
+      const hp = ramp(u, 0, 0.38);
+      hero.visible = hp < 1; hero.position.set(3.7, lerp(9.5, 4.75, hp * hp), 0); hero.rotation.set(1.3 + u * 9, 0.4, 0.2);
+      for (const k of coins) {
+        const p = (u - k.s) / 0.95;
+        k.c.visible = p > 0 && p < 1;
+        if (k.c.visible) { k.c.position.copy(arc(p, k.z, k.y0)); k.c.rotation.set(k.r[0] + p * 9, k.r[1] + p * 5, k.r[2]); }
+      }
+      for (const f of floorCoins) {
+        const q = u - f.t0; f.c.visible = q > 0;
+        if (q > 0) {
+          const fall = clamp(q / 0.35), bounce = q > 0.35 ? Math.abs(Math.sin((q - 0.35) * 14)) * 0.5 * Math.exp(-(q - 0.35) * 6) : 0;
+          f.c.position.set(lerp(3.0, f.x, smooth(fall)), lerp(4.6, 0.033, fall * fall) + bounce, lerp(0.2, f.z, smooth(fall)));
+          f.c.rotation.set(lerp(0.4, Math.PI / 2, smooth(clamp(q / 0.6))), 0, f.ry);
+        }
+      }
+      reels.forEach((t, i) => { const stop = beat(4) + i * B; const p = ramp(u, 0.3, stop); t.offset.y = 0.75 + 7 * (1 - backOut(p, 1.1)); });
+    },
+    // shot 5 (u = 0..1.71): everything comes back out and the machine folds away
+    rewind(u) {
+      cam.position.set(-1.0, 3.4, 16.2); cam.lookAt(0.4, 2.9, 0);
+      hero.visible = false; floorCoins.forEach(f => (f.c.visible = false));
+      const gather = new THREE.Vector3(-5.2, 4.2, 1.5);
+      for (const k of coins) {
+        const p = 1 - clamp((u - (1 - k.s / 2.8) * 0.35) / 0.55);
+        const q = clamp((u - 0.55 - k.s * 0.08) / 0.3);
+        k.c.visible = p < 1 && q < 1;
+        if (k.c.visible) { const a = arc(p, k.z, k.y0); a.lerp(gather, smooth(q)); k.c.position.copy(a); k.c.rotation.set(k.r[0] + p * 9 - u * 6, k.r[1] + p * 5, k.r[2]); }
+      }
+      reels.forEach((t, i) => { t.offset.y = 0.75 - u * 3.5 * (1 + i * 0.2); });
+      const f = expoIn(ramp(u, 0.95, 1.4));
+      M.scale.set(1 + f * 0.15, Math.max(1 - f, 0.001), 1); M.visible = f < 0.999;
+      hero.visible = u > 1.05; hero.scale.setScalar(lerp(0.6, 1.5, smooth(ramp(u, 1.05, 1.5))));
+      hero.position.copy(gather); hero.rotation.set(0.1, -0.3 + Math.sin(u * 3) * 0.1, 0);
+    },
+  };
+}
+
+function buildTitle2() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.9;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100); cam.position.set(0, 0, 12);
+  const a = textPlane(['DEJA DE TIRAR'], 220, C.acc, 8.45); a.position.set(0, 1.25, 0); scene.add(a);
+  const b = textPlane(['MONEDAS AL AIRE.'], 220, C.acc, 10.4); b.position.set(0, -1.15, 0); scene.add(b);
+  const c = coin('agente', 'agente', 0.7); scene.add(c);
+  keyLight(scene, [-4, 5, 8], 2.2, false); rim(scene, [3, 4, -6], C.acc, 3);
+  S.title2 = { scene, cam, comp: composer(scene, cam, { bloom: 0.16 }), update(lt) {
+    const p = inOut(ramp(lt, 0.15, 1.45));
+    c.position.set(lerp(-9, 9, p), 0.05 + Math.sin(p * Math.PI) * 0.15, 1.2); c.rotation.set(lt * 11, 0.5, 0.2);
+    cam.position.z = lerp(12, 11.6, lt / BAR);
+  } };
+}
+
+function buildField() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.5;
+  studio(scene, C.grey);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200);
+  const tags = ['DEPA · 3 HAB', 'CASA · 4 HAB', 'TERRENO', 'OFICINA', 'DEPA · 3 HAB', 'SUITE', 'CASA · 2 HAB', 'DEPA · 3 HAB', 'LOCAL', 'DEPA · 1 HAB', 'BODEGA', 'DEPA · 3 HAB', 'CASA · 3 HAB', 'SUITE', 'TERRENO'];
+  const people = tags.map((t, i) => {
+    const col = i % 5, row = Math.floor(i / 5);
+    const x = 1.6 + (col - 2) * 2.5 + (hash(i) - 0.5) * 0.6, z = -1.0 + row * 2.2 + (hash(i + 7) - 0.5) * 0.5;
+    const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+    const matB = new THREE.MeshPhysicalMaterial({ color: '#C3C9C2', roughness: 0.6, envMapIntensity: 0.5 });
+    const matH = new THREE.MeshPhysicalMaterial({ color: '#AEB6B0', roughness: 0.5, emissive: new THREE.Color(C.acc), emissiveIntensity: 0, envMapIntensity: 0.5 });
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.32, 0.45, 8, 24), matB); body.position.y = 0.55; body.castShadow = true; g.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 24), matH); head.position.y = 1.32; head.castShadow = true; g.add(head);
+    const tag = pillSprite(t); tag.position.set(0, 2.05, 0); g.add(tag);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.035, 8, 64), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false, transparent: true }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; g.add(ring);
+    return { g, matH, ring, x, z, match: t === 'DEPA · 3 HAB' };
+  });
+  const target = people[7];
+  const c = coin('agente', 'agente', 0.42); scene.add(c);
+  const pulse = new THREE.Mesh(new THREE.TorusGeometry(1, 0.03, 8, 96), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false, transparent: true }));
+  pulse.rotation.x = -Math.PI / 2; pulse.position.set(target.x, 0.03, target.z); scene.add(pulse);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.3));
+  keyLight(scene, [-6, 12, 7], 1.8, true, 14); rim(scene, [6, 6, -8], '#ffffff', 1);
+  const coinPill = ov('pill', `background:${C.acc};color:${C.black}`, 'TIENES: DEPA · 3 HAB', 6);
+  const coinPos = lt => {
+    if (lt < 1.55) { const p = inOut(ramp(lt, 0.0, 1.55)); return new THREE.Vector3(lerp(-6.5, 8.2, p), 2.75 + Math.sin(p * 6) * 0.12, 1.1); }
+    const q = ramp(lt, 1.55, beat(6)), a = new THREE.Vector3(8.2, 2.75, 1.1), b = new THREE.Vector3(target.x, 1.32, target.z);
+    const v = a.clone().lerp(b, inOut(q)); v.y += Math.sin(q * Math.PI) * 1.6; return v;
+  };
+  S.field = { scene, cam, comp: composer(scene, cam, { bloom: 0.2 }), update(lt) {
+    cam.position.set(lerp(0.2, 0.8, lt / (2 * BAR)), 8.6, 12.6); cam.lookAt(1.6, 2.4, -0.6);
+    const cp = coinPos(lt), landed = lt >= beat(6);
+    c.visible = !landed; c.position.copy(cp); c.rotation.set(0.6 + lt * 2, lt * 4, 0.2);
+    if (lt > 1.55) c.scale.setScalar(lerp(1, 0.55, ramp(lt, beat(6) - 0.2, beat(6))));
+    for (const pp of people) {
+      const lit = pp.match && cp.x > pp.x - 0.3 && lt > 0.05 ? smooth(clamp((lt - (inverseX(pp.x))) / 0.25)) : 0;
+      const hit = pp === target && landed ? 1 : 0;
+      pp.matH.color.set(lit > 0 ? C.acc : '#AEB6B0').lerp(new THREE.Color('#AEB6B0'), 1 - lit);
+      pp.matH.emissiveIntensity = lit * 0.25 + hit * (0.9 * Math.exp(-(lt - beat(6)) * 3) + 0.3);
+      pp.ring.material.opacity = lit; pp.ring.scale.setScalar(lerp(0.4, 1, backOut(lit)));
+    }
+    const pq = ramp(lt, beat(6), beat(6) + 0.7);
+    pulse.visible = landed && pq < 1; pulse.scale.setScalar(lerp(0.6, 3.2, expoOut(pq))); pulse.material.opacity = 1 - pq;
+    const [sx, sy] = screenOf(cp, cam);
+    coinPill.style.left = sx + 'px'; coinPill.style.top = (sy - 70) + 'px';
+    showO(coinPill, landed ? 0 : smooth(ramp(lt, 0.1, 0.3)));
+  } };
+  // time at which the sweeping coin passes x (inverse of the sweep, for the light-up)
+  function inverseX(x) { const p = (x + 6.5) / 14.7; let lo = 0, hi = 1; for (let i = 0; i < 20; i++) { const m = (lo + hi) / 2; inOut(m) < p ? (lo = m) : (hi = m); } return lo * 1.55; }
+}
+
+function buildFlip() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.9;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100); cam.position.set(0, 0.15, 12);
+  const c = coin('agente', 'reloj', 1.75); c.position.set(0, 0.45, 0); scene.add(c);
+  keyLight(scene, [-4, 4, 8], 2.0, false); rim(scene, [3, 4, -6], C.acc, 3); rim(scene, [-4, -3, -5], '#ffffff', 1);
+  S.flip = { scene, cam, comp: composer(scene, cam, { bloom: 0.16 }), update(lt) {
+    const p = backOut(ramp(lt, 0.25, 0.85), 1.1);
+    c.rotation.set(0.08 * Math.sin(lt * 2), Math.PI * p + 0.18 * (1 - ramp(lt, 0, 0.3)), 0);
+    cam.position.z = lerp(12, 11.2, lt / BAR);
+  } };
+}
+
+function buildFeed() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.6;
+  scene.fog = new THREE.Fog(C.black, 14, 34);
+  const cam = new THREE.PerspectiveCamera(32, W / H, 0.1, 200); cam.position.set(0, 0, 14);
+  const card = (() => { const c = canvas(512, 512), g = c.getContext('2d');
+    g.fillStyle = '#DADDD8'; roundRect(g, 0, 0, 512, 512, 34); g.fill();
+    g.fillStyle = '#AEB5AE'; roundRect(g, 26, 26, 460, 250, 18); g.fill();
+    g.fillStyle = '#C3C9C2'; g.beginPath(); g.moveTo(140, 230); g.lineTo(256, 120); g.lineTo(372, 230); g.fill();
+    g.fillStyle = '#9AA39B'; roundRect(g, 26, 305, 300, 34, 10); g.fill(); roundRect(g, 26, 360, 200, 26, 10); g.fill(); roundRect(g, 26, 410, 380, 22, 10); g.fill();
+    return tex(c); })();
+  const stampTex = word => { const c = canvas(512, 160), g = c.getContext('2d'); g.strokeStyle = C.ink; g.lineWidth = 10; roundRect(g, 16, 16, 480, 128, 14); g.stroke(); g.fillStyle = C.ink; g.font = "800 80px 'Barlow Condensed'"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(word, 256, 84); return tex(c); };
+  const grid = new THREE.Group(); grid.rotation.set(-0.55, 0.32, 0.12); grid.position.set(1.5, 0.6, -2); scene.add(grid);
+  const cards = {};
+  const mat = new THREE.MeshStandardMaterial({ map: card, roughness: 0.8 });
+  for (let row = -6; row <= 8; row++) for (let col = -2; col <= 2; col++) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), mat); m.position.set(col * 2.9, row * 2.9 + (col % 2 ? 1.2 : 0), 0); grid.add(m); cards[`${col},${row}`] = m;
+  }
+  const words = ['YA SE ARRENDÓ', 'NO DISPONIBLE', 'SIN RESPUESTA', 'YA SE VENDIÓ', 'YA SE ARRENDÓ', 'SIN RESPUESTA', 'NO DISPONIBLE', 'YA SE VENDIÓ'];
+  const cols = [0, 1, -1, 2, 0, -2, 1, -1];
+  const SPEED = 2.2;
+  const stamps = words.map((w, k) => {
+    const u = beat(k), col = cols[k], off = col % 2 ? 1.2 : 0;
+    const row = Math.round((1.8 - u * SPEED - off) / 2.9);
+    const parent = cards[`${col},${row}`];
+    const st = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.62), new THREE.MeshBasicMaterial({ map: stampTex(w), transparent: true, toneMapped: false }));
+    st.position.set(0, 0.05, 0.02); st.rotation.z = -0.22 + (hash(k) - 0.5) * 0.1; parent.add(st); return { st, u };
+  });
+  const clocks = [0, 1, 2, 3, 4, 5].map(i => { const c = coin('reloj', 'reloj', 0.62); scene.add(c); return { c, i }; });
+  keyLight(scene, [-4, 6, 10], 1.6, false); rim(scene, [4, 6, -6], C.acc, 5);
+  S.feed = { scene, cam, comp: composer(scene, cam, { bloom: 0.14, bokeh: { focus: 13, aperture: 0.0016, maxblur: 0.008 } }), update(u) {
+    grid.position.y = 0.6 + u * SPEED * 0.85; grid.position.z = -2 + u * SPEED * 0.45;
+    for (const s of stamps) { const q = ramp(u, s.u, s.u + 0.12); s.st.visible = u >= s.u; s.st.scale.setScalar(lerp(1.9, 1, expoOut(q))); s.st.material.opacity = clamp(q * 3); }
+    for (const k of clocks) {
+      const per = 2.4, ph = ((u + k.i * 0.43) % per) / per;
+      k.c.position.set(-5.4 + (k.i % 3) * 1.4 + ph * 1.2, lerp(6.5, -6.5, ph), 1.5 + (k.i % 2) * 2.5);
+      k.c.rotation.set(0.3 + ph * 2, -0.5 + k.i, k.i * 0.7 + ph * 3);
+    }
+  } };
+}
+
+function buildFit() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.35;
+  studio(scene, C.grey);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200); cam.position.set(1.4, 12.5, 8.2); cam.lookAt(1.4, 0, 0.7);
+  const G = new THREE.Group(); G.position.x = 3.3; scene.add(G);
+  const slab = new THREE.Shape(); slab.moveTo(-3.6, -2.9); slab.lineTo(3.6, -2.9); slab.lineTo(3.6, 3.2); slab.lineTo(-3.6, 3.2); slab.lineTo(-3.6, -2.9);
+  slab.holes.push(new THREE.Path(houseShape(1.18).getPoints()));
+  const slabMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(slab, { depth: 0.55, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 4 }), new THREE.MeshPhysicalMaterial({ color: '#E9E7DF', roughness: 0.7, envMapIntensity: 0.4 }));
+  slabMesh.rotation.x = -Math.PI / 2; slabMesh.castShadow = true; slabMesh.receiveShadow = true; G.add(slabMesh);
+  const pts = houseShape(1.2).getPoints(); pts.push(pts[0]);
+  const rimT = tube(pts.map(p => new THREE.Vector3(p.x, 0.63, -p.y)), 0.035, C.acc, true); G.add(rimT);
+  const piece = new THREE.Mesh(new THREE.ExtrudeGeometry(houseShape(1.15), { depth: 0.5, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 3 }),
+    new THREE.MeshPhysicalMaterial({ color: '#7FC24B', metalness: 0.55, roughness: 0.32, clearcoat: 0.6, envMapIntensity: 0.8, emissive: new THREE.Color(C.acc), emissiveIntensity: 0 }));
+  piece.castShadow = true; G.add(piece);
+  const wrongMat = new THREE.MeshPhysicalMaterial({ color: '#AEB6B0', roughness: 0.6, envMapIntensity: 0.4 });
+  const wrong = [houseShape(0.95, false), houseShape(0.78, false)].map(sh => { const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.4, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03 }), wrongMat); m.castShadow = true; scene.add(m); return m; });
+  const pulse = tube(pts.map(p => new THREE.Vector3(p.x, 0.64, -p.y)), 0.03, C.acc, true); pulse.material.transparent = true; G.add(pulse);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.25));
+  keyLight(scene, [-5, 12, 6], 1.9); rim(scene, [6, 6, -8], C.acc, 1.5);
+  const tagPts = [[2.35, 0.65, 0.41, '3 HAB'], [-2.45, 0.65, 0.18, '2 BAÑOS'], [0, 0.65, -2.2, 'ZONA'], [0, 0.65, 1.85, 'PRESUPUESTO']];
+  const tags = tagPts.map(([, , , t]) => ov('pill', `background:${C.black};color:${C.marfil}`, t, 10));
+  const bubble = ov('bubble', '', 'Hola, tengo lo que buscas.', 10);
+  // u = 0 at 18.86 s; the click is at beat 8 of the scene (22.29 s)
+  const CLICK = beat(8);
+  S.fit = { scene, cam, comp: composer(scene, cam, { bloom: 0.3 }), update(u) {
+    const drop = ramp(u, 0, 0.35);
+    G.position.y = lerp(5, 0, expoOut(drop)) + (drop >= 1 ? Math.max(0, Math.sin((u - 0.35) * 18) * 0.12 * Math.exp(-(u - 0.35) * 8)) : 0);
+    // tags pop on beats 1-4
+    tagPts.forEach(([x, y, z], i) => { const st = beat(1 + i), q = ramp(u, st, st + 0.3); const [sx, sy] = screenOf(new THREE.Vector3(x + G.position.x, y + G.position.y, z), cam);
+      tags[i].style.left = sx + 'px'; tags[i].style.top = sy + 'px'; showO(tags[i], u >= st ? 1 : 0, `translate(-50%,-50%) scale(${lerp(0.4, 1, backOut(q))})`); });
+    // wrong piece A: comes in, hits at beat 5, bounces left; B: hits at beat 6, bounces right
+    const hitA = beat(5), hitB = beat(6);
+    const wA = wrong[0], wB = wrong[1];
+    wA.visible = u > beat(4);
+    if (wA.visible) {
+      const a = ramp(u, beat(4), hitA), b = ramp(u, hitA, hitA + 0.55);
+      const p0 = new THREE.Vector3(-4, 5, -1), p1 = new THREE.Vector3(3.3, 1.2, 0.2), p2 = new THREE.Vector3(-3.2, 0.02, 4.6);
+      const pos = u < hitA ? p0.clone().lerp(p1, inOut(a)) : p1.clone().lerp(p2, b); if (u >= hitA) pos.y = lerp(1.2, 0.02, b) + Math.sin(b * Math.PI) * 1.6;
+      wA.position.copy(pos); wA.rotation.set(-Math.PI / 2 + (1 - b) * 0.3 * (u < hitA ? 1 : 1 - b), 0, 0.6 + b * 2.5);
+    }
+    wB.visible = u > hitA;
+    if (wB.visible) {
+      const a = ramp(u, hitA, hitB), b = ramp(u, hitB, hitB + 0.55);
+      const p0 = new THREE.Vector3(10, 5, 1), p1 = new THREE.Vector3(3.3, 1.2, 0.3), p2 = new THREE.Vector3(8.2, 0.02, -0.6);
+      const pos = u < hitB ? p0.clone().lerp(p1, inOut(a)) : p1.clone().lerp(p2, b); if (u >= hitB) pos.y = lerp(1.2, 0.02, b) + Math.sin(b * Math.PI) * 1.4;
+      wB.position.copy(pos); wB.rotation.set(-Math.PI / 2, 0, -0.5 - b * 2);
+    }
+    // the right piece: appears after B, aligns, drops in on the click
+    piece.visible = u > hitB + 0.05;
+    const al = inOut(ramp(u, hitB + 0.05, CLICK - 0.25)), dr = expoIn(ramp(u, CLICK - 0.25, CLICK));
+    piece.position.set(lerp(1.4, 0, al), lerp(lerp(4.5, 2.1, al), 0.08, dr), lerp(-1.6, 0, al));
+    piece.rotation.set(-Math.PI / 2 + lerp(0.6, 0, al) * (1 - dr), lerp(0.4, 0, al), lerp(-0.9, 0, al));
+    const k = u >= CLICK ? Math.exp(-(u - CLICK) * 3.5) : 0;
+    piece.material.emissiveIntensity = k * 0.8; rimT.material.color.set(C.acc).lerp(new THREE.Color('#ffffff'), k * 0.8);
+    const pq = ramp(u, CLICK, CLICK + 0.6); pulse.visible = u >= CLICK && pq < 1; pulse.scale.set(lerp(1, 1.9, expoOut(pq)), 1, lerp(1, 1.9, expoOut(pq))); pulse.material.opacity = 1 - pq;
+    const [bx, by] = screenOf(new THREE.Vector3(G.position.x + 1.3, 0.7, -1.6), cam);
+    bubble.style.left = bx + 'px'; bubble.style.top = (by - 90) + 'px';
+    const bq = ramp(u, CLICK + 0.2, CLICK + 0.5); showO(bubble, u > CLICK + 0.2 ? 1 : 0, `scale(${lerp(0.3, 1, backOut(bq))})`);
+  } };
+}
+
+function buildPayoff() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.6;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100); cam.position.set(0, 0, 12);
+  const L = coin('reloj', 'reloj', 0.82), R = coin('agente', 'agente', 0.82); scene.add(L, R);
+  const roof = tube([new THREE.Vector3(-2.15, -1.25, 0), new THREE.Vector3(0, 0.45, 0), new THREE.Vector3(2.15, -1.25, 0)], 0.035, C.marfil); scene.add(roof);
+  const roofCount = roof.geometry.index.count;
+  keyLight(scene, [-3, 3, 8], 1.8, false); rim(scene, [0, 5, -6], C.acc, 3); rim(scene, [-6, -3, -3], '#ffffff', 1.2);
+  // where the logo's heads sit in the end card (logo 906 px wide at 507,250), in world units at z = 0
+  const tanH = Math.tan(THREE.MathUtils.degToRad(15)), ppu = H / (2 * 12 * tanH);
+  const toWorld = (sx, sy) => new THREE.Vector3((sx - W / 2) / ppu, -(sy - H / 2) / ppu, 0);
+  const K = 906 / 1208;
+  const headL = { p: toWorld(507 + 147.5 * K, 250 + 109 * K), r: 71 * K / 2 / ppu }, headR = { p: toWorld(507 + 320 * K, 250 + 108.5 * K), r: 72 * K / 2 / ppu };
+  S.payoff = { scene, cam, comp: composer(scene, cam, { bloom: 0.25 }), update(u) {
+    const rl = expoOut(ramp(u, 0, 0.6)), rr = expoOut(ramp(u, beat(0.5), beat(0.5) + 0.6));
+    const m = inOut(ramp(u, 2.25, 3.05));
+    const posL = new THREE.Vector3(-1.35, lerp(-6, 1.25, rl), 0).lerp(headL.p, m), posR = new THREE.Vector3(1.35, lerp(-6, 1.25, rr), 0).lerp(headR.p, m);
+    L.position.copy(posL); R.position.copy(posR);
+    L.scale.setScalar(lerp(1, headL.r / 0.82, m)); R.scale.setScalar(lerp(1, headR.r / 0.82, m));
+    L.rotation.set(0.04 * (1 - m), lerp(0.12, 0, m) + (1 - rl) * 2, 0); R.rotation.set(0.04 * (1 - m), lerp(-0.12, 0, m) - (1 - rr) * 2, 0);
+    roof.geometry.setDrawRange(0, Math.floor(roofCount * inOut(ramp(u, 0.45, 1.1)) / 3) * 3);
+    roof.material.transparent = true; roof.material.opacity = 1 - smooth(ramp(u, 2.1, 2.6));
+    scene.background.set(C.black).lerp(new THREE.Color(C.marfil), smooth(ramp(u, 2.55, 2.95)));
+  } };
+}
+
+// ------------------------------------------------------------------ overlays per shot
+const T = {};
+function buildOverlays() {
+  T.funciona = ov('t', `left:110px;top:720px;font-size:160px;color:${C.ink}`, '¿FUNCIONARÁ?', 3);
+  T.funciona2 = ov('s', `left:116px;top:900px;font-size:40px;color:${C.ink}`, 'Inviertes. Esperas. Cruzas los dedos.', 3);
+  T.invBack = ov('', `left:0;top:0;width:1920px;height:420px;background:linear-gradient(180deg, ${C.grey} 0%, ${C.grey} 55%, rgba(228,231,226,0) 100%)`, '', 6);
+  T.invierte = ov('t', `left:110px;top:70px;font-size:120px;color:${C.ink}`, 'INVIERTE EN QUIEN YA\nBUSCA LO QUE TIENES.', 6);
+  T.tiempo = ov('s', `left:0;width:1920px;text-align:center;top:930px;font-size:46px;font-weight:600;color:${C.marfil}`, 'Si buscas casa, tu moneda es el tiempo.', 7);
+  T.vig = ov('', `left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse 60% 70% at 18% 75%, rgba(11,23,18,.92), rgba(11,23,18,0) 70%)`, '', 9);
+  T.regalar = ov('t', `left:110px;top:640px;font-size:170px;color:${C.acc}`, 'DEJA DE REGALAR\nTUS HORAS.', 9);
+  T.regalar2 = ov('s', `left:116px;top:960px;font-size:34px;color:${C.marfil}`, 'Horas y horas buscando. Ninguna era la tuya.', 9);
+  T.publica = ov('t', `left:110px;top:90px;font-size:150px;color:${C.ink}`, 'PUBLICA LO\nQUE NECESITAS.', 10);
+  T.encaja = ov('s', `left:116px;top:380px;font-size:40px;font-weight:600;color:${C.ink}`, 'Te contactan solo si encaja.', 11);
+  T.busca = ov('s', `left:${730 - 200}px;width:400px;text-align:center;top:130px;font-size:28px;font-weight:600;letter-spacing:.14em;color:${C.marfil}`, 'QUIEN BUSCA', 12);
+  T.tiene = ov('s', `left:${1190 - 200}px;width:400px;text-align:center;top:130px;font-size:28px;font-weight:600;letter-spacing:.14em;color:${C.marfil}`, 'QUIEN TIENE', 12);
+  T.porfin = ov('t', `left:0;width:1920px;text-align:center;top:840px;font-size:150px;color:${C.acc}`, 'POR FIN, ENCAJAN.', 13);
+  // end card: ivory, real logo, two lines, domain
+  T.end = ov('', `left:0;top:0;width:1920px;height:1080px;background:${C.marfil}`, `<img src="../../anuncios/reel-publica-tu-busqueda/marca/logo-horizontal-transparente.png" style="position:absolute;left:507px;top:250px;width:906px;height:323px">`, 13);
+  T.l1 = ov('s', `left:0;width:1920px;text-align:center;top:640px;font-size:44px;font-weight:600;color:${C.ink}`, '¿Buscas casa? Publica gratis lo que necesitas.', 14);
+  T.l2 = ov('s', `left:0;width:1920px;text-align:center;top:710px;font-size:44px;font-weight:600;color:${C.ink}`, '¿Eres agente? Invierte solo en quien ya busca lo que tienes.', 14);
+  T.url = ov('s', `left:0;width:1920px;text-align:center;top:860px;font-size:30px;letter-spacing:.06em;color:${C.ink}`, 'propiedadconecta.com', 14);
+}
+
+// ------------------------------------------------------------------ timeline
+// [startBeat, endBeat, render function(lt)]
+const SHOTS = [
+  [0, 8, lt => run(S.toss, lt)],                                            // 1 · CARA O CRUZ
+  [8, 16, lt => { S.machine.cascade(lt); render(S.machine); }],              // 2-3 · the machine
+  [16, 20, lt => run(S.title2, lt)],                                        // 4 · DEJA DE TIRAR MONEDAS AL AIRE
+  [20, 24, lt => { S.machine.rewind(lt); render(S.machine); }],              // 5 · rewind
+  [24, 32, lt => run(S.field, lt)],                                         // 6 · invest in who already wants it
+  [32, 36, lt => run(S.flip, lt)],                                          // 7 · the coin turns: a clock
+  [36, 44, lt => run(S.feed, lt)],                                          // 8-9 · the endless feed
+  [44, 56, lt => run(S.fit, lt)],                                           // 10-11 · your shape, the click
+  [56, 64, lt => run(S.payoff, lt)],                                        // 12-13 · POR FIN, ENCAJAN → logo
+  [64, 74.7, () => {}],                                                     // 14 · end card (DOM only)
+];
+function render(s) { s.comp.render(); }
+function run(s, lt) { s.update(lt); render(s); }
+
+function overlays(t) {
+  const sh = n => SHOTS[n];
+  const at = (b) => t >= beat(b);
+  if (t >= beat(12) && t < beat(16)) { showO(T.funciona); showO(T.funciona2); }
+  if (t >= beat(28) && t < beat(32)) { showO(T.invBack); showO(T.invierte); }
+  if (t >= beat(32) + 0.9 && t < beat(36)) showO(T.tiempo, smooth(ramp(t, beat(32) + 0.9, beat(32) + 1.15)));
+  if (t >= beat(40) && t < beat(44)) { showO(T.vig); showO(T.regalar); showO(T.regalar2); }
+  if (t >= beat(44) && t < beat(56)) showO(T.publica);
+  if (t >= beat(52) && t < beat(56)) showO(T.encaja, smooth(ramp(t, beat(52), beat(52) + 0.2)));
+  if (t >= beat(56) + 0.9 && t < beat(56) + 2.2) { const a = smooth(ramp(t, beat(56) + 0.9, beat(56) + 1.2)) * (1 - smooth(ramp(t, beat(56) + 1.9, beat(56) + 2.2))); showO(T.busca, a); showO(T.tiene, a); }
+  if (t >= beat(60) && t < beat(60) + 0.9) showO(T.porfin, 1 - smooth(ramp(t, beat(60) + 0.55, beat(60) + 0.9)));
+  // the coins land on the logo's heads at 27.0 s; the ivory card and the real logo fade in over them
+  if (t >= beat(56) + 2.95) showO(T.end, smooth(ramp(t, beat(56) + 2.95, beat(56) + 3.3)));
+  if (at(64)) { const q1 = ramp(t, beat(64), beat(64) + 0.35), q2 = ramp(t, beat(65), beat(65) + 0.35), q3 = ramp(t, beat(66), beat(66) + 0.35);
+    showO(T.l1, smooth(q1), `translateY(${(1 - expoOut(q1)) * 18}px)`); showO(T.l2, smooth(q2), `translateY(${(1 - expoOut(q2)) * 18}px)`); showO(T.url, smooth(q3)); }
+  void sh;
+}
+
+function draw(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  drawClock(t);
+  for (const d of O) d.style.display = 'none';            // scenes and overlays() re-show what they need
+  for (const [a, b, f] of SHOTS) if (t >= beat(a) && t < beat(b)) { f(t - beat(a)); break; }
+  overlays(t);
+}
+
+// ------------------------------------------------------------------ boot
+window.READY = false; window.draw = draw;
+(async () => {
+  await Promise.all([document.fonts.load("800 200px 'Barlow Condensed'"), document.fonts.load('600 40px Outfit'), document.fonts.load('500 40px Outfit')]);
+  makeTextures();
+  buildToss(); buildMachine(); buildTitle2(); buildField(); buildFlip(); buildFeed(); buildFit(); buildPayoff(); buildOverlays();
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  // warm up every scene once so shaders compile before the first timed frame
+  for (const t of [0.5, 4, 7.5, 9, 11, 14.5, 16, 20, 25]) draw(t);
+  window.READY = true;
+  const q = new URLSearchParams(location.search);
+  if (q.has('render')) { draw(0); return; }
+  document.body.classList.add('preview');
+  const st = document.getElementById('stage'); const fit = () => { st.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; }; fit(); addEventListener('resize', fit);
+  if (q.has('t')) { draw(parseFloat(q.get('t'))); return; }
+  let t0 = performance.now(), paused = false, pt = 0;
+  addEventListener('click', () => { paused = !paused; if (!paused) t0 = performance.now() - pt * 1000; });
+  const loop = now => { if (!paused) { pt = ((now - t0) / 1000) % DURATION; draw(pt); } requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

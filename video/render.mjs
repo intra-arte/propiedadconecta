@@ -6,7 +6,7 @@
  *                                           video/music/soundtrack.wav exists) + contact sheet
  *   node video/render.mjs --stills 1,6.5  → video/out/stills/t_<s>.png only
  *
- * Other films: --page <html> --out <dir> --name <file> --duration <s> --music <wav>
+ * Other films: --page <html> --out <dir> --name <file> --duration <s> --music <wav> [--gl for WebGL pages]
  *   node video/render.mjs --page video/explicativo/index.html --out video/explicativo/out \
  *     --name propiedad-conecta-explicativo-32s --duration 32 --music video/explicativo/music/soundtrack.wav
  *
@@ -54,12 +54,13 @@ async function main() {
 
   const server = await serve();
   const { chromium } = playwright();
-  const browser = await chromium.launch();
+  // --gl: software WebGL (SwiftShader) for Three.js pages
+  const browser = await chromium.launch(process.argv.includes('--gl') ? { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } : {});
   const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   page.on('console', m => m.type() === 'error' && console.error('page:', m.text()));
   page.on('pageerror', e => { console.error('page error:', e.message); process.exitCode = 1; });
   await page.goto(`http://127.0.0.1:${server.address().port}/${path.relative(ROOT, PAGE).split(path.sep).join('/')}?render=1`);
-  await page.waitForFunction(() => window.READY === true, null, { timeout: 30000 });
+  await page.waitForFunction(() => window.READY === true, null, { timeout: 180000 });
   const stage = page.locator('#stage');
 
   if (stills) {
