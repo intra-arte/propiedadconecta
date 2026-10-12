@@ -2,7 +2,7 @@
 """
 Voice-over mix for «Monedas al aire».
 
-Takes one ElevenLabs take (locucion/toma-b.mp3: the eleven lines read in one go), speeds it up 10 %,
+Takes one ElevenLabs take (locucion/toma-c.mp3: the eleven lines read in one go), speeds it up 10 %,
 splits it into its voiced chunks, groups the chunks into the eleven lines by expected length, tightens
 the pauses inside each line, places each line where its shot or headline appears, ducks the score under
 the voice and writes music/soundtrack-locucion.wav (48 kHz stereo, -14 LUFS, peak <= -1 dBFS).
@@ -20,7 +20,7 @@ from scipy import ndimage, signal
 from scipy.io import wavfile
 
 HERE = Path(__file__).resolve().parent
-TAKE = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "toma-b.mp3"
+TAKE = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "toma-c.mp3"
 SCORE = HERE.parent / "music" / "soundtrack.wav"
 OUT = HERE.parent / "music" / "soundtrack-locucion.wav"
 SR, DUR = 48000, 32.0

@@ -1,6 +1,6 @@
 # Locución · «Monedas al aire» (32 s)
 
-Voz: **Gael** (ElevenLabs, español latino neutro, publicidad) · modelo `eleven_v4`.
+Voz: la toma que generaste en ElevenLabs (`toma-c.mp3`, la que se usa). Antes: **Gael** (español latino neutro, publicidad, `eleven_v4`) en `toma-a.mp3` y `toma-b.mp3`.
 Tono: cercano y seguro, sin gritar. La voz acompaña a los titulares: dice lo mismo que se lee, o lo une, y nunca dice más de lo que se ve.
 
 Cada línea entra en el momento en que aparece su imagen o su titular. Los tiempos son la entrada de la voz.
@@ -23,7 +23,7 @@ Cada línea entra en el momento en que aparece su imagen o su titular. Los tiemp
 
 Se graba todo seguido y después `video/monedas/locucion/mezcla.py` lo acelera un 10 %, lo corta por los silencios, agrupa los trozos en las once líneas según su duración, acorta las pausas internas y coloca cada línea en su tiempo. La música baja 8 dB mientras se habla y la mezcla queda a −14 LUFS con picos a −1 dBFS.
 
-Hay dos tomas en `video/monedas/locucion/`: `toma-b.mp3` (la que se usa) y `toma-a.mp3` (alternativa). Para probar la otra: `python3 video/monedas/locucion/mezcla.py video/monedas/locucion/toma-a.mp3`.
+Hay tres tomas en `video/monedas/locucion/`: `toma-c.mp3` (la tuya, la que se usa), y `toma-a.mp3` y `toma-b.mp3` (las primeras, con la voz Gael). Para probar otra: `python3 video/monedas/locucion/mezcla.py video/monedas/locucion/toma-b.mp3`.
 
 ```
 ¿Cara o cruz?
