@@ -3,6 +3,7 @@
 Concept and script: [`docs/monedas/idea.md`](../../docs/monedas/idea.md). Style frames: `style-frames/`.
 
 - **Output:** `out/monedas-al-aire-32s.mp4` (1920 × 1080, 60 fps, 1920 frames, H.264 + AAC) and a contact sheet.
+- **With voice-over:** `out/monedas-al-aire-32s-locucion.mp4` (same picture; ElevenLabs voice over the ducked score). Script and timing: [`docs/monedas/locucion.md`](../../docs/monedas/locucion.md).
 - **Preview:** serve the repo root (`npx http-server .`), open `/video/monedas/index.html` in a browser with WebGL. Click to pause; `?t=22.3` shows the click.
 
 ## Rebuild
@@ -12,6 +13,12 @@ python3 video/monedas/music/compose.py      # original score (same engine as the
 node video/render.mjs --gl --page video/monedas/index.html --out video/monedas/out \
   --name monedas-al-aire-32s --duration 32 --music video/monedas/music/soundtrack.wav
 node video/monedas/frames.mjs               # the six style frames (optional)
+
+# voice-over: cut the ElevenLabs take into lines, place them, duck the score, mux
+python3 video/monedas/locucion/mezcla.py    # → music/soundtrack-locucion.wav
+ffmpeg -i video/monedas/out/monedas-al-aire-32s.mp4 -i video/monedas/music/soundtrack-locucion.wav \
+  -map 0:v -map 1:a -c:v copy -c:a aac -b:a 256k -shortest -movflags +faststart \
+  video/monedas/out/monedas-al-aire-32s-locucion.mp4
 ```
 
 `--gl` launches Chromium with software WebGL (SwiftShader); about 1.8 s per frame, ~1 h for the film.
