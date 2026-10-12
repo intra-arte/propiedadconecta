@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Propiedad Conecta · explicativo 32 s</title>
+<!--
+  32 s 16:9 explainer. Shot list: docs/explicativo/shot_list.md · grammar: docs/explicativo/guia_de_estilo.md.
+  Every frame is a pure function of time: draw(t). Cuts sit on a 140 BPM grid (one beat = 60/140 s).
+  Run `python3 video/explicativo/prep.py` first. Opened directly the page loops (click to pause); ?t=12 shows a still.
+-->
+<style>
+  @font-face { font-family: Outfit; src: url(../../anuncios/reel-publica-tu-busqueda/animatic/fuentes/Outfit-Variable.ttf) format('truetype'); font-weight: 100 900; }
+  @font-face { font-family: 'Barlow Condensed'; src: url(fuentes/BarlowCondensed-800.woff2) format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #111; }
+  body.preview { display: grid; place-items: center; min-height: 100vh; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0B1712; font-family: Outfit, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  .shot { position: absolute; inset: 0; overflow: hidden; display: none; }
+  .tit { position: absolute; left: 0; width: 1920px; text-align: center; font-family: 'Barlow Condensed'; font-weight: 800; text-transform: uppercase; line-height: .92; letter-spacing: -0.01em; white-space: pre; }
+  .pill { position: absolute; transform-origin: center; white-space: nowrap; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; border-radius: 999px; }
+  .cap { position: absolute; left: 0; width: 1920px; text-align: center; font-weight: 600; white-space: pre; }
+  .win { position: absolute; overflow: hidden; background: #F7F8FB; border-radius: 28px; box-shadow: 0 0 0 1.5px #DADDD8, 0 30px 80px rgba(11,23,18,.10); }
+  .win img { position: absolute; left: 0; top: 0; }
+  .tile { position: absolute; background: #FAF9F5; overflow: hidden; }
+  .tile img { position: absolute; }
+  img { display: block; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="hblur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur id="hblurStd" stdDeviation="0 0"/></filter>
+</svg>
+
+<script>
+'use strict';
+// ------------------------------------------------------------------ constants
+const W = 1920, H = 1080, DURATION = 32;
+const B = 60 / 140;                                   // one beat
+const C = { black: '#0B1712', acc: '#92CE58', grey: '#E4E7E2', white: '#FFFFFF', marfil: '#FAF9F5', ink: '#142A22', line: '#DADDD8', page: '#F7F8FB' };
+const ISO = { w: 465, h: 431, draw: { x0: 72, x1: 392, y0: 73, y1: 358 } };
+const MARCA = '../../anuncios/reel-publica-tu-busqueda/marca/';
+const ASSETS1 = '../assets/';                          // card crops of the first film (3 px per unit)
+// Shot boundaries in beats (17 shots; the last one runs to 32 s).
+const BEATS = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 52, 56, 60, 68];   // 15 = poster + pages (60-68)
+const T = BEATS.map(b => b * B);                      // shot starts in seconds; pages end at 68 B = 29.14 s
+
+// ------------------------------------------------------------------ helpers
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const expoIn = x => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const inOut = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const smooth = x => x * x * (3 - 2 * x);
+const backOut = (x, s = 1.4) => { x = clamp(x); const c3 = s + 1; return 1 + c3 * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2); };
+const el = (tag, cls, parent, css) => { const e = document.createElement(tag); if (cls) e.className = cls; if (css) e.style.cssText = css; if (parent) parent.appendChild(e); return e; };
+const img = (src, parent, css) => { const i = el('img', 'abs', parent, css); i.src = src; return i; };
+const box = (e, x, y, w, h) => { const s = e.style; s.left = x + 'px'; s.top = y + 'px'; if (w != null) s.width = w + 'px'; if (h != null) s.height = h + 'px'; };
+const show = (e, on) => { e.style.display = on ? 'block' : 'none'; return on; };
+
+function title(parent, lines, size, color, cy) {
+  const d = el('div', 'tit', parent, `font-size:${size}px;color:${color}`);
+  d.textContent = lines.join('\n');
+  d.style.top = (cy - lines.length * size * 0.92 / 2 - size * 0.04) + 'px';
+  return d;
+}
+function pill(parent, text, bg, fg, size = 34) {
+  const p = el('div', 'pill', parent, `background:${bg};color:${fg};font-size:${size}px;padding:${size * .55}px ${size * 1.15}px`);
+  p.textContent = text;
+  return p;
+}
+// Pop with back-out and a little squash & stretch (style guide R4).
+function pop(p, cx, cy, lt, start, dur = 0.3) {
+  const q = ramp(lt, start, start + dur);
+  if (!show(p, lt >= start)) return;
+  const s = lerp(0.35, 1, backOut(q));
+  const squash = 0.14 * Math.sin(Math.PI * clamp(q * 1.6));
+  p.style.left = cx + 'px'; p.style.top = cy + 'px';
+  p.style.transform = `translate(-50%,-50%) scale(${s * (1 + squash)}, ${s * (1 - squash * 0.7)})`;
+}
+function caption(parent, text, color, y, size = 46) {
+  const c = el('div', 'cap', parent, `color:${color};font-size:${size}px;top:${y}px`);
+  c.innerHTML = text;
+  return c;
+}
+// Ivory tile with the isotipo: the logo always sits on ivory (brand rule), even on dark scenes.
+function tile(parent) {
+  const t = el('div', 'tile', parent);
+  const i = img(MARCA + 'isotipo-transparente.png', t);
+  return { t, i };
+}
+function placeTile(o, cx, cy, size) {
+  box(o.t, cx - size / 2, cy - size / 2, size, size);
+  o.t.style.borderRadius = size * 0.22 + 'px';
+  const k = size * 0.62 / (ISO.draw.x1 - ISO.draw.x0);            // isotipo drawing = 62 % of the tile width
+  const dx = cx - (ISO.draw.x0 + (ISO.draw.x1 - ISO.draw.x0) / 2) * k, dy = cy - (ISO.draw.y0 + (ISO.draw.y1 - ISO.draw.y0) / 2) * k;
+  box(o.i, dx - (cx - size / 2), dy - (cy - size / 2), ISO.w * k, ISO.h * k);
+}
+// A rounded "screen" showing a real capture; camera = scale s and a focus point (asset px) at the window centre.
+function makeWin(parent, src) { const w = el('div', 'win', parent); const i = img(src, w); return { w, i }; }
+function drawWin(o, r, aw, ah, s, fx, fy) {
+  box(o.w, r.x, r.y, r.w, r.h);
+  // keep the content inside the window when it is bigger than it
+  const cw = aw * s, ch = ah * s;
+  let ox = r.w / 2 - fx * s, oy = r.h / 2 - fy * s;
+  ox = cw > r.w ? clamp(ox, r.w - cw, 0) : (r.w - cw) / 2;
+  oy = ch > r.h ? clamp(oy, r.h - ch, 0) : (r.h - ch) / 2;
+  box(o.i, ox, oy, cw, ch);
+}
+// Sutherland–Hodgman: keep the part of a polygon with a*x + b*y <= c.
+function clipHalf(pts, a, b, c) {
+  const out = [];
+  for (let i = 0; i < pts.length; i++) {
+    const P = pts[i], Q = pts[(i + 1) % pts.length];
+    const fp = a * P[0] + b * P[1] - c, fq = a * Q[0] + b * Q[1] - c;
+    if (fp <= 0) out.push(P);
+    if ((fp < 0) !== (fq < 0) && fp !== fq) { const u = fp / (fp - fq); out.push([P[0] + u * (Q[0] - P[0]), P[1] + u * (Q[1] - P[1])]); }
+  }
+  return out;
+}
+const poly = pts => pts.length ? `polygon(${pts.map(p => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(',')})` : 'polygon(0 0,0 0,0 0)';
+// Page peel from the bottom-right corner along a 45° fold (style guide R9). p = 0 flat, 1 gone.
+function peel(page, flap, p) {
+  const rect = [[0, 0], [W, 0], [W, H], [0, H]];
+  const k = (W + H) * (1 - p);
+  page.style.clipPath = p > 0 ? poly(clipHalf(rect, 1, 1, k)) : 'none';
+  const removed = clipHalf(rect, -1, -1, -k);
+  show(flap, p > 0 && p < 1);
+  flap.firstElementChild.style.clipPath = poly(removed.map(([x, y]) => [k - y, k - x]));
+}
+
+// ------------------------------------------------------------------ build
+const S = {};                       // per-shot elements
+const stage = document.getElementById('stage');
+const shot = (n, bg) => { const d = el('div', 'shot', stage, `background:${bg}`); d.dataset.n = n; return d; };
+
+function build() {
+  // 1 · the line that searches
+  S[1] = { root: shot(1, C.black) };
+  S[1].root.innerHTML = `<svg class="abs" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" stroke="${C.marfil}" stroke-linecap="round" stroke-linejoin="round">
+    <path id="wander" pathLength="1" stroke-width="2.5" d="M -60 780 C 260 760 380 330 640 400 S 800 860 1020 720 S 1330 230 1500 420 S 1330 930 1120 790 S 830 520 860 600"/>
+    <path id="chev" pathLength="1" stroke-width="3" d="M 860 600 L 960 500 L 1060 600"/></svg>`;
+
+  // 2 · pills of the problem
+  S[2] = { root: shot(2, C.grey) };
+  S[2].cam = el('div', 'abs', S[2].root, 'width:1920px;height:1080px');
+  S[2].pills = [['YA SE ARRENDÓ', 600, 390], ['NO CONTESTAN', 1310, 330], ['ANUNCIO VIEJO', 730, 700], ['YA SE VENDIÓ', 1250, 680]]
+    .map(([t, x, y]) => ({ p: pill(S[2].cam, t, C.black, C.marfil, 38), x, y }));
+
+  // 3 · giant title + lens
+  S[3] = { root: shot(3, C.black) };
+  S[3].t = title(S[3].root, ['DEJA DE PERSEGUIR', 'ANUNCIOS.'], 210, C.acc, 540);
+  S[3].lens = el('div', 'abs', S[3].root, `border-radius:50%;overflow:hidden;background:${C.black};box-shadow:inset 0 0 0 2px rgba(250,249,245,.55),inset 0 0 60px rgba(250,249,245,.18),0 0 40px rgba(0,0,0,.6)`);
+  S[3].lensIn = el('div', 'abs', S[3].lens, 'width:1920px;height:1080px');
+  title(S[3].lensIn, ['DEJA DE PERSEGUIR', 'ANUNCIOS.'], 210, C.acc, 540);
+
+  // 4 · tile → the real page
+  S[4] = { root: shot(4, C.black) };
+  S[4].page = img('assets/pagina.png', S[4].root, 'width:1920px;height:1080px;transform-origin:54px 60px');
+  S[4].tile = tile(S[4].root);
+
+  // 5 · masked band
+  S[5] = { root: shot(5, C.grey) };
+  S[5].root.insertAdjacentHTML('beforeend', `<svg class="abs" width="1920" height="1080"><line id="slice" x1="-80" y1="930" x2="2000" y2="10" stroke="${C.black}" stroke-width="2" pathLength="1" stroke-dasharray="1 1"/></svg>`);
+  S[5].band = el('div', 'abs', S[5].root, `background:${C.white};overflow:hidden`);
+  S[5].word = el('div', 'abs', S[5].band, `font-family:'Barlow Condensed';font-weight:800;font-size:560px;line-height:1;color:${C.black};white-space:nowrap;letter-spacing:-0.01em`);
+  S[5].word.textContent = 'AL REVÉS.';
+  S[5].cap = caption(S[5].root, 'En los portales tú buscas. Aquí publicas lo que buscas.', C.ink, 820, 40);
+  S[5].card = img(ASSETS1 + 'que-lleno.png', S[5].root, 'width:640px;border-radius:14px;box-shadow:0 30px 60px rgba(11,23,18,.25)');
+
+  // 6 · pills → the real card
+  S[6] = { root: shot(6, C.grey) };
+  S[6].morph = el('div', 'abs', S[6].root, 'overflow:hidden');
+  S[6].a = pill(S[6].root, 'COMPRAR', C.black, C.marfil, 40);
+  S[6].b = pill(S[6].root, 'ALQUILAR', C.acc, C.black, 40);
+  S[6].card = img(ASSETS1 + 'que-lleno.png', S[6].root, 'width:1072px;height:283px;border-radius:24px');
+  S[6].cap = caption(S[6].root, '01 · Cuéntanos qué buscas.', C.ink, 860);
+
+  // 7 · row of cards, whip
+  S[7] = { root: shot(7, C.grey) };
+  S[7].row = el('div', 'abs', S[7].root, 'width:1920px;height:1080px');
+  S[7].cards = [['ubicacion-lleno.png', 1072, 307, 'Zona'], ['presupuesto-lleno.png', 1072, 273, 'Presupuesto'], [null, 1072, 840, 'Lo que no puede faltar']]
+    .map(([src, w, h, label], i) => {
+      const c = img(src ? ASSETS1 + src : 'assets/caracteristicas.png', S[7].row, 'border-radius:16px;box-shadow:0 24px 60px rgba(11,23,18,.12)');
+      const l = caption(S[7].row, label, C.ink, 0, 40); l.style.width = '900px';
+      return { c, l, w, h, x: i * 1000 };
+    });
+
+  // 8 · macro on the button
+  S[8] = { root: shot(8, C.black) };
+  S[8].blur = img('assets/publicar.png', S[8].root, 'filter:blur(9px);border-radius:24px');
+  S[8].sharp = img('assets/publicar.png', S[8].root, 'border-radius:24px;-webkit-mask-image:radial-gradient(ellipse 34% 120% at 50% 50%,#000 55%,transparent 100%)');
+  S[8].cap = caption(S[8].root, `02 · Publica. <span style="color:${C.acc}">Es gratis.</span>`, C.marfil, 740, 58);
+
+  // 9 · published
+  S[9] = { root: shot(9, C.white) };
+  S[9].win = makeWin(S[9].root, 'assets/publicada.png');
+  S[9].cap = caption(S[9].root, 'Tú eliges cuántos agentes: 1, 3 o 5.', C.ink, 930);
+
+  // 10 · agent marketplace
+  S[10] = { root: shot(10, C.grey) };
+  S[10].win = makeWin(S[10].root, 'assets/marketplace.png');
+  S[10].cap = caption(S[10].root, '03 · Los agentes ven solicitudes que coinciden.', C.ink, 930);
+
+  // 11 · hidden contact
+  S[11] = { root: shot(11, C.white) };
+  S[11].win = makeWin(S[11].root, 'assets/detalle.png');
+  S[11].cap = caption(S[11].root, 'Tus datos quedan ocultos.', C.ink, 930);
+
+  // 12 · unlock (two bars)
+  S[12] = { root: shot(12, C.black) };
+  S[12].modal = img('assets/desbloquear.png', S[12].root, 'border-radius:22px;transform-origin:center');
+  S[12].flash = el('div', 'abs', S[12].root, 'border-radius:12px;background:#fff');
+  S[12].lock = el('div', 'abs', S[12].root, 'width:240px;height:280px');
+  S[12].lock.innerHTML = `<svg width="240" height="280" viewBox="0 0 240 280">
+      <g id="shackle"><path d="M62 128 V84 a58 58 0 0 1 116 0 V128" fill="none" stroke-width="26" stroke-linecap="round"/></g>
+      <rect id="lbody" x="20" y="120" width="200" height="150" rx="30"/>
+      <circle id="hole" cx="120" cy="185" r="17"/><rect id="hole2" x="111" y="190" width="18" height="40" rx="9"/></svg>`;
+  S[12].cap = caption(S[12].root, '04 · Si tiene algo que coincide, usa créditos y desbloquea tu contacto.', C.marfil, 935, 42);
+
+  // 13 · unlocked lead + channels
+  S[13] = { root: shot(13, C.white) };
+  S[13].win = makeWin(S[13].root, 'assets/lead.png');
+  // caption and channel pills share one centred row
+  S[13].row = el('div', 'abs', S[13].root, 'left:0;top:905px;width:1920px;display:flex;justify-content:center;align-items:center;gap:18px');
+  el('span', '', S[13].row, `font-size:42px;font-weight:600;color:${C.ink};margin-right:8px`).textContent = '05 · Te contacta por';
+  S[13].pills = ['WHATSAPP', 'LLAMADA', 'EMAIL'].map(t => { const p = pill(S[13].row, t, C.black, C.marfil, 32); p.style.position = 'relative'; return p; });
+
+  // 14 · giant title
+  S[14] = { root: shot(14, C.black) };
+  S[14].t = title(S[14].root, ['TÚ PUBLICAS.', 'EL AGENTE TE ENCUENTRA.'], 165, C.acc, 540);
+
+  // 15 + 16 · poster, then three pages (stacked so each peel reveals the next)
+  S[15] = { root: shot(15, C.white) };
+  S[15].pages = [];
+  const pages = [['3', 'Te contacta quien tiene', 'algo que coincide.'], ['2', 'Elige cuántos', 'agentes.'], ['1', 'Publica gratis', 'lo que buscas.']];
+  for (const [n, a, b] of pages) {
+    const pg = el('div', 'abs', S[15].root, `width:1920px;height:1080px;background:${C.white}`);
+    el('div', 'abs', pg, `left:120px;top:80px;font-size:22px;font-weight:600;letter-spacing:.12em;color:${C.ink}`).textContent = 'PROPIEDAD CONECTA · CÓMO FUNCIONA';
+    el('div', 'abs', pg, `left:auto;right:120px;top:80px;font-size:22px;font-weight:600;letter-spacing:.12em;color:${C.ink}`).textContent = `${n} / 3`;
+    el('div', 'abs', pg, `left:120px;top:150px;width:1680px;height:1.5px;background:${C.ink};opacity:.25`);
+    el('div', 'abs', pg, `left:150px;top:290px;font-family:'Barlow Condensed';font-weight:800;font-size:520px;line-height:1;color:${C.ink}`).textContent = n;
+    const tx = el('div', 'abs', pg, `left:560px;top:420px;font-size:92px;font-weight:600;line-height:1.08;letter-spacing:-0.02em;color:${C.ink}`);
+    tx.innerHTML = `${a}<br>${b}`;
+    S[15].pages.unshift(pg);                       // pages[0] = page 1 (top of the three)
+  }
+  const poster = el('div', 'abs', S[15].root, `width:1920px;height:1080px;background:${C.marfil}`);
+  const small = `font-size:22px;font-weight:600;letter-spacing:.12em;color:${C.ink}`;
+  el('div', 'abs', poster, `left:80px;top:62px;${small}`).textContent = 'PROPIEDAD CONECTA';
+  el('div', 'abs', poster, `left:auto;right:80px;top:62px;${small}`).textContent = '2026';
+  el('div', 'abs', poster, `left:80px;top:110px;width:1760px;height:1.5px;background:${C.ink};opacity:.25`);
+  el('div', 'abs', poster, `left:80px;top:950px;width:1760px;height:1.5px;background:${C.ink};opacity:.25`);
+  const hl = el('div', 'abs', poster, `left:auto;right:80px;top:150px;text-align:right;font-size:40px;font-weight:700;line-height:1.08;letter-spacing:.01em;color:${C.ink}`);
+  hl.innerHTML = 'PUBLICA LO<br>QUE BUSCAS.';
+  img(MARCA + 'logo-horizontal-transparente.png', poster, 'left:356px;top:300px;width:1208px;height:431px');
+  const para = el('div', 'abs', poster, `left:80px;top:800px;width:620px;font-size:30px;font-weight:400;line-height:1.3;color:${C.ink}`);
+  para.textContent = 'Quien busca publica gratis. Los agentes con algo que coincide le contactan.';
+  img('assets/qr.svg', poster, 'left:1690px;top:790px;width:150px;height:150px');
+  el('div', 'abs', poster, `left:80px;top:982px;${small};letter-spacing:.06em`).textContent = 'propiedadconecta.com';
+  el('div', 'abs', poster, `left:auto;right:80px;top:982px;${small};letter-spacing:.06em`).textContent = 'Publica gratis tu búsqueda';
+  S[15].sheets = [poster, ...S[15].pages];          // top to bottom in peel order
+  S[15].flaps = S[15].sheets.slice(0, 3).map(() => {
+    const f = el('div', 'abs', S[15].root, 'width:1920px;height:1080px;filter:drop-shadow(-14px -14px 22px rgba(11,23,18,.28))');
+    el('div', 'abs', f, 'width:1920px;height:1080px;background:linear-gradient(135deg,#FFFFFF 0%,#ECEEEA 60%,#D9DCD6 100%)');
+    return f;
+  });
+  // stacking: page 3 at the bottom … poster on top, flaps above their own sheet
+  S[15].sheets.slice().reverse().forEach((s, i) => { s.style.zIndex = i * 2; });
+  S[15].flaps.forEach((f, i) => { f.style.zIndex = (3 - i) * 2 + 1; });
+
+  // 17 · closing
+  S[17] = { root: shot(17, C.black) };
+  const grid = `background:rgba(250,249,245,.08)`;
+  for (const x of [160, 1760]) el('div', 'abs', S[17].root, `left:${x}px;top:0;width:1px;height:1080px;${grid}`);
+  for (const y of [120, 960]) el('div', 'abs', S[17].root, `left:0;top:${y}px;width:1920px;height:1px;${grid}`);
+  S[17].line = caption(S[17].root, 'Publica gratis tu búsqueda.', C.marfil, 520, 36); S[17].line.style.fontWeight = 400;
+  S[17].tile = tile(S[17].root);
+  S[17].dom = caption(S[17].root, 'propiedadconecta.com', C.marfil, 610, 32); S[17].dom.style.fontWeight = 400;
+}
+
+// ------------------------------------------------------------------ draw each shot (lt = local time)
+const D = {};
+D[1] = lt => {
+  const w = S[1].root.querySelector('#wander'), c = S[1].root.querySelector('#chev');
+  w.setAttribute('stroke-dasharray', '1 1');
+  w.setAttribute('stroke-dashoffset', 1 - inOut(ramp(lt, 0.0, 1.25)));
+  w.style.opacity = 1 - smooth(ramp(lt, 1.2, 1.6));
+  c.setAttribute('stroke-dasharray', '1 1');
+  c.setAttribute('stroke-dashoffset', 1 - expoOut(ramp(lt, 1.2, 1.55)));
+};
+D[2] = lt => {
+  S[2].pills.forEach((o, k) => pop(o.p, o.x, o.y, lt, k * B));
+  const last = S[2].pills[3], z = inOut(ramp(lt, 3 * B, 4 * B));
+  S[2].cam.style.transformOrigin = `${last.x}px ${last.y}px`;
+  S[2].cam.style.transform = `translate(${(960 - last.x) * z}px, ${(540 - last.y) * z}px) scale(${lerp(1, 1.5, z)})`;
+};
+D[3] = lt => {
+  const r = 190, cx = lerp(-260, 2180, inOut(ramp(lt, 0.12, 1.62))), cy = 560;
+  box(S[3].lens, cx - r, cy - r, 2 * r, 2 * r);
+  const inner = S[3].lensIn.style;
+  inner.left = -(cx - r) + 'px'; inner.top = -(cy - r) + 'px';
+  inner.transformOrigin = `${cx}px ${cy}px`; inner.transform = 'scale(1.38)';
+};
+D[4] = lt => {
+  const p = inOut(ramp(lt, 0.62, 1.25));
+  // tile: centre (960,540) 300 px → onto the header isotipo (centre 54,60; drawing 70.7 px wide)
+  const size0 = 300, size1 = 70.7 / 0.62;
+  const s = lerp(size0, size1, p) * lerp(0.6, 1, backOut(ramp(lt, 0, 0.3)));
+  placeTile(S[4].tile, lerp(960, 54, p), lerp(540, 60, p), s);
+  S[4].tile.t.style.opacity = 1 - smooth(ramp(lt, 1.2, 1.38));
+  S[4].page.style.opacity = smooth(ramp(lt, 0.78, 1.18));
+  S[4].page.style.transform = `scale(${lerp(1.14, 1, expoOut(ramp(lt, 0.78, 1.5)))})`;
+  S[4].root.style.background = C.black;
+};
+D[5] = lt => {
+  S[5].root.querySelector('#slice').setAttribute('stroke-dashoffset', 1 - expoOut(ramp(lt, 0, 0.28)));
+  S[5].root.querySelector('#slice').style.opacity = 1 - ramp(lt, 0.3, 0.5);
+  const h = 520 * expoOut(ramp(lt, 0.16, 0.52)), cy = 450;
+  box(S[5].band, 120, cy - h / 2, 1680, h);
+  // word laid out for the full band height, sliding right → left so it reads over the shot
+  box(S[5].word, lerp(150, -560, ramp(lt, 0.2, 1.71)), 260 - (520 - h) / 2 - 300);
+  S[5].cap.style.opacity = smooth(ramp(lt, 0.4, 0.6));
+  const q = inOut(ramp(lt, 0.55, 1.6));
+  box(S[5].card, lerp(-700, 2000, q), lerp(760, 150, q));
+  S[5].card.style.transform = `rotate(${lerp(-12, -4, q)}deg)`;
+};
+D[6] = lt => {
+  const m = inOut(ramp(lt, 0.5, 1.05));
+  const A = S[6].a, Bp = S[6].b;
+  pop(A, lerp(800, 960, m), 500, lt, 0); pop(Bp, lerp(1110, 960, m), 500, lt, B * 0.5);
+  if (m > 0) { A.style.opacity = 1 - ramp(lt, 0.5, 0.62); Bp.style.opacity = 1 - ramp(lt, 0.5, 0.62); }
+  else { A.style.opacity = 1; Bp.style.opacity = 1; }
+  // the black pill's box grows into the card's box; colour goes black → white
+  const w = lerp(330, 1072, m), h = lerp(84, 283, m), on = m > 0;
+  show(S[6].morph, on);
+  box(S[6].morph, 960 - w / 2, 500 - h / 2, w, h);
+  S[6].morph.style.borderRadius = lerp(42, 24, m) + 'px';
+  S[6].morph.style.background = `rgb(${[11, 23, 18].map(v => Math.round(lerp(v, 255, smooth(m)))).join(',')})`;
+  box(S[6].card, 960 - 536, 500 - 141.5);
+  S[6].card.style.opacity = smooth(ramp(lt, 0.95, 1.2));
+};
+let lastX7 = null;
+D[7] = lt => {
+  // camera over the row: hold, whip, whip, settle
+  const cx = lerp(0, 1000, inOut(ramp(lt, 0.28, 0.62))) + lerp(0, 1000, inOut(ramp(lt, 0.62, 1.0)));
+  const s = 0.76;
+  S[7].cards.forEach(o => {
+    const w = o.w * s, h = o.h * s, x = 960 + (o.x - cx) - w / 2, y = 450 - h / 2;
+    box(o.c, x, y, w, h);
+    o.l.style.left = (960 + (o.x - cx) - 450) + 'px'; o.l.style.top = (450 + Math.max(h, 260) / 2 + 40) + 'px';
+  });
+  // horizontal motion blur from the camera speed
+  const dt = 1 / 60, v = Math.abs(cx - (lerp(0, 1000, inOut(ramp(lt - dt, 0.28, 0.62))) + lerp(0, 1000, inOut(ramp(lt - dt, 0.62, 1.0)))));
+  document.getElementById('hblurStd').setAttribute('stdDeviation', `${(v * 0.9).toFixed(1)} 0`);
+  S[7].row.style.filter = v > 0.5 ? 'url(#hblur)' : 'none';
+};
+D[8] = lt => {
+  const press = 1 - 0.03 * Math.sin(Math.PI * ramp(lt, 0.86, 1.3));
+  const s = lerp(1.0, 1.08, lt / (4 * B)) * press, w = 1500 * s, h = 140 * 1500 / 1608 * s;
+  for (const e of [S[8].blur, S[8].sharp]) box(e, 960 - w / 2, 470 - h / 2, w, h);
+};
+const WR = { x: 210, y: 70, w: 1500, h: 800 };
+D[9] = lt => {
+  const p = inOut(ramp(lt, 0.55, 1.55));
+  drawWin(S[9].win, WR, 1560, 1440, lerp(0.962, 1.6, p), lerp(780, 520, p), lerp(400, 935, p));
+};
+D[10] = lt => {
+  const p = inOut(ramp(lt, 0.45, 1.5));
+  drawWin(S[10].win, WR, 1524, 604, lerp(0.984, 2.2, p), lerp(762, 548, p), lerp(302, 182, p));
+};
+D[11] = lt => {
+  const p = inOut(ramp(lt, 0, 1.71));
+  drawWin(S[11].win, { x: 210, y: 180, w: 1500, h: 600 }, 1650, 482, lerp(0.909, 1.2, p), lerp(700, 980, p), 170);
+};
+D[12] = lt => {
+  const white = lt >= 6 * B;                                  // cut to white at beat 50 (21.43 s)
+  S[12].root.style.background = white ? C.white : C.black;
+  S[12].cap.style.color = white ? C.ink : C.marfil;
+  const dim = smooth(ramp(lt, 3.2 * B, 3.6 * B));
+  const press = 1 - 0.02 * Math.sin(Math.PI * ramp(lt, 3 * B, 3 * B + 0.25));
+  const mw = 998 * press, mh = 718 * press;
+  show(S[12].modal, !white);
+  box(S[12].modal, 960 - mw / 2, 470 - mh / 2, mw, mh);
+  S[12].modal.style.opacity = lerp(1, 0.3, dim);
+  // button "Usar 10 créditos y desbloquear" (asset 346..983 × 546..647)
+  show(S[12].flash, !white && lt > 3 * B && lt < 3 * B + 0.3);
+  box(S[12].flash, 960 - mw / 2 + 346 * press, 470 - mh / 2 + 546 * press, 637 * press, 101 * press);
+  S[12].flash.style.opacity = 0.35 * (1 - ramp(lt, 3 * B, 3 * B + 0.3));
+  // lock: pops at beat 47.3, opens on beat 48 (20.57 s)
+  const lockOn = lt >= 3.3 * B;
+  show(S[12].lock, lockOn);
+  if (lockOn) {
+    const sc = lerp(0.4, 1, backOut(ramp(lt, 3.3 * B, 3.3 * B + 0.3)));
+    box(S[12].lock, 960 - 120, 440 - 140);
+    S[12].lock.style.transform = `scale(${sc})`;
+    const open = expoOut(ramp(lt, 4 * B, 4 * B + 0.28));
+    const col = white ? C.ink : C.acc;
+    const svg = S[12].lock;
+    svg.querySelector('#shackle').setAttribute('transform', `translate(${58 * open} ${-34 * open}) rotate(${-28 * open} 178 128)`);
+    svg.querySelector('#shackle path').setAttribute('stroke', col);
+    svg.querySelector('#lbody').setAttribute('fill', col);
+    for (const id of ['#hole', '#hole2']) svg.querySelector(id).setAttribute('fill', white ? C.white : C.black);
+  }
+};
+D[13] = lt => {
+  const p = inOut(ramp(lt, 0.25, 1.4));
+  drawWin(S[13].win, { x: 210, y: 70, w: 1500, h: 780 }, 1584, 725, lerp(0.947, 1.35, p), lerp(792, 620, p), lerp(362, 560, p));
+  // channel pills pop on the beat, in place inside the row
+  S[13].pills.forEach((pp, k) => {
+    const q = ramp(lt, (k + 1) * B, (k + 1) * B + 0.3), on = lt >= (k + 1) * B;
+    const sc = on ? lerp(0.35, 1, backOut(q)) : 0, sq = 0.14 * Math.sin(Math.PI * clamp(q * 1.6));
+    pp.style.opacity = on ? 1 : 0;
+    pp.style.transform = `scale(${sc * (1 + sq)}, ${sc * (1 - sq * 0.7)})`;
+  });
+};
+D[14] = lt => { S[14].t.style.transform = `scale(${lerp(1, 1.03, lt / (4 * B))})`; };
+D[15] = lt => {
+  // poster 0-1.45; peel poster 1.45-1.71; page 1 to 2.29 (peel from 2.07); page 2 to 2.86 (peel from 2.64); page 3 to 3.43
+  const P = 4 * B, pageLen = (4 * B) / 3;
+  const peels = [[P - 0.27, P], [P + pageLen - 0.22, P + pageLen], [P + 2 * pageLen - 0.22, P + 2 * pageLen]];
+  S[15].sheets.slice(0, 3).forEach((sh, i) => {
+    const p = expoIn(ramp(lt, peels[i][0], peels[i][1])) * 0.35 + inOut(ramp(lt, peels[i][0], peels[i][1])) * 0.65;
+    peel(sh, S[15].flaps[i], p);
+    show(sh, p < 1);
+  });
+};
+D[17] = lt => {
+  const a = smooth(ramp(lt, 0.25, 0.6)) * (1 - smooth(ramp(lt, 1.15, 1.45)));
+  S[17].line.style.opacity = a;
+  const b = smooth(ramp(lt, 1.45, 1.85)) * (1 - smooth(ramp(lt, 2.35, 2.75)));
+  placeTile(S[17].tile, 960, 470, 120);
+  S[17].tile.t.style.opacity = b; S[17].dom.style.opacity = b;
+};
+
+// ------------------------------------------------------------------ timeline
+// Shot n starts at T[n-1]; 15 covers poster + pages (60 → 68 beats); 17 runs to the end.
+const SHOTS = [];
+for (let n = 1; n <= 14; n++) SHOTS.push({ n, a: T[n - 1], b: T[n] });
+SHOTS.push({ n: 15, a: T[14], b: T[15] });
+SHOTS.push({ n: 17, a: T[15], b: DURATION });
+
+function draw(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  for (const s of SHOTS) {
+    const on = t >= s.a && t < s.b;
+    show(S[s.n].root, on);
+    if (on) D[s.n](t - s.a);
+  }
+}
+
+// ------------------------------------------------------------------ boot
+window.READY = false;
+window.draw = draw;
+(async () => {
+  build();
+  await Promise.all([document.fonts.load("800 200px 'Barlow Condensed'"), document.fonts.load('600 40px Outfit'), document.fonts.load('400 40px Outfit'), document.fonts.load('700 40px Outfit')]);
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  window.READY = true;
+  const q = new URLSearchParams(location.search);
+  if (q.has('render')) { draw(0); return; }
+  document.body.classList.add('preview');
+  const fit = () => { stage.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; };
+  fit(); addEventListener('resize', fit);
+  if (q.has('t')) { draw(parseFloat(q.get('t'))); return; }
+  let t0 = performance.now(), paused = false, pt = 0;
+  addEventListener('click', () => { paused = !paused; if (!paused) t0 = performance.now() - pt * 1000; });
+  const loop = now => { if (!paused) { pt = ((now - t0) / 1000) % DURATION; draw(pt); } requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

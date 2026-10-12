@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 /*
- * Renders video/index.html frame by frame into an MP4.
+ * Renders a time-driven page (window.draw(t)) frame by frame into an MP4.
  *
  *   node video/render.mjs                 → video/out/propiedad-conecta-15s.mp4 (+ soundtrack if
  *                                           video/music/soundtrack.wav exists) + contact sheet
  *   node video/render.mjs --stills 1,6.5  → video/out/stills/t_<s>.png only
+ *
+ * Other films: --page <html> --out <dir> --name <file> --duration <s> --music <wav>
+ *   node video/render.mjs --page video/explicativo/index.html --out video/explicativo/out \
+ *     --name propiedad-conecta-explicativo-32s --duration 32 --music video/explicativo/music/soundtrack.wav
  *
  * Needs Playwright (Chromium) and ffmpeg. Run `python3 video/prep.py` first.
  */
@@ -18,9 +22,12 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(DIR, '..');
-const OUT = path.join(DIR, 'out');
-const FPS = 60, DURATION = 15, W = 1920, H = 1080;
-const NAME = 'propiedad-conecta-15s';
+const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
+const PAGE = path.resolve(ROOT, arg('--page', 'video/index.html'));
+const OUT = path.resolve(ROOT, arg('--out', 'video/out'));
+const FPS = 60, DURATION = Number(arg('--duration', 15)), W = 1920, H = 1080;
+const NAME = arg('--name', 'propiedad-conecta-15s');
+const MUSIC = path.resolve(ROOT, arg('--music', 'video/music/soundtrack.wav'));
 
 function playwright() {
   try { return require('playwright'); } catch {
@@ -28,7 +35,7 @@ function playwright() {
   }
 }
 
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.ttf': 'font/ttf', '.jpg': 'image/jpeg' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg' };
 function serve() {
   const server = http.createServer((req, res) => {
     const file = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -42,7 +49,7 @@ function serve() {
 async function main() {
   const stillsArg = process.argv.indexOf('--stills');
   const stills = stillsArg > 0 ? process.argv[stillsArg + 1].split(',').map(Number) : null;
-  if (!fs.existsSync(path.join(DIR, 'assets', 'meta.json'))) throw new Error('Run python3 video/prep.py first');
+  if (!fs.existsSync(path.join(path.dirname(PAGE), 'assets', 'meta.json'))) throw new Error('Run the prep.py next to the page first');
   fs.mkdirSync(OUT, { recursive: true });
 
   const server = await serve();
@@ -51,7 +58,7 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   page.on('console', m => m.type() === 'error' && console.error('page:', m.text()));
   page.on('pageerror', e => { console.error('page error:', e.message); process.exitCode = 1; });
-  await page.goto(`http://127.0.0.1:${server.address().port}/video/index.html?render=1`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/${path.relative(ROOT, PAGE).split(path.sep).join('/')}?render=1`);
   await page.waitForFunction(() => window.READY === true, null, { timeout: 30000 });
   const stage = page.locator('#stage');
 
@@ -82,7 +89,7 @@ async function main() {
     await done;
     console.log(`\n  wrote ${path.relative(ROOT, file)}`);
     // Soundtrack (video/music/compose.py): mux it in when it exists.
-    const music = path.join(DIR, 'music', 'soundtrack.wav');
+    const music = MUSIC;
     if (fs.existsSync(music)) {
       const tmp = file.replace(/\.mp4$/, '.tmp.mp4');
       execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-i', music, '-map', '0:v', '-map', '1:a',
@@ -92,7 +99,8 @@ async function main() {
     }
     // Contact sheet: one frame every 0.5 s.
     const sheet = path.join(OUT, `${NAME}-contact-sheet.jpg`);
-    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-vf', 'fps=2,scale=384:-1,tile=6x5:padding=4:color=0x222222', '-frames:v', '1', '-q:v', '3', sheet]);
+    const rows = Math.ceil(DURATION * 2 / 6);
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-vf', `fps=2,scale=384:-1,tile=6x${rows}:padding=4:color=0x222222`, '-frames:v', '1', '-q:v', '3', sheet]);
     console.log(`  wrote ${path.relative(ROOT, sheet)}`);
   }
   await browser.close();
