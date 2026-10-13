@@ -2,7 +2,7 @@
 
 Reel vertical de 20 s para agentes e inmobiliarias: las dos personas del logo (la que busca casa y el agente) se encuentran y, al conectar, forman el logo. Hecho con el motor (`anuncios/motor/`) y la fórmula (`anuncios/FORMULA.md`).
 
-**Estado:** video completo con la voz de L1–L4 (ElevenLabs, voz Arturo Casares) en `entregables/propiedad-conecta-los-dos-del-logo-sin-cta-hablado.mp4`; todos los controles en OK ([informe-qa.md](informe-qa.md)). Falta L5, el CTA hablado: ElevenLabs desactivó la cuenta gratuita antes de generarla. Cuando llegue, se coloca y se vuelve a renderizar.
+**Estado:** terminado, en `entregables/propiedad-conecta-los-dos-del-logo.mp4`, con la voz de L1–L4 (ElevenLabs, voz Arturo Casares); todos los controles en OK ([informe-qa.md](informe-qa.md)). El CTA va solo en pantalla (botón «Regístrate gratis», «Para agentes e inmobiliarias» y el nombre): el cliente decidió no agregar la frase hablada, así que la música ya no le deja hueco.
 
 | Archivo | Qué es |
 |---|---|

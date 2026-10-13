@@ -13,7 +13,3 @@ Pagas solo por el cliente que eliges.
 4
 00:00:08,925 --> 00:00:12,345
 Si no responde, puedes recuperar tus créditos.
-
-5
-00:00:15,400 --> 00:00:18,100
-Regístrate gratis en Propiedad Conecta.

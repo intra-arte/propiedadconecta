@@ -2,10 +2,10 @@
 
 Generado desde [guion.js](guion.js) con `generar-textos.mjs` del motor. **No editar a mano.**
 
-**20,0 s** · 120 BPM (1 beat = 0,50 s, 40 beats = 10 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (`beats.json`: 119,98 BPM, desfase 4,0 ms).
+**20,0 s** · 120 BPM (1 beat = 0,50 s, 40 beats = 10 compases) · 1080 × 1920 · 30 fps · tiempos en segundos según la cuadrícula **medida** (`beats.json`: 119,99 BPM, desfase 4,1 ms).
 Zona segura para texto y logo: x 65–1015, y 270–1248 (la de la marca, en `motor/nucleo/marca.js`).
 
-**Pendiente:** toma L5 de la voz («Regístrate gratis en Propiedad Conecta.»).
+**Pendiente:** nada.
 
 Un solo gancho: no hay versión B.
 
@@ -54,8 +54,7 @@ Tiempos reales de cada frase en la mezcla (`locucion/colocacion.json`). «Imagen
 | L2 | Ves qué buscan y cuánto quieren invertir. | 2,90 | 5,93 | beat 6 (beat 6,00) −0,10 s | 3,00 | 4,0 |
 | L3 | Pagas solo por el cliente que eliges. | 6,15 | 8,77 | pasos[2] (beat 11,50) +0,40 s | 5,75 | 4,6 |
 | L4 | Si no responde, puedes recuperar tus créditos. | 8,93 | 12,04 | silencio (beat 17,25) +0,30 s | 8,63 | 4,8 |
-| L5 | Regístrate gratis en Propiedad Conecta. **(falta la toma)** | 15,40 | 17,80 | hueco planeado | — | — |
 
-La voz termina en 17,80 s: quedan 2,2 s de cierre sin voz con el logo y el CTA completos.
+La voz termina en 12,04 s: quedan 8,0 s de cierre sin voz con el logo y el CTA completos.
 
 Toda la locución aparece también como texto en pantalla (titulares, cabecera o botón). Los subtítulos `.srt` son para la plataforma; no se queman.

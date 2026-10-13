@@ -1,13 +1,9 @@
 LOCUCIÓN — Propiedad Conecta · «Los dos del logo» · agentes (20,0 s)
 Generado desde guion.js y locucion/colocacion.json con generar-textos.mjs del motor. No editar a mano.
 
-ESTADO: GRABADA, SALVO L5 («Regístrate gratis en Propiedad Conecta.»). Las tomas están en locucion/tomas/.
-El video ya lleva las grabadas; la música ya deja el hueco de lo que falta.
+ESTADO: GRABADA. Las tomas están en locucion/tomas/ (ver su LEEME).
 
-PARA GRABAR L5: la misma voz y el mismo tono de las otras tomas, en el mismo formato. A ritmo natural: no hace falta clavar los tiempos.
-  L5  «Regístrate gratis en Propiedad Conecta.»  (Directa y cálida. Marca bien clara.) Hueco: 15,40–17,80 s, 2,4 s para 13 sílabas.
-
-Voz: Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada. Para L5, la misma voz y el mismo modelo.
+Voz: Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada.
 Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
 
 ==============================================================
@@ -25,7 +21,4 @@ VERSIÓN A (directa)
 
 [8,93–12,04]  Si no responde, puedes recuperar tus créditos.
                (Tranquila, que dé confianza. Peso en «recuperar». · toma L4-1-si-no-responde-puedes-recuperar-tus-creditos.mp3 · 15 sílabas en 3,12 s de voz = 4,8 síl./s, natural)
-
-[15,40–17,80]  Regístrate gratis en Propiedad Conecta.   ← FALTA LA TOMA
-               (Directa y cálida. Marca bien clara.)
 

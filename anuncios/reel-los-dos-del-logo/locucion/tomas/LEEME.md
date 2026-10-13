@@ -2,7 +2,7 @@
 
 Generadas con ElevenLabs el 13/10/2026, a pedido del cliente, con la voz que eligió: **Arturo Casares – Smooth, Rich and Tender** (`N2HSRirbsHTZ8DE2WqjB`), modelo `eleven_v4`, en el flujo «Propiedad Conecta · voces de los anuncios para agentes» de su cuenta. Son voz sintética, no una grabación. Se guardan tal como llegaron (MP3, 44,1 kHz, mono, unos 190 kbps); el motor las corta y procesa sin tocar estos archivos.
 
-Cada línea se pidió con cuatro variantes. Durante la generación ElevenLabs desactivó el acceso gratuito de la cuenta por «actividad inusual» (menciona proxies o VPN), así que L4 quedó con dos variantes y **L5 («Regístrate gratis en Propiedad Conecta.») no se pudo generar**.
+Cada línea se pidió con cuatro variantes. Durante la generación ElevenLabs desactivó el acceso gratuito de la cuenta por «actividad inusual» (menciona proxies o VPN), así que L4 quedó con dos variantes y **L5 («Regístrate gratis en Propiedad Conecta.») no se pudo generar**. Después el cliente decidió dejar el CTA solo en pantalla, sin L5.
 
 «Voz» es el tramo con sonido medido en la toma (umbral 32 dB bajo su tramo más fuerte). Se eligió en cada línea la variante que mejor entra en su lugar de la imagen; ninguna tiene pausas internas de más de 80 ms ni ruidos antes de la frase. El texto se verificó por duración y pausas, no por reconocimiento de voz: hay que escucharlas.
 

@@ -77,9 +77,9 @@ Son las mismas capturas y recortes del anuncio para agentes, sin datos de prueba
 | L2 | 3,2–5,4 s | Ves qué buscan y cuánto quieren invertir. | 5,5 |
 | L3 | 5,7–7,9 s | Pagas solo por el cliente que eliges. | 5,5 |
 | L4 | 8,2–10,9 s | Si no responde, puedes recuperar tus créditos. | 5,6 |
-| L5 | 15,4–17,8 s | Regístrate gratis en Propiedad Conecta. | 5,4 |
+| L5 | 15,4–17,8 s | Regístrate gratis en Propiedad Conecta. *(quedó fuera)* | 5,4 |
 
-**Así quedó con la voz de ElevenLabs** (Arturo Casares, 13/10/2026): es pausada, cada línea dura entre 2,6 y 3,1 s. Se colocaron enteras, sin acelerarlas: L1 0,10–2,71 s · L2 2,90–5,94 · L3 6,15–8,77 · L4 8,93–12,05. Para que cada frase caiga sobre lo que nombra se corrieron unos eventos: el cliente se calla en 8,6 s, la moneda vuelve en 10,0–10,5 s («puedes recuperar») y el segundo cliente contesta en 11,4 s. L5 queda pendiente: ElevenLabs desactivó la cuenta gratuita antes de generarla.
+**Así quedó con la voz de ElevenLabs** (Arturo Casares, 13/10/2026): es pausada, cada línea dura entre 2,6 y 3,1 s. Se colocaron enteras, sin acelerarlas: L1 0,10–2,71 s · L2 2,90–5,94 · L3 6,15–8,77 · L4 8,93–12,05. Para que cada frase caiga sobre lo que nombra se corrieron unos eventos: el cliente se calla en 8,6 s, la moneda vuelve en 10,0–10,5 s («puedes recuperar») y el segundo cliente contesta en 11,4 s. L5 no se pudo generar (ElevenLabs desactivó la cuenta gratuita) y el cliente decidió dejar el CTA solo en pantalla: la voz termina en 12,05 s y de ahí al final cuentan la música y el cierre.
 
 Los tiempos de la tabla eran los provisionales. Todas están a ritmo natural (≤ 5,8 sílabas/s). Entre 10,9 y 15,4 s no hay voz: la conexión y el logo se cuentan solos, con música. La voz termina 2,2 s antes del final. Mejor con la misma voz de los otros dos anuncios.
 

@@ -16,7 +16,7 @@ export const DURACION = 20;      // s
 export const PENDIENTE = {
   gratis: 'confirmado',          // el registro de agentes es gratis
   capturas: 'recibidas',         // las del anuncio para agentes (reel-agentes/capturas), recortadas
-  voz: 'parcial',                // L1–L4 generadas con ElevenLabs (13/10/2026); falta L5, el CTA hablado
+  voz: 'recibida',               // L1–L4 con ElevenLabs (13/10/2026); el CTA queda solo en pantalla, por decisión del cliente
 };
 
 export const CTA = { conGratis: 'Regístrate gratis', sinGratis: 'Regístrate' };
@@ -78,10 +78,11 @@ export const EV = {
 
 // ---------- locución ----------
 // L1–L4: voz «Arturo Casares» de ElevenLabs, elegida por el cliente (ver locucion/tomas/LEEME.md). Cada
-// línea entra entera, sin acelerar ni estirar; el ancla es dónde empieza a sonar. L5 todavía no existe.
+// línea entra entera, sin acelerar ni estirar; el ancla es dónde empieza a sonar. No hay CTA hablado: el
+// cliente decidió dejarlo solo en pantalla (13/10/2026), así que la música no le deja hueco.
 export const LOCUCION = {
   ritmo: { natural: 5.8, agil: 6.3 },
-  voz: 'Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada. Para L5, la misma voz y el mismo modelo.',
+  voz: 'Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada.',
   tomas: 'locucion/tomas/',
   A: [{ id: 'L1', inicio: 0.1, fin: 2.72, texto: 'Tus próximos clientes ya están buscando.', direccion: 'Cercana, con una buena noticia. Peso en «buscando».',
     toma: 'L1-2-tus-proximos-clientes-ya-estan-buscando.mp3', ancla: { s: 0.1 } }],
@@ -95,7 +96,6 @@ export const LOCUCION = {
     // «Si no responde» cuando los puntos se apagan; «puedes recuperar» cuando la moneda sale del candado
     { id: 'L4', inicio: 8.93, fin: 12.05, texto: 'Si no responde, puedes recuperar tus créditos.', direccion: 'Tranquila, que dé confianza. Peso en «recuperar».',
       toma: 'L4-1-si-no-responde-puedes-recuperar-tus-creditos.mp3', ancla: { b: EV.silencio, s: 0.3 } },
-    { id: 'L5', inicio: 15.4, fin: 17.8, texto: '__CTA__ en Propiedad Conecta.', direccion: 'Directa y cálida. Marca bien clara.', toma: null },
   ],
 };
 export const lineasVoz = v => [...LOCUCION[v], ...LOCUCION.comun].map(l => ({ ...l, texto: l.texto.replace('__CTA__', ctaTexto()) }));
