@@ -259,13 +259,32 @@ function buildOld() {
     const a = pts[Math.min(k, N - 1)], b = pts[Math.min(k + 1, N - 1)];
     const v = a.clone().lerp(b, inOut(g)); v.y = 0.14 + Math.sin(Math.PI * g) * 1.3; return { v, g, k };
   };
+  // the chase camera rides a smooth point on the path (not the hops), behind and to the left of the pawn
+  const CH = { back: 5.4, side: 2.4, up: 6.4, ahead: 0.9, lookSide: 0.4, lookY: -0.35 };
+  const REV = { pos: V3(13, 18, 15), look: V3(2.5, 0, -4) };
+  const MAC = { pos: V3(-4.6, 3.1, 3.4), look: V3(-1.0, 1.35, 0.6) };
+  const chase = t => {
+    const u = clamp((8 + Math.max(0, t - 4) / B + 0.4) / N), p = path.getPointAt(u), tg = path.getTangentAt(u), right = V3(-tg.z, 0, tg.x);
+    return { pos: p.clone().addScaledVector(tg, -CH.back).addScaledVector(right, -CH.side).setY(CH.up), look: p.clone().addScaledVector(tg, CH.ahead).addScaledVector(right, CH.lookSide).setY(CH.lookY) };
+  };
+  // each stamp turns to face the camera that sees it land, so the word reads upright
+  for (const k of tiles) if (k.stamp) {
+    const c = chase(hopLand(k) + 0.3).pos, d = k.p.clone().sub(c).setY(0).normalize().applyAxisAngle(V3(0, 1, 0), -k.t.rotation.y);
+    k.stamp.rotation.set(-Math.PI / 2, 0, Math.atan2(-d.x, -d.z));
+  }
   S.old = {
     scene, cam, comp: composer(scene, cam, { bloom: 0.16, tilt: 4.5, band: 0.42 }), update(t) {
-      // camera: wide over the board while it builds, then down into the hop view
-      const m = inOut(ramp(t, 2.6, 4.2));
-      const p0 = V3(0.5, 30, 24), l0 = V3(0, 0, -8), p1 = V3(2.5, 13.5, 17), l1 = V3(1.2, 0, -2);
-      const push = Math.max(0, t - 4.2);
-      cam.position.copy(p0.clone().lerp(p1, m)).add(V3(-0.06 * push, -0.12 * push, -0.18 * push)); cam.lookAt(l0.clone().lerp(l1, m));
+      // camera: wide over the board while it builds; dives to table level and chases the pawn (4-7 s);
+      // cranes back to show the path never ends (7-8.5 s); macro on the falling sand (8.5-10 s)
+      const p0 = V3(0.5, 30, 24), l0 = V3(0, 0, -8);
+      let pos, look, fov = 28;
+      if (t < 2.6) { pos = p0; look = l0; }
+      else if (t < 4.0) { const m = inOut(ramp(t, 2.6, 4.0)), f = chase(4.0); pos = p0.clone().lerp(f.pos, m); look = l0.clone().lerp(f.look, m); fov = lerp(28, 31, m); }
+      else if (t < 7.0) { ({ pos, look } = chase(t)); fov = 31; }
+      else if (t < 8.5) { const m = inOut(ramp(t, 7.0, 8.5)), f = chase(t); pos = f.pos.clone().lerp(REV.pos, m); look = f.look.clone().lerp(REV.look, m); fov = lerp(31, 32, m); }
+      else { const k = ramp(t, 8.5, 10); pos = MAC.pos.clone().add(V3(0.3 * k, -0.1 * k, -0.35 * k)); look = MAC.look; fov = 22; }
+      if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+      cam.position.copy(pos); cam.lookAt(look);
       // squares drop into place one after another
       for (const k of tiles) {
         const q = ramp(t, k.td, k.td + 0.28); k.t.visible = t >= k.td;
@@ -306,14 +325,25 @@ function buildAd() {
   scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.3));
   keyLight(scene, [-6, 13, 9], 1.8, true, 16); rim(scene, [7, 8, -8], '#ffffff', 1.2);
   const S0 = V3(-3.4, 0, -3.6), SLOT = V3(4.4, 2.95, -1.3);
+  const coinAt = (k, p) => { const e = inOut(p); return V3(lerp(S0.x, SLOT.x, e), lerp(k.y0, SLOT.y, e) + 3.0 * Math.sin(Math.PI * p), lerp(S0.z, SLOT.z, e) + 0.7 * Math.sin(Math.PI * p)); };
+  // the ride ends exactly on the wide shot's framing at 11.5 s, so the camera pulls back into it without a cut
+  const wide = u => ({ pos: V3(-1.5 + u * 0.08, 7.2, 19 - u * 0.25), look: V3(0.4 + u * 0.05, 4.6, 0) });
+  const RIDE = { a: V3(-4.2, 0.8, 2.4), b: wide(1.5).pos.sub(SLOT), look: wide(1.5).look };
   S.ad = { scene, cam, comp: composer(scene, cam, { bloom: 0, tilt: 2.0, band: 0.6 }), update(u) {
-    cam.position.set(-1.5 + u * 0.08, 7.2, 19 - u * 0.25); cam.lookAt(0.4 + u * 0.05, 4.6, 0);
+    // camera: rides the first coin from the stack into the slot (10-11.5 s); the wide shot; then low behind the walkers (14-16 s)
+    if (u < 1.5) {
+      const k0 = coins[0], fp = ramp(u, k0.tc, k0.tc + 0.85), cp = ramp(u, 0.2, 1.25);
+      const cpos = fp > 0 ? coinAt(k0, fp) : V3(S0.x, k0.y0, S0.z), along = coinAt(k0, cp);
+      const off = RIDE.a.clone().lerp(RIDE.b, inOut(ramp(u, 0.7, 1.5)));
+      cam.position.copy(along).add(off); cam.lookAt(cpos.clone().lerp(RIDE.look, inOut(ramp(u, 0.9, 1.5))));
+    } else if (u < 4) { const w = wide(u); cam.position.copy(w.pos); cam.lookAt(w.look); }
+    else { const k = u - 4; cam.position.set(-6.4 + k * 0.4, 0.75, 6.4); cam.lookAt(-0.2 + k * 0.3, 2.3, -1.2); }
     let pulse = 0;
     for (const k of coins) {
       const p = ramp(u, k.tc, k.tc + 0.85);
       k.c.visible = p < 1;
       if (u < k.tc) { k.c.position.set(S0.x + (hash(k.tc * 100) - 0.5) * 0.06, k.y0, S0.z); k.c.rotation.set(0, k.ry, 0); }
-      else if (p < 1) { const e = inOut(p); k.c.position.set(lerp(S0.x, SLOT.x, e), lerp(k.y0, SLOT.y, e) + 3.0 * Math.sin(Math.PI * p), lerp(S0.z, SLOT.z, e)); k.c.rotation.set(k.r[0] + p * 8, k.r[1] + p * 4, Math.PI / 2 * e); }
+      else if (p < 1) { const e = inOut(p); k.c.position.copy(coinAt(k, p)); k.c.rotation.set(k.r[0] + p * 8, k.r[1] + p * 4, Math.PI / 2 * e); }
       pulse = Math.max(pulse, u >= k.tc + 0.85 ? Math.exp(-(u - k.tc - 0.85) * 6) : 0);
     }
     glow.intensity = pulse * 8;
@@ -346,7 +376,9 @@ function buildFlip() {
   const placeOnBoard = (d, u) => { const b = boardAt(u); tmp.rotation.set(b.rx, 0, b.rz); tmp.position.set(0, b.y, 0); tmp.updateMatrixWorld(); return d.local.clone().applyMatrix4(tmp.matrixWorld); };
   S.flip = { scene, cam, comp: composer(scene, cam, { bloom: 0.14 }), update(u) {
     const b = boardAt(u); board.rotation.set(b.rx, 0, b.rz); board.position.y = b.y;
-    cam.position.set(0, lerp(10, 13, smooth(ramp(u, 1.0, 2))), lerp(17, 12.5, smooth(ramp(u, 1.0, 2)))); cam.lookAt(0, 0.5, 0);
+    // camera: swings round and over the board as it flips, rolling with it, and lands looking down on the ivory side
+    const f = inOut(ramp(u, 0.05, 1.3)), az = lerp(0.8, 0, f), el = lerp(0.12, 0.8, f), R = lerp(17, 18, f), roll = -0.32 * Math.sin(Math.PI * ramp(u, 0.1, 1.2));
+    cam.position.set(R * Math.sin(az) * Math.cos(el), R * Math.sin(el), R * Math.cos(az) * Math.cos(el)); cam.up.set(Math.sin(roll), Math.cos(roll), 0); cam.lookAt(0, lerp(1.2, 0.5, f), 0);
     for (const d of debris) {
       if (u < T0) { d.obj.position.copy(placeOnBoard(d, u)); d.obj.rotation.set(b.rx, 0, b.rz); d.obj.visible = true; }
       else { const dt = u - T0, p0 = placeOnBoard(d, T0); d.obj.position.set(p0.x + d.v.x * dt, p0.y + d.v.y * dt - 4 * dt * dt, p0.z + d.v.z * dt); d.obj.rotation.set(d.w.x * dt, d.w.y * dt, d.w.z * dt); d.obj.visible = d.obj.position.y > -12; }
@@ -381,16 +413,30 @@ function buildNew() {
   const trailCount = trail.geometry.index.count;
   const scan = ring(1, 0.05, C.acc, 0); scan.position.y = 0.05; scene.add(scan);
   const c = coin(0.5); scene.add(c);
-  const click = ring(1, 0.04, C.acc, 0); click.position.set(1.15, 0.2, 0.65); scene.add(click);
+  const click = ring(1, 0.04, C.acc, 0); click.position.set(0.68, 0.27, 0.7); scene.add(click);
   scene.add(new THREE.HemisphereLight('#ffffff', '#e5e2d8', 0.35));
   keyLight(scene, [-6, 14, 8], 1.7, true, 18); rim(scene, [6, 6, -8], C.acc, 1.4);
   const HG0 = V3(-3.4, 0, 1.1), CLICK = 4.0;                 // u6: the coin lands at 28.0 s
+  const TOP = { pos: V3(-1.2, 15, 4.2), look: V3(-1.3, 0, -1.3) }, CRANE = { pos: V3(-2.2, 16.5, 17.5), look: V3(-1.0, 0, -3.0) };
+  const OTS = { pos: V3(-2.6, 4.8, 3.6), look: V3(5.0, -0.4, -6.4) }, TRK = { a: V3(9.4, 1.7, 0.2), b: V3(7.4, 1.5, 1.8) }, MACRO = { pos: V3(-0.45, 3.6, 0.45), look: V3(1.0, 0.25, 0.42) };
   const bubble = ov('bubble', '', 'Hola, tengo lo que buscas.');
   S.nuevo = { scene, cam, comp: composer(scene, cam, { bloom: 0, tilt: 1.3, band: 0.72 }), bubble, update(t) {
     const u5 = t - 18, u6 = t - 24;
-    // camera: shot 5 close on the pawn (it sits right of frame); shot 6 wide and high over the board
-    if (t < 24) { const k = u5 / 6; cam.position.set(lerp(-2.3, -2.6, k), lerp(7.2, 7.6, k), lerp(14.2, 15.4, k)); cam.lookAt(lerp(-3.1, -2.8, k), 1.3, -0.3); }
-    else { const k = u6 / 6; cam.position.set(lerp(5.4, 5.0, k), lerp(9.4, 8.6, k), lerp(12.6, 11.6, k)); cam.lookAt(lerp(4.6, 4.8, k), -0.4, lerp(-4.9, -4.5, k)); }
+    // camera: top-down as the card stands up (18-19.5 s); close on the pawn; a crane up that finds the agents' houses (21-24 s);
+    // over the pawn's shoulder as the scan goes out (24-26 s); beside the house on its way (26-27.5 s); macro on the coin
+    // (27.5-28.5 s); wide and high over the board
+    const shot5 = k => ({ pos: V3(lerp(-2.3, -2.6, k), lerp(7.2, 7.6, k), lerp(14.2, 15.4, k)), look: V3(lerp(-3.1, -2.8, k), 1.3, -0.3) });
+    const shot6 = k => ({ pos: V3(lerp(5.4, 5.0, k), lerp(9.4, 8.6, k), lerp(12.6, 11.6, k)), look: V3(lerp(4.6, 4.8, k), -0.4, lerp(-4.9, -4.5, k)) });
+    let v, fov = 28;
+    if (t < 19.5) { const k = ramp(t, 18, 19.5); v = { pos: TOP.pos.clone().add(V3(0, -0.8 * k, 0.3 * k)), look: TOP.look }; }
+    else if (t < 21) v = shot5(u5 / 6);
+    else if (t < 24) { const m = inOut(ramp(t, 21, 24)), a = shot5(u5 / 6); v = { pos: a.pos.lerp(CRANE.pos, m), look: a.look.lerp(CRANE.look, m) }; fov = lerp(28, 34, m); }
+    else if (t < 26) { const k = ramp(t, 24, 26); v = { pos: OTS.pos.clone().add(V3(-0.3 * k, 0.15 * k, 0.3 * k)), look: OTS.look }; fov = 34; }
+    else if (t < 27.5) { const g = inOut(ramp(u6, 2.0, 3.6)), hp = trailCurve.getPoint(g); v = { pos: TRK.a.clone().lerp(TRK.b, g), look: hp.clone().lerp(V3(-0.4, 0, 0.25), 0.25).setY(0.6) }; fov = 34; }
+    else if (t < 28.5) { const k = ramp(t, 27.5, 28.5); v = { pos: MACRO.pos.clone().add(V3(-0.05 * k, -0.15 * k, 0.03 * k)), look: MACRO.look }; fov = 30; }
+    else v = shot6(u6 / 6);
+    if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+    cam.position.copy(v.pos); cam.lookAt(v.look); cam.updateMatrixWorld();   // the bubble projects through this camera below
     // the pawn drops onto its square
     const dq = ramp(u5, 0, 0.3); pw.position.set(-0.4, lerp(4, 0.17, dq * dq) + bounce(u5 - 0.3, 0.22), 0.25);
     // the card stands up like a flag
@@ -411,7 +457,7 @@ function buildNew() {
     trail.visible = t >= 24 && u6 > 1.9; trail.geometry.setDrawRange(0, Math.floor(trailCount * ramp(u6, 1.95, 2.4) / 3) * 3);
     trail.material.opacity = 1;
     const cq = ramp(u6, CLICK - 0.45, CLICK); c.visible = t >= 24 && u6 > CLICK - 0.45;
-    c.position.set(lerp(3.4, 1.15, smooth(cq)), lerp(6.5, 0.06, expoIn(cq)) + bounce(u6 - CLICK, 0.12, 22, 9), lerp(3.5, 0.65, smooth(cq)));
+    c.position.set(lerp(3.4, 0.68, smooth(cq)), lerp(6.5, 0.25, expoIn(cq)) + bounce(u6 - CLICK, 0.12, 22, 9), lerp(3.5, 0.7, smooth(cq)));   // lands on the pawn's square
     c.rotation.set(lerp(1.2, 0, cq), cq * 4, lerp(0.7, 0, cq));
     const kq = ramp(u6, CLICK, CLICK + 0.6); click.visible = u6 >= CLICK && kq < 1; click.scale.setScalar(lerp(0.6, 3.0, expoOut(kq))); click.material.opacity = 1 - kq;
     const [bx, by] = screenOf(V3(lit.position.x, 1.6, lit.position.z), cam);
@@ -430,15 +476,19 @@ function buildPayoff() {
   const roof = new THREE.Mesh(new THREE.TubeGeometry(roofPath, 200, 0.035, 8), new THREE.MeshBasicMaterial({ color: C.marfil, toneMapped: false, transparent: true })); scene.add(roof); const roofCount = roof.geometry.index.count;
   keyLight(scene, [-3, 3, 8], 1.8, false); rim(scene, [0, 5, -6], C.acc, 3); rim(scene, [-6, -3, -3], '#ffffff', 1.2);
   // the logo's heads in the end card (logo 806 px wide at 557, 230), in world units at z = 0
-  const tanH = Math.tan(THREE.MathUtils.degToRad(15)), ppu = H / (2 * 12 * tanH);
-  const toWorld = (sx, sy) => V3((sx - W / 2) / ppu, -(sy - H / 2) / ppu, 0);
-  const LK = 806 / 1208;
-  const headL = { p: toWorld(557 + 147.5 * LK, 230 + 109 * LK), r: 71 * LK / 2 / ppu }, headR = { p: toWorld(557 + 320 * LK, 230 + 108.5 * LK), r: 72 * LK / 2 / ppu };
+  // (computed for the camera's distance at that moment, so the slow push-in still lands them exactly)
+  const tanH = Math.tan(THREE.MathUtils.degToRad(15)), LK = 806 / 1208;
+  const heads = zc => {
+    const ppu = H / (2 * zc * tanH), toWorld = (sx, sy) => V3((sx - W / 2) / ppu, -(sy - H / 2) / ppu, 0);
+    return { L: { p: toWorld(557 + 147.5 * LK, 230 + 109 * LK), r: 71 * LK / 2 / ppu }, R: { p: toWorld(557 + 320 * LK, 230 + 108.5 * LK), r: 72 * LK / 2 / ppu } };
+  };
   const r0 = P.userData.headR;
   P.userData.bodyMat.transparent = true;
   S.payoff = { scene, cam, comp: composer(scene, cam, { bloom: 0.22 }), update(u) {
     const rl = expoOut(ramp(u, 0, 0.6)), rr = expoOut(ramp(u, 0.25, 0.85));
     const m = inOut(ramp(u, 2.8, 3.5));
+    const zc = 12 - 0.7 * smooth(ramp(u, 0, 3.5)); cam.position.set(0, 0, zc);   // a slow push-in
+    const { L: headL, R: headR } = heads(zc);
     const pL = V3(-2.0, lerp(-7, 1.2, rl), 0).lerp(headL.p, m), pR = V3(2.0, lerp(-7, 1.2, rr), 0).lerp(headR.p, m);
     P.position.copy(pL); K.position.copy(pR);
     P.scale.setScalar(lerp(1, headL.r / r0, m)); K.scale.setScalar(lerp(1, headR.r / 0.82, m));
