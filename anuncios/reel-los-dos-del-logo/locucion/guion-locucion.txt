@@ -1,33 +1,30 @@
 LOCUCIÓN — Propiedad Conecta · «Los dos del logo» · agentes (20,0 s)
 Generado desde guion.js y locucion/colocacion.json con generar-textos.mjs del motor. No editar a mano.
 
-ESTADO: PENDIENTE DE GRABAR. El video todavía no tiene voz; la música ya baja en cada hueco.
+ESTADO: GRABADA, SALVO L5 («Regístrate gratis en Propiedad Conecta.»). Las tomas están en locucion/tomas/.
+El video ya lleva las grabadas; la música ya deja el hueco de lo que falta.
 
-PARA GRABAR L1, L2, L3, L4, L5: una toma por línea, mejor tres, en un cuarto silencioso. A ritmo natural: no hace falta clavar los tiempos.
-  L1  «Tus próximos clientes ya están buscando.»  (Cercana, con una buena noticia. Peso en «buscando».) Hueco: 0,10–2,60 s, 2,5 s para 12 sílabas.
-  L2  «Ves qué buscan y cuánto quieren invertir.»  (Clara, como mostrando algo. Peso en «invertir».) Hueco: 3,20–5,40 s, 2,2 s para 12 sílabas.
-  L3  «Pagas solo por el cliente que eliges.»  (Segura. Peso en «solo» y «eliges».) Hueco: 5,70–7,90 s, 2,2 s para 12 sílabas.
-  L4  «Si no responde, puedes recuperar tus créditos.»  (Tranquila, que dé confianza. Peso en «recuperar».) Hueco: 8,20–10,90 s, 2,7 s para 15 sílabas.
+PARA GRABAR L5: la misma voz y el mismo tono de las otras tomas, en el mismo formato. A ritmo natural: no hace falta clavar los tiempos.
   L5  «Regístrate gratis en Propiedad Conecta.»  (Directa y cálida. Marca bien clara.) Hueco: 15,40–17,80 s, 2,4 s para 13 sílabas.
 
-Voz: La misma voz de los otros anuncios: cálida y segura, conversacional, sin tono de locutor. Grabación seca, tres tomas por línea.
+Voz: Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada. Para L5, la misma voz y el mismo modelo.
 Ritmo: hasta 5,8 sílabas por segundo suena tranquilo; más de 6,3 se oye apurado.
 
 ==============================================================
 VERSIÓN A (directa)
 ==============================================================
 
-[0,10–2,60]  Tus próximos clientes ya están buscando.   ← FALTA LA TOMA
-               (Cercana, con una buena noticia. Peso en «buscando».)
+[0,10–2,71]  Tus próximos clientes ya están buscando.
+               (Cercana, con una buena noticia. Peso en «buscando». · toma L1-2-tus-proximos-clientes-ya-estan-buscando.mp3 · 12 sílabas en 2,61 s de voz = 4,6 síl./s, natural)
 
-[3,20–5,40]  Ves qué buscan y cuánto quieren invertir.   ← FALTA LA TOMA
-               (Clara, como mostrando algo. Peso en «invertir».)
+[2,90–5,93]  Ves qué buscan y cuánto quieren invertir.
+               (Clara, como mostrando algo. Peso en «invertir». · toma L2-1-ves-que-buscan-y-cuanto-quieren-invertir.mp3 · 12 sílabas en 3,03 s de voz = 4,0 síl./s, natural)
 
-[5,70–7,90]  Pagas solo por el cliente que eliges.   ← FALTA LA TOMA
-               (Segura. Peso en «solo» y «eliges».)
+[6,15–8,77]  Pagas solo por el cliente que eliges.
+               (Segura. Peso en «solo» y «eliges». · toma L3-1-pagas-solo-por-el-cliente-que-eliges.mp3 · 12 sílabas en 2,62 s de voz = 4,6 síl./s, natural)
 
-[8,20–10,90]  Si no responde, puedes recuperar tus créditos.   ← FALTA LA TOMA
-               (Tranquila, que dé confianza. Peso en «recuperar».)
+[8,93–12,04]  Si no responde, puedes recuperar tus créditos.
+               (Tranquila, que dé confianza. Peso en «recuperar». · toma L4-1-si-no-responde-puedes-recuperar-tus-creditos.mp3 · 15 sílabas en 3,12 s de voz = 4,8 síl./s, natural)
 
 [15,40–17,80]  Regístrate gratis en Propiedad Conecta.   ← FALTA LA TOMA
                (Directa y cálida. Marca bien clara.)

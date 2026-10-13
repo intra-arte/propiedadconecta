@@ -5,38 +5,93 @@
   {
    "id": "L1",
    "texto": "Tus próximos clientes ya están buscando.",
-   "toma": null,
-   "pendiente": true,
+   "toma": "L1-2-tus-proximos-clientes-ya-estan-buscando.mp3",
+   "pendiente": false,
    "inicio": 0.1,
-   "fin": 2.6,
-   "frases": []
+   "fin": 2.71,
+   "compresionMaxDb": 4.3,
+   "limitadorMaxDb": 3.1,
+   "frases": [
+    {
+     "texto": "Tus próximos clientes ya están buscando.",
+     "corte": [
+      0,
+      2.8
+     ],
+     "inicio": 0.1,
+     "fin": 2.71,
+     "ancla": "0,10 s"
+    }
+   ]
   },
   {
    "id": "L2",
    "texto": "Ves qué buscan y cuánto quieren invertir.",
-   "toma": null,
-   "pendiente": true,
-   "inicio": 3.2,
-   "fin": 5.4,
-   "frases": []
+   "toma": "L2-1-ves-que-buscan-y-cuanto-quieren-invertir.mp3",
+   "pendiente": false,
+   "inicio": 2.9,
+   "fin": 5.935,
+   "compresionMaxDb": 4.4,
+   "limitadorMaxDb": 0.7,
+   "frases": [
+    {
+     "texto": "Ves qué buscan y cuánto quieren invertir.",
+     "corte": [
+      0,
+      3.28
+     ],
+     "inicio": 2.9,
+     "fin": 5.935,
+     "ancla": "beat 6 (beat 6,00) −0,10 s",
+     "imagen": 3
+    }
+   ]
   },
   {
    "id": "L3",
    "texto": "Pagas solo por el cliente que eliges.",
-   "toma": null,
-   "pendiente": true,
-   "inicio": 5.7,
-   "fin": 7.9,
-   "frases": []
+   "toma": "L3-1-pagas-solo-por-el-cliente-que-eliges.mp3",
+   "pendiente": false,
+   "inicio": 6.15,
+   "fin": 8.765,
+   "compresionMaxDb": 4.2,
+   "limitadorMaxDb": 2.8,
+   "frases": [
+    {
+     "texto": "Pagas solo por el cliente que eliges.",
+     "corte": [
+      0,
+      2.88
+     ],
+     "inicio": 6.15,
+     "fin": 8.765,
+     "ancla": "pasos[2] (beat 11,50) +0,40 s",
+     "imagen": 5.75
+    }
+   ]
   },
   {
    "id": "L4",
    "texto": "Si no responde, puedes recuperar tus créditos.",
-   "toma": null,
-   "pendiente": true,
-   "inicio": 8.2,
-   "fin": 10.9,
-   "frases": []
+   "toma": "L4-1-si-no-responde-puedes-recuperar-tus-creditos.mp3",
+   "pendiente": false,
+   "inicio": 8.925,
+   "fin": 12.045,
+   "compresionMaxDb": 4.7,
+   "limitadorMaxDb": 2.4,
+   "frases": [
+    {
+     "texto": "Si no responde, puedes recuperar tus créditos.",
+     "corte": [
+      0,
+      3.36
+     ],
+     "inicio": 8.925,
+     "fin": 12.045,
+     "ancla": "silencio (beat 17,25) +0,30 s",
+     "imagen": 8.625
+    }
+   ]
   },
   {
    "id": "L5",

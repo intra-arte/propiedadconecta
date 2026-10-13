@@ -1,17 +1,17 @@
 1
-00:00:00,100 --> 00:00:02,900
+00:00:00,100 --> 00:00:02,860
 Tus próximos clientes ya están buscando.
 
 2
-00:00:03,200 --> 00:00:05,660
+00:00:02,900 --> 00:00:06,110
 Ves qué buscan y cuánto quieren invertir.
 
 3
-00:00:05,700 --> 00:00:08,160
+00:00:06,150 --> 00:00:08,885
 Pagas solo por el cliente que eliges.
 
 4
-00:00:08,200 --> 00:00:11,200
+00:00:08,925 --> 00:00:12,345
 Si no responde, puedes recuperar tus créditos.
 
 5

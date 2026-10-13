@@ -16,7 +16,7 @@ export const DURACION = 20;      // s
 export const PENDIENTE = {
   gratis: 'confirmado',          // el registro de agentes es gratis
   capturas: 'recibidas',         // las del anuncio para agentes (reel-agentes/capturas), recortadas
-  voz: 'pendiente',              // la música ya deja los huecos
+  voz: 'parcial',                // L1–L4 generadas con ElevenLabs (13/10/2026); falta L5, el CTA hablado
 };
 
 export const CTA = { conGratis: 'Regístrate gratis', sinGratis: 'Regístrate' };
@@ -53,17 +53,17 @@ export const EV = {
   saleTitular: 5.5,                     // el titular se va
   saltos: [6.5, 7, 7.5, 8],             // el agente pasa saltando frente a los clientes (aterrizajes)
   burbuja: 8.25,                        // la burbuja del elegido sube y se abre en la app
-  pasos: [9, 10, 11.5, 13.5, 17, 21.5], // la cabecera cambia y entra cada pantalla real
+  pasos: [9, 10, 11.5, 13.5, 17.5, 22.5], // la cabecera cambia y entra cada pantalla real
   acerca: 12.5,                         // la cámara se acerca al botón «Desbloquear contacto»
   candados: [11, 11.25, 11.5],          // a cada cliente le aparece su candado
   lanza: 13.75, entra: 14.5, abre: 14.75, // la moneda sale de la mano, entra en el candado y lo abre
-  espera: 15.25, silencio: 16.75,       // «…» y se apaga: el cliente no contesta
-  vuelve: [18, 19],                     // la moneda sale del candado y vuelve a la mano
-  lanza2: 20, entra2: 21, abre2: 21.25, // la misma moneda abre al cliente de la izquierda
-  responde: 21.75,                      // contesta: globo de chat y un salto
-  apartan: 22.5,                        // los otros dos se apartan
-  acercan: [23, 23.75],                 // los dos saltan al centro
-  camara: [23.5, 25],                   // la cámara se acerca a ellos
+  espera: 15.5, silencio: 17.25,        // «…» y se apaga: el cliente no contesta
+  vuelve: [20, 21],                     // la moneda sale del candado y vuelve a la mano («puedes recuperar»)
+  lanza2: 21.25, entra2: 22, abre2: 22.25, // la misma moneda abre al cliente de la izquierda
+  responde: 22.75,                      // contesta: globo de chat y un salto
+  apartan: 23.25,                       // los otros dos se apartan
+  acercan: [23.5, 24],                  // los dos saltan al centro
+  camara: [23.75, 25],                  // la cámara se acerca a ellos
   fuera: 25,                            // sale la cabecera
   agacha: 25.25, salto: 25.5, junta: 26.5, // se agachan, saltan y los brazos se juntan en el vértice
   baja: [25.5, 26.75],                  // la app se achica y baja a la casa
@@ -76,16 +76,25 @@ export const EV = {
   empujes: [35, 37],                    // la flecha del botón empuja
 };
 
-// ---------- locución (pendiente de grabar) ----------
+// ---------- locución ----------
+// L1–L4: voz «Arturo Casares» de ElevenLabs, elegida por el cliente (ver locucion/tomas/LEEME.md). Cada
+// línea entra entera, sin acelerar ni estirar; el ancla es dónde empieza a sonar. L5 todavía no existe.
 export const LOCUCION = {
   ritmo: { natural: 5.8, agil: 6.3 },
-  voz: 'La misma voz de los otros anuncios: cálida y segura, conversacional, sin tono de locutor. Grabación seca, tres tomas por línea.',
+  voz: 'Arturo Casares (ElevenLabs, eleven_v4): cálida y pausada. Para L5, la misma voz y el mismo modelo.',
   tomas: 'locucion/tomas/',
-  A: [{ id: 'L1', inicio: 0.1, fin: 2.6, texto: 'Tus próximos clientes ya están buscando.', direccion: 'Cercana, con una buena noticia. Peso en «buscando».', toma: null }],
+  A: [{ id: 'L1', inicio: 0.1, fin: 2.72, texto: 'Tus próximos clientes ya están buscando.', direccion: 'Cercana, con una buena noticia. Peso en «buscando».',
+    toma: 'L1-2-tus-proximos-clientes-ya-estan-buscando.mp3', ancla: { s: 0.1 } }],
   comun: [
-    { id: 'L2', inicio: 3.2, fin: 5.4, texto: 'Ves qué buscan y cuánto quieren invertir.', direccion: 'Clara, como mostrando algo. Peso en «invertir».', toma: null },
-    { id: 'L3', inicio: 5.7, fin: 7.9, texto: 'Pagas solo por el cliente que eliges.', direccion: 'Segura. Peso en «solo» y «eliges».', toma: null },
-    { id: 'L4', inicio: 8.2, fin: 10.9, texto: 'Si no responde, puedes recuperar tus créditos.', direccion: 'Tranquila, que dé confianza. Peso en «recuperar».', toma: null },
+    // «Ves qué buscan» mientras el agente mira a cada cliente; «cuánto quieren invertir» con su presupuesto en pantalla
+    { id: 'L2', inicio: 2.9, fin: 6.0, texto: 'Ves qué buscan y cuánto quieren invertir.', direccion: 'Clara, como mostrando algo. Peso en «invertir».',
+      toma: 'L2-1-ves-que-buscan-y-cuanto-quieren-invertir.mp3', ancla: { b: EV.saltos[0] - 0.5, s: -0.1 } },
+    // «por el cliente» cuando la moneda entra en el candado
+    { id: 'L3', inicio: 6.15, fin: 8.78, texto: 'Pagas solo por el cliente que eliges.', direccion: 'Segura. Peso en «solo» y «eliges».',
+      toma: 'L3-1-pagas-solo-por-el-cliente-que-eliges.mp3', ancla: { b: EV.pasos[2], s: 0.4 } },
+    // «Si no responde» cuando los puntos se apagan; «puedes recuperar» cuando la moneda sale del candado
+    { id: 'L4', inicio: 8.93, fin: 12.05, texto: 'Si no responde, puedes recuperar tus créditos.', direccion: 'Tranquila, que dé confianza. Peso en «recuperar».',
+      toma: 'L4-1-si-no-responde-puedes-recuperar-tus-creditos.mp3', ancla: { b: EV.silencio, s: 0.3 } },
     { id: 'L5', inicio: 15.4, fin: 17.8, texto: '__CTA__ en Propiedad Conecta.', direccion: 'Directa y cálida. Marca bien clara.', toma: null },
   ],
 };
