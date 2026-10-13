@@ -110,7 +110,7 @@ export const CONTROL = {
 };
 
 // Momentos de la hoja a tamaño de teléfono (revision/movil-1a1.jpg): [variante, segundo].
-export const REVISION = { movil: [['A', 1.6], ['A', 4.8], ['A', 6.0], ['A', 7.3], ['A', 9.3], ['A', 11.2], ['A', 13.9], ['A', 18.5]] };
+export const REVISION = { movil: [['A', 1.6], ['A', 4.8], ['A', 6.0], ['A', 7.3], ['A', 9.3], ['A', 11.7], ['A', 13.9], ['A', 18.5]] };
 
 // Tabla de eventos del guion técnico: [nombre, beat o lista de beats, imagen, sonido].
 export const EVENTOS = [
