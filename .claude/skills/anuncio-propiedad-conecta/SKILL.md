@@ -30,7 +30,7 @@ Leer primero, completos: `anuncios/FORMULA.md` (la receta: cinco tiempos, el pun
 **2. Concepto (esperar aprobación).** Escribir `anuncios/<slug>/CONCEPTO.md` con:
 - **La metáfora nueva del dolor y el giro.** No reciclar el muro de anuncios.
 - **El recorrido del punto** por los cinco tiempos, terminando siempre en la cabeza del isotipo.
-- **Los dos ganchos**, A directo y B curiosidad, que solo difieren en los primeros 3 s.
+- **Los dos ganchos**, A directo y B curiosidad, que solo difieren en los primeros 3 s. Si el cliente quiere uno solo, `VARIANTES = ['A']` en el guion.
 - **El guion con tiempos.** Ritmo natural de la voz ≤ 5,8 sílabas/s; la voz termina 1,5–2 s antes del final; algo nuevo cada 2–4 s.
 
 Mostrar el concepto en lenguaje claro y esperar el visto bueno.

@@ -40,6 +40,7 @@ Vista previa en el navegador: servir `anuncios/` y abrir `/motor/index.html?anun
 **`guion.js`**: sin dependencias, porque lo leen Node y el navegador. Exporta:
 
 - `TITULO`, `ETIQUETA` (capa de revisión), `ARCHIVO` (nombre de los videos), `BPM`, `BEATS`, `DURACION` y `PENDIENTE` (lo no confirmado: `'pendiente'`, `'confirmado'`, `'no'`).
+- `VARIANTES` (opcional): `['A']` para un anuncio con un solo gancho; sin ella, A y B. Todos los pasos (voz, música, beats, textos, render, controles y revisión) la respetan.
 - `CTA` y `ctaTexto()`.
 - `APERTURA.A` y `APERTURA.B` (las escenas del gancho), y `COMUN` (las escenas compartidas). Cada escena: `{ id, nombre, b0, b1, texto[], visual }`.
 - `EV`: los eventos en beats, que comparten imagen, sonido y voz.
