@@ -6,7 +6,7 @@
 // Uso: node motor/herramientas/musica.mjs --anuncio <carpeta> [A|B]   (sin variante genera las dos)
 import { writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { ruta, G, sueltos } from './comun.mjs';
+import { ruta, G, sueltos, VARS } from './comun.mjs';
 import { mulberry32 } from '../nucleo/lib.js';
 import * as D from '../nucleo/dsp.mjs';
 
@@ -18,7 +18,8 @@ const VMR = 10;      // dB: la voz, medida en sus propios tramos, queda 10 dB po
 const DUCK = -5;     // dB que baja la música bajo cada frase (el ritmo y los SFX bajan el 60 % de eso)
 const N = Math.round(DURACION * SR), BEAT = 60 / BPM, B = b => b * BEAT;
 // notas MIDI por nombre (la partitura las recibe como M)
-const M = { B1: 35, D2: 38, G1: 31, A1: 33, B2: 47, D3: 50, Fs3: 54, G3: 55, A3: 57, B3: 59, Cs4: 61, D4: 62, E4: 64, Fs4: 66, G4: 67, A4: 69, B4: 71, Cs5: 73, D5: 74, E5: 76, Fs5: 78, A5: 81, B5: 83, D6: 86, A2: 45, Cs3: 49, E3: 52 };
+// notas MIDI por nombre, de C0 a B8 (C4 = 60; sostenidos con «s»: Fs3, Cs4)
+const M = Object.fromEntries(Array.from({ length: 108 }, (_, i) => [['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'][i % 12] + (Math.floor(i / 12)), i + 12]));
 
 function render(VAR) {
   const bus = () => [new Float32Array(N), new Float32Array(N)];
@@ -120,4 +121,4 @@ function render(VAR) {
 }
 
 const arg = sueltos[0];
-for (const v of arg ? [arg] : ['A', 'B']) render(v);
+for (const v of arg ? [arg] : VARS) render(v);

@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { ruta, G, coma } from './comun.mjs';
+import { ruta, G, coma, VARS } from './comun.mjs';
 
 const { ARCHIVO, DURACION } = G;
 const tmp = mkdtempSync(join(tmpdir(), 'revision-'));
@@ -16,7 +16,7 @@ const mp4 = v => ruta('salida', `${ARCHIVO}-${v}.mp4`);
 const cuadro = (v, t, ancho, nombre) => { const png = join(tmp, nombre); execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(t), '-i', mp4(v), '-frames:v', '1', '-vf', `scale=${ancho}:-1`, png]); return png; };
 const coloc = existsSync(ruta('locucion', 'colocacion.json')) ? JSON.parse(readFileSync(ruta('locucion', 'colocacion.json'))) : null;
 
-for (const v of ['A', 'B']) {
+for (const v of VARS) {
   if (!existsSync(mp4(v))) { console.log(`sin ${ARCHIVO}-${v}.mp4: se salta`); continue; }
   const cada = [];
   for (let k = 0; k < Math.floor(DURACION); k++) cada.push('-label', `${coma(k + 0.5, 1)} s`, cuadro(v, k + 0.5, 265, `${v}-s${k}.png`));

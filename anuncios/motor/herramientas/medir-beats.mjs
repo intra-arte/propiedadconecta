@@ -49,6 +49,9 @@ for (let it = 0; it < 4; it++) {
   const snn = pts.reduce((a, p) => a + p.n * p.n, 0), snt = pts.reduce((a, p) => a + p.n * p.t, 0);
   P = (m * snt - sn * st) / (m * snn - sn * sn); t0 = (st - P * sn) / m;
 }
+// the fit only fixes the phase to a 16th note: if the first attack is not on a whole beat (a piece that
+// opens on an upbeat), t0 lands a multiple of P/4 late. The score starts on beat 0 at 0 s: re-anchor there.
+t0 -= Math.round(t0 / (P / 4)) * (P / 4);
 // residual over onsets that sit on the 16th-note grid (within 15 ms); the rest are off-grid SFX / tails
 const resid = onsets.map(o => { const n = Math.round(((o.t - t0) / P) * 4) / 4; return (o.t - (t0 + n * P)) * 1000; }).filter(r => Math.abs(r) < 15);
 const rms = Math.sqrt(resid.reduce((a, r) => a + r * r, 0) / resid.length);

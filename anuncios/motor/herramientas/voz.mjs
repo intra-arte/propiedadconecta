@@ -7,7 +7,7 @@
 // Uso: node motor/herramientas/voz.mjs --anuncio <carpeta>
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { ruta, G, coma } from './comun.mjs';
+import { ruta, G, coma, VARS } from './comun.mjs';
 import * as D from '../nucleo/dsp.mjs';
 
 const { BPM, DURACION, EV, LOCUCION, lineasVoz } = G;
@@ -113,7 +113,7 @@ function armar(V) {
 }
 
 const colocacion = { generado: 'node voz.mjs — no editar a mano', nivelLinea: NIVEL };
-for (const V of ['A', 'B']) {
+for (const V of VARS) {
   colocacion[V] = armar(V);
   console.log(`voz-${V}.wav`);
   for (const l of colocacion[V]) {

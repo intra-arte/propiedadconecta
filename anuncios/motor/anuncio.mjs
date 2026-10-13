@@ -26,7 +26,7 @@ const correr = (herramienta, dir, extra = []) => {
   if (r.status !== 0) { console.error(`\n✗ falló ${herramienta} ${extra.join(' ')}`); process.exit(r.status || 1); }
 };
 const guion = async dir => import(pathToFileURL(join(dir, 'guion.js')).href);
-const variantes = () => (resto.includes('--v') ? [resto[resto.indexOf('--v') + 1]] : ['A', 'B']);
+const variantes = () => (resto.includes('--v') ? [resto[resto.indexOf('--v') + 1]] : VARIANTES);
 const sinV = () => resto.filter((a, i) => a !== '--v' && resto[i - 1] !== '--v');
 
 if (paso === 'nuevo') {
@@ -72,11 +72,11 @@ if (paso === 'probar') {
 
 const dir = resolve(carpeta);
 if (!existsSync(join(dir, 'guion.js'))) { console.error(`No hay guion.js en ${dir}`); process.exit(1); }
-const { ARCHIVO } = await guion(dir);
+const { ARCHIVO, VARIANTES = ['A', 'B'] } = await guion(dir);
 const pasos = {
   voz: () => correr('voz.mjs', dir),
   musica: () => correr('musica.mjs', dir),
-  beats: () => { correr('medir-beats.mjs', dir, ['A']); correr('medir-beats.mjs', dir, ['B']); },
+  beats: () => { for (const v of VARIANTES) correr('medir-beats.mjs', dir, [v]); },
   textos: () => correr('generar-textos.mjs', dir),
   hoja: () => correr('render.mjs', dir, ['--hoja', ...resto]),
   render: () => { for (const v of variantes()) correr('render.mjs', dir, ['--v', v, ...sinV()]); },

@@ -1,0 +1,51 @@
+{
+ "generado": "node voz.mjs — no editar a mano",
+ "nivelLinea": -20,
+ "A": [
+  {
+   "id": "L1",
+   "texto": "Tus próximos clientes ya están buscando.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 0.1,
+   "fin": 2.6,
+   "frases": []
+  },
+  {
+   "id": "L2",
+   "texto": "Ves qué buscan y cuánto quieren invertir.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 3.2,
+   "fin": 5.4,
+   "frases": []
+  },
+  {
+   "id": "L3",
+   "texto": "Pagas solo por el cliente que eliges.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 5.7,
+   "fin": 7.9,
+   "frases": []
+  },
+  {
+   "id": "L4",
+   "texto": "Si no responde, puedes recuperar tus créditos.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 8.2,
+   "fin": 10.9,
+   "frases": []
+  },
+  {
+   "id": "L5",
+   "texto": "Regístrate gratis en Propiedad Conecta.",
+   "toma": null,
+   "pendiente": true,
+   "inicio": 15.4,
+   "fin": 17.8,
+   "frases": []
+  }
+ ]
+}

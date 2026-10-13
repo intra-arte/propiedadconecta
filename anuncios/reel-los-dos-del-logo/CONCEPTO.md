@@ -1,6 +1,6 @@
 # Concepto: «Los dos del logo»
 
-**Propiedad Conecta · Reel vertical para agentes e inmobiliarias · 20 s · Propuesta del 13/10/2026, pendiente de aprobación.**
+**Propiedad Conecta · Reel vertical para agentes e inmobiliarias · 20 s · Aprobado el 13/10/2026 con un cambio: un solo gancho (A), para que el logo aparezca recién al final, cuando los dos se conectan.**
 
 Idea del cliente: el logo son dos personas. La verde oscura es la que busca casa y la verde clara es el agente. El agente busca leads, da una moneda cuando quiere uno, y al conectar se forma el logo. Esta propuesta la desarrolla con la fórmula (`anuncios/FORMULA.md`) y el motor (`anuncios/motor/`). El storyboard está en `revision/storyboard.jpg`.
 
@@ -51,15 +51,9 @@ Los dos cuerpos se tocan en una sola línea vertical, en el vértice del techo (
 
 Son las mismas capturas y recortes del anuncio para agentes, sin datos de prueba en cuadro. La burbuja de la app aparece arriba y los personajes abajo, así historia y producto se ven a la vez.
 
-## Gancho A y gancho B
+## Un solo gancho
 
-| | A — Directa | B — Curiosidad |
-|---|---|---|
-| Texto y voz (0–3 s) | «Tus próximos clientes ya están buscando.» | «Mira bien el logo: son dos personas.» |
-| Imagen | Los clientes aparecen uno por beat con su burbuja; el punto cae y es el agente | El logo original, quieto. En el beat, el techo se abre en el vértice, la ventana cae y las dos personas salen caminando. El que busca se suma a la fila de clientes |
-| Desde 3,0 s | Idéntico | Idéntico |
-
-B pone la marca en primer plano y termina donde empezó: el logo se desarma al principio y se vuelve a formar al final.
+«Tus próximos clientes ya están buscando.» Los clientes caen uno por beat con su burbuja y el punto cae sobre un cuerpo claro: es el agente. El gancho B («Mira bien el logo: son dos personas.») quedó fuera por decisión del cliente: mostraba el logo al principio, y el logo tiene que aparecer recién al final, como desenlace de la historia.
 
 ## Movimiento (lo que lo hace especial)
 
@@ -80,7 +74,6 @@ B pone la marca en primer plano y termina donde empezó: el logo se desarma al p
 | Línea | Tiempo | Texto | Sílabas/s |
 |---|---|---|---|
 | L1 (A) | 0,1–2,6 s | Tus próximos clientes ya están buscando. | 4,8 |
-| LB1 (B) | 0,1–2,8 s | Mira bien el logo: son dos personas. | 4,1 |
 | L2 | 3,2–5,4 s | Ves qué buscan y cuánto quieren invertir. | 5,5 |
 | L3 | 5,7–7,9 s | Pagas solo por el cliente que eliges. | 5,5 |
 | L4 | 8,2–10,9 s | Si no responde, puedes recuperar tus créditos. | 5,6 |
@@ -102,8 +95,8 @@ La historia necesita su momento sin voz, de unos 4 s, para que el logo se forme 
 - **Sin precios.** Ni en la voz ni en los textos. Las capturas muestran «10 créditos», como en el anuncio anterior: si el sistema cambia, hay que volver a capturar esas pantallas.
 - **Logo original.** Ver «Lo que descubrimos en el logo»: piezas cortadas del archivo y nunca deformadas; armado, es el original.
 
-## Para decidir
+## Decisiones del cliente (13/10/2026)
 
-1. **¿Apruebas usar el logo en piezas** así (cortadas del original, sin deformar y armadas idénticas al final)?
-2. **¿20 s**, o lo ajusto a 18 s acortando el momento sin voz?
-3. **Gancho:** ¿A y B como están?
+- Concepto aprobado, con el logo en piezas tal como se describe arriba y 20 s.
+- Un solo gancho, el A: el logo no se muestra antes del final.
+- «Quizá un poco más de movimiento»: los personajes respiran y miran, crece la burbuja del cliente que el agente mira, la cámara se abre al principio, se acerca a los dos y lleva el logo a su lugar, y la ciudad del fondo se desliza con paralaje.

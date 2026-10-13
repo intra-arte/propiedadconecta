@@ -4,7 +4,7 @@
 // Todo se escribe dentro de la carpeta del anuncio.
 // Uso: node motor/herramientas/generar-textos.mjs --anuncio <carpeta>
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
-import { ruta, G, coma } from './comun.mjs';
+import { ruta, G, coma, VARS } from './comun.mjs';
 import { SEGURA } from '../nucleo/marca.js';
 
 const { BPM, BEATS, DURACION, PENDIENTE, APERTURA, COMUN, LOCUCION, lineasVoz, ctaTexto, TITULO, ARCHIVO, EVENTOS } = G;
@@ -30,7 +30,7 @@ const palabras = t => t.toLowerCase().replace(/[^a-záéíóúüñ\s]/g, ' ').sp
 const silabas = t => palabras(t).reduce((s, p) => s + silabasPalabra(p), 0);
 
 const escenas = v => [...APERTURA[v], ...COMUN];
-const faltan = [...new Map(['A', 'B'].flatMap(v => voz(v).filter(l => l.pendiente).map(l => [l.id, l]))).values()];
+const faltan = [...new Map(VARS.flatMap(v => voz(v).filter(l => l.pendiente).map(l => [l.id, l]))).values()];
 const pend = Object.entries(PENDIENTE).filter(([, e]) => e === 'pendiente').map(([k]) => ({ gratis: '«gratis» en el CTA', capturas: 'capturas del formulario (escena P)', voz: 'grabación de la voz', rotulos: 'rótulos del formulario' })[k])
   .concat(PENDIENTE.voz === 'parcial' ? faltan.map(l => `toma ${l.id} de la voz («${l.texto}»)`) : []);
 
@@ -44,9 +44,8 @@ Zona segura para texto y logo: x ${SEGURA.x0}–${SEGURA.x1}, y ${SEGURA.y0}–$
 
 **Pendiente:** ${pend.length ? pend.join(' · ') : 'nada'}.
 
-A y B comparten todo desde el beat 6 (${coma(S(6))} s). Solo cambia la apertura.
-`;
-for (const v of ['A', 'B']) {
+${VARS.length > 1 ? `A y B comparten todo desde el beat 6 (${coma(S(6))} s). Solo cambia la apertura.\n` : 'Un solo gancho: no hay versión B.\n'}`;
+for (const v of VARS) {
   md += `\n## Versión ${v}${v === 'A' ? ' — directa' : ' — curiosidad'}\n\n| Escena | Beats | Inicio (s) | Fin (s) | Texto en pantalla | Qué pasa |\n|---|---|---|---|---|---|\n`;
   for (const e of escenas(v)) {
     if (v === 'B' && !e.id.startsWith('B') && e.b0 < 6) continue;
@@ -56,7 +55,7 @@ for (const v of ['A', 'B']) {
 }
 md += `\n## Eventos de imagen y sonido (beat → segundo)\n\n| Evento | Beat | Segundo | Imagen | Sonido |\n|---|---|---|---|---|\n`;
 for (const [n, b, img, snd] of EVENTOS) md += `| ${n} | ${Array.isArray(b) ? b.map(x => coma(x)).join(' · ') : coma(b)} | ${Array.isArray(b) ? '—' : coma(S(b))} | ${img} | ${snd} |\n`;
-for (const v of ['A', 'B']) {
+for (const v of VARS) {
   md += `\n## Locución ${v}\n\nTiempos reales de cada frase en la mezcla (\`locucion/colocacion.json\`). «Imagen» es el segundo nominal del evento al que se ancla la frase (la cuadrícula medida difiere en menos de 10 ms). Ritmo: «natural» ≤ ${coma(LOCUCION.ritmo.natural, 1)} sílabas/s · «ágil» ≤ ${coma(LOCUCION.ritmo.agil, 1)}.\n\n| Línea | Frase | Inicio (s) | Fin (s) | Ancla | Imagen (s) | Síl./s |\n|---|---|---|---|---|---|---|\n`;
   for (const l of voz(v)) {
     if (l.pendiente) { md += `| ${l.id} | ${l.texto} **(falta la toma)** | ${coma(l.inicio)} | ${coma(l.fin)} | hueco planeado | — | — |\n`; continue; }
@@ -73,14 +72,14 @@ const tc = s => { const ms = Math.round(s * 1000), p = (n, w = 2) => String(n).p
 mkdirSync(ruta('subtitulos'), { recursive: true });
 // L3 va frase por frase (cada dato con su tarjeta); las demás líneas, enteras. Cada texto se queda
 // 0,3 s después de la voz, sin pisar el siguiente.
-for (const v of ['A', 'B']) {
+for (const v of VARS) {
   const cues = voz(v).flatMap(l => (l.id === 'L3' && !l.pendiente ? l.frases.map(f => [f.inicio, f.fin, f.texto]) : [[l.inicio, l.fin, l.texto]]));
   writeFileSync(ruta('subtitulos', `${ARCHIVO}-${v}.srt`), cues.map(([a, b, t], i) => `${i + 1}\n${tc(a)} --> ${tc(Math.min(b + 0.3, cues[i + 1] ? cues[i + 1][0] - 0.04 : DURACION))}\n${t}\n`).join('\n'));
 }
 
 // ---------- guion de locución ----------
-const lineaDe = id => linea('A', id) || linea('B', id);
-const hayGrabadas = ['A', 'B'].some(v => voz(v).some(l => !l.pendiente));
+const lineaDe = id => VARS.map(v => linea(v, id)).find(Boolean);
+const hayGrabadas = VARS.some(v => voz(v).some(l => !l.pendiente));
 const estado = !faltan.length
   ? 'ESTADO: GRABADA. Las tomas están en locucion/tomas/ (ver su LEEME).'
   : hayGrabadas
@@ -98,7 +97,7 @@ ${faltan.map(l => `  ${l.id}  «${l.texto}»  (${lineaDe(l.id).direccion}) Hueco
 Voz: ${LOCUCION.voz}
 Ritmo: hasta ${coma(LOCUCION.ritmo.natural, 1)} sílabas por segundo suena tranquilo; más de ${coma(LOCUCION.ritmo.agil, 1)} se oye apurado.
 ${PENDIENTE.gratis === 'pendiente' ? '\n«gratis» está PENDIENTE DE CONFIRMAR: grabar L4 en las dos variantes («Publica gratis tu búsqueda.» y «Publica tu búsqueda.»).\n' : ''}`;
-for (const v of ['A', 'B']) {
+for (const v of VARS) {
   loc += `\n==============================================================\nVERSIÓN ${v} ${v === 'A' ? '(directa)' : '(curiosidad) — solo cambia la primera línea'}\n==============================================================\n\n`;
   for (const l of voz(v)) {
     const d = linea(v, l.id).direccion;
@@ -111,4 +110,4 @@ for (const v of ['A', 'B']) {
 }
 mkdirSync(ruta('locucion'), { recursive: true });
 writeFileSync(ruta('locucion', 'guion-locucion.txt'), loc);
-console.log(`escritos guion-tecnico.md, subtitulos/${ARCHIVO}-{A,B}.srt, locucion/guion-locucion.txt`);
+console.log(`escritos guion-tecnico.md, subtitulos/${ARCHIVO}-${VARS.length > 1 ? `{${VARS.join(',')}}` : VARS[0]}.srt, locucion/guion-locucion.txt`);

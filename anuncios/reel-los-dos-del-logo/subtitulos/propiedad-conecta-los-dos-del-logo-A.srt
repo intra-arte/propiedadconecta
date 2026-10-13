@@ -1,0 +1,19 @@
+1
+00:00:00,100 --> 00:00:02,900
+Tus próximos clientes ya están buscando.
+
+2
+00:00:03,200 --> 00:00:05,660
+Ves qué buscan y cuánto quieren invertir.
+
+3
+00:00:05,700 --> 00:00:08,160
+Pagas solo por el cliente que eliges.
+
+4
+00:00:08,200 --> 00:00:11,200
+Si no responde, puedes recuperar tus créditos.
+
+5
+00:00:15,400 --> 00:00:18,100
+Regístrate gratis en Propiedad Conecta.

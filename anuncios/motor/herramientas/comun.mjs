@@ -18,4 +18,5 @@ if (!existsSync(join(DIR, 'guion.js'))) { console.error(`No hay guion.js en ${DI
 export const RUTA_WEB = relative(ANUNCIOS, DIR).split('\\').join('/'); // la carpeta vista desde la raíz del render
 export const ruta = (...p) => join(DIR, ...p);
 export const G = await import(pathToFileURL(ruta('guion.js')).href);
+export const VARS = G.VARIANTES ?? ['A', 'B']; // un anuncio puede tener un solo gancho (VARIANTES = ['A'])
 export const coma = (n, d = 2) => Number(n).toFixed(d).replace('.', ',');
