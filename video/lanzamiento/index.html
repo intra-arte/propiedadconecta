@@ -438,15 +438,15 @@ function buildPayoff() {
   P.userData.bodyMat.transparent = true;
   S.payoff = { scene, cam, comp: composer(scene, cam, { bloom: 0.22 }), update(u) {
     const rl = expoOut(ramp(u, 0, 0.6)), rr = expoOut(ramp(u, 0.25, 0.85));
-    const m = inOut(ramp(u, 2.5, 3.3));
+    const m = inOut(ramp(u, 2.8, 3.5));
     const pL = V3(-2.0, lerp(-7, 1.2, rl), 0).lerp(headL.p, m), pR = V3(2.0, lerp(-7, 1.2, rr), 0).lerp(headR.p, m);
     P.position.copy(pL); K.position.copy(pR);
     P.scale.setScalar(lerp(1, headL.r / r0, m)); K.scale.setScalar(lerp(1, headR.r / 0.82, m));
     P.rotation.set(0, (1 - rl) * 2, 0); K.rotation.set(Math.PI / 2 + 0.05 * (1 - m), 0, lerp(-0.15, 0, m) - (1 - rr) * 2);
-    P.userData.bodyMat.opacity = 1 - smooth(ramp(u, 2.4, 2.9)); P.userData.body.visible = u < 2.9;
+    P.userData.bodyMat.opacity = 1 - smooth(ramp(u, 2.7, 3.2)); P.userData.body.visible = u < 3.2;
     roof.geometry.setDrawRange(0, Math.floor(roofCount * inOut(ramp(u, 0.45, 1.1)) / 3) * 3);
-    roof.material.opacity = 1 - smooth(ramp(u, 2.2, 2.6));
-    scene.background.set(C.black).lerp(new THREE.Color(C.marfil), smooth(ramp(u, 2.85, 3.3)));
+    roof.material.opacity = 1 - smooth(ramp(u, 2.5, 2.9));
+    scene.background.set(C.black).lerp(new THREE.Color(C.marfil), smooth(ramp(u, 3.15, 3.5)));
   } };
 }
 
@@ -495,10 +495,10 @@ function overlays(t) {
   if (t >= 18.65 && t < 21) rise(T.publicas, t, 18.65, 21.0);
   if (t >= 21.0 && t < 24) rise(T.trabajan, t, 21.05);
   if (t >= 24.5 && t < 30) { rise(T.rule4, t, 24.5); rise(T.prospectos, t, 24.65); }
-  if (t >= 30.3 && t < 32.6) { rise(T.tiempo, t, 30.3, 32.6); }
-  if (t >= 31.3 && t < 32.6) { rise(T.ciegas, t, 31.3, 32.6); }
-  // the pieces land on the logo's heads at 33.3 s; the ivory card and the real logo fade in over them
-  if (t >= 33.3) showO(T.end, smooth(ramp(t, 33.3, 33.6)));
+  if (t >= 30.3 && t < 33.1) { rise(T.tiempo, t, 30.3, 33.1); }
+  if (t >= 32.0 && t < 33.1) { rise(T.ciegas, t, 32.0, 33.1); }
+  // the pieces land on the logo's heads at 33.5 s (with the bell); the ivory card and the real logo fade in over them
+  if (t >= 33.5) showO(T.end, smooth(ramp(t, 33.5, 33.8)));
   if (t >= 34.5) rise(T.slogan, t, 34.5);
   if (t >= 35.3) rise(T.sub, t, 35.3);
   if (t >= 35.9) showO(T.url, smooth(ramp(t, 35.9, 36.3)));

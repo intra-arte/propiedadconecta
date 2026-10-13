@@ -10,6 +10,9 @@
  *   node video/render.mjs --page video/explicativo/index.html --out video/explicativo/out \
  *     --name propiedad-conecta-explicativo-32s --duration 32 --music video/explicativo/music/soundtrack.wav
  *
+ * --from <s> --to <s>: render only that span into <name>.part.mp4 (no soundtrack, no contact sheet), to re-shoot
+ *   one passage and splice it back in.
+ *
  * Needs Playwright (Chromium) and ffmpeg. Run `python3 video/prep.py` first.
  */
 import { createRequire } from 'node:module';
@@ -28,6 +31,7 @@ const OUT = path.resolve(ROOT, arg('--out', 'video/out'));
 const FPS = 60, DURATION = Number(arg('--duration', 15)), W = 1920, H = 1080;
 const NAME = arg('--name', 'propiedad-conecta-15s');
 const MUSIC = path.resolve(ROOT, arg('--music', 'video/music/soundtrack.wav'));
+const FROM = Number(arg('--from', 0)), TO = Number(arg('--to', DURATION)), PART = process.argv.includes('--from') || process.argv.includes('--to');
 
 function playwright() {
   try { return require('playwright'); } catch {
@@ -72,15 +76,15 @@ async function main() {
     }
     console.log(`  ${stills.length} stills → ${path.relative(ROOT, dir)}`);
   } else {
-    const file = path.join(OUT, `${NAME}.mp4`);
+    const file = path.join(OUT, PART ? `${NAME}.part.mp4` : `${NAME}.mp4`);
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
       '-c:v', 'libx264', '-preset', 'slow', '-crf', '14', '-tune', 'animation', '-x264-params', 'aq-mode=3',
       '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
       '-movflags', '+faststart', file], { stdio: ['pipe', 'inherit', 'inherit'] });
     const done = new Promise((ok, bad) => ff.on('close', c => (c === 0 ? ok() : bad(new Error('ffmpeg exited ' + c)))));
-    const frames = Math.round(FPS * DURATION);
+    const frames = Math.round(FPS * TO), first = Math.round(FPS * FROM);
     const t0 = Date.now();
-    for (let i = 0; i < frames; i++) {
+    for (let i = first; i < frames; i++) {
       await page.evaluate(x => window.draw(x), i / FPS);
       const png = await stage.screenshot({ type: 'png' });
       if (!ff.stdin.write(png)) await new Promise(r => ff.stdin.once('drain', r));
@@ -89,6 +93,7 @@ async function main() {
     ff.stdin.end();
     await done;
     console.log(`\n  wrote ${path.relative(ROOT, file)}`);
+    if (PART) { await browser.close(); server.close(); return; }
     // Soundtrack (video/music/compose.py): mux it in when it exists.
     const music = MUSIC;
     if (fs.existsSync(music)) {

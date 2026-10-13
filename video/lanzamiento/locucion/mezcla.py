@@ -32,10 +32,10 @@ LINES = [  # (entry in seconds, text as read) — docs/lanzamiento/locucion.md
     (16.30, "Cambiamos las reglas."),
     (18.40, "Con Propiedad Conecta, publicas gratis lo que necesitas… y los agentes trabajan por ti."),
     (24.40, "Y el agente invierte solo en prospectos que encajan con lo que tiene."),
-    (30.40, "Deja de regalar tu tiempo. Deja de invertir a ciegas."),
+    (30.20, "Deja de regalar tu tiempo. Deja de invertir a ciegas."),
     (34.40, "Propiedad Conecta. Tú buscas… nosotros conectamos."),
 ]
-TEMPO = 1.10        # speeds the take up a little so every line fits its shot (1.0 = as read)
+TEMPO = 1.05        # speeds the take up a little so every line fits its shot (1.0 = as read)
 INNER = 0.18        # longest pause kept inside a line
 DUCK_DB = -8.0      # score level under the voice
 GAP = 0.12          # minimum air between two lines when one runs long
