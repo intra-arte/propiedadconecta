@@ -223,8 +223,29 @@ def ending():
     return bus
 
 
+def camera():
+    """Sound for the camera moves, on its own random stream so the rest of the score stays note for note."""
+    r = np.random.default_rng(77)
+    dry, send = np.zeros((N, 2)), np.zeros((N, 2))
+    air = lambda dur, f0, f1, level: E.hp(E.sweep_lp(r.standard_normal((int(dur * SR), 2)), f0, f1), 200) * (np.sin(np.linspace(0, np.pi, int(dur * SR))) ** 1.5)[:, None] * 0.2 * level
+    place(send, air(1.5, 5500, 300, 0.75), 2.65)                # the dive to table level
+    place(dry, air(1.5, 5500, 300, 0.35), 2.65)
+    place(send, air(1.5, 300, 4000, 0.45), 7.0)                 # the crane back
+    place(dry, sand(1.5, 2.6), 8.5, pan=0.2)                    # the macro: the sand up close
+    place(dry, glass(0.25), 8.52); place(send, glass(0.3), 8.52)
+    place(dry, air(0.9, 1200, 5000, 0.6), 10.28, pan=-0.2)      # riding the coin
+    place(send, air(0.9, 1200, 5000, 0.5), 10.28)
+    for k in range(4):                                          # low and close behind the walkers
+        place(dry, tap(0.45, 470), 14.0 + k * B + 0.25, pan=-0.15)
+    place(send, E.riser(3.0, 250, 2600, 1.3), 21.0)            # the crane up to the agents' houses
+    place(dry, air(1.3, 900, 3500, 0.9), 26.0, pan=0.3)        # alongside the house
+    place(dry, M.thud(90, 0.55, 1500), DROP + 0.005)            # the coin on the square, close
+    place(send, air(1.2, 4000, 600, 0.3), 30.0)                 # the push-in
+    return dry + E.reverb(send, 1.6, 6000, seed=33) * 0.8
+
+
 def main():
-    mix = score() + ending()
+    mix = score() + ending() + camera()
     mix = E.hp(mix, 28)
     mix = np.tanh(mix * 1.15) / 1.15
     meter = pyloudnorm.Meter(SR)
