@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nuevas reglas · style frames</title>
+<!--
+  Style frames for the launch pitch «Nuevas reglas» (docs/lanzamiento/idea.md).
+  ?f=1..6 renders one frame. Three.js (MIT) is shared with video/monedas/vendor/.
+  Every game piece is drawn in code; the only brand asset is the real logo in frame 6.
+-->
+<style>
+  @font-face { font-family: Outfit; src: url(../../anuncios/reel-publica-tu-busqueda/animatic/fuentes/Outfit-Variable.ttf) format('truetype'); font-weight: 100 900; }
+  @font-face { font-family: 'Barlow Condensed'; src: url(../explicativo/fuentes/BarlowCondensed-800.woff2) format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #111; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0B1712; font-family: Outfit, sans-serif; }
+  #gl { position: absolute; inset: 0; }
+  #over { position: absolute; inset: 0; pointer-events: none; }
+  .t { position: absolute; font-family: 'Barlow Condensed'; font-weight: 800; text-transform: uppercase; line-height: .9; letter-spacing: -0.01em; white-space: pre; }
+  .s { position: absolute; font-weight: 600; white-space: pre; }
+  .rule { position: absolute; font-weight: 700; font-size: 26px; letter-spacing: .16em; padding: 10px 20px 9px; border-radius: 8px; white-space: nowrap; }
+  .bubble { position: absolute; font-weight: 600; font-size: 30px; padding: 18px 28px; border-radius: 26px 26px 26px 6px; white-space: nowrap; box-shadow: 0 10px 30px rgba(11,23,18,.18); }
+</style>
+<script type="importmap">{ "imports": { "three": "../monedas/vendor/three/build/three.module.js", "three/addons/": "../monedas/vendor/three/examples/jsm/" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="gl" width="1920" height="1080"></canvas><div id="over"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { HorizontalTiltShiftShader } from 'three/addons/shaders/HorizontalTiltShiftShader.js';
+import { VerticalTiltShiftShader } from 'three/addons/shaders/VerticalTiltShiftShader.js';
+
+const C = { black: '#0B1712', acc: '#92CE58', grey: '#E4E7E2', marfil: '#FAF9F5', ink: '#142A22', pend: '#B9C2BE', seek: '#2E5A40' };
+const W = 1920, H = 1080;
+const over = document.getElementById('over');
+const html = (cls, css, text) => { const d = document.createElement('div'); d.className = cls; d.style.cssText = css; d.innerHTML = text; over.appendChild(d); return d; };
+
+// ------------------------------------------------------------------ renderer
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true });
+renderer.setSize(W, H, false);
+renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const ENV = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ------------------------------------------------------------------ textures drawn in code
+function canvasTex(w, h, draw, srgb = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); draw(g, w, h);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+const lerp = (a, b, p) => a + (b - a) * p;
+const rnd = (() => { let s = 11; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+
+// The agent's coin (same coin as «Monedas al aire»: roof chevron and the name around it).
+const faceBump = canvasTex(1024, 1024, (g, s) => {
+  g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, s, s);
+  const c = s / 2;
+  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(c, c, s * 0.5, 0, 7); g.arc(c, c, s * 0.445, 0, 7, true); g.fill('evenodd');
+  for (let i = 0; i < 72; i++) { const a = i / 72 * Math.PI * 2; g.beginPath(); g.arc(c + Math.cos(a) * s * 0.415, c + Math.sin(a) * s * 0.415, 5.5, 0, 7); g.fill(); }
+  g.strokeStyle = '#ffffff'; g.lineWidth = 62; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(c - 210, c + 120); g.lineTo(c, c - 95); g.lineTo(c + 210, c + 120); g.stroke();
+  g.fillRect(c - 52, c + 40, 104, 104);
+  g.font = "600 46px Outfit"; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const txt = 'PROPIEDAD · CONECTA · PROPIEDAD · CONECTA · ';
+  for (let i = 0; i < txt.length; i++) { const a = -Math.PI / 2 + i / txt.length * Math.PI * 2; g.save(); g.translate(c + Math.cos(a) * s * 0.36, c + Math.sin(a) * s * 0.36); g.rotate(a + Math.PI / 2); g.fillText(txt[i], 0, 0); g.restore(); }
+}, false);
+faceBump.center.set(0.5, 0.5); faceBump.rotation = Math.PI / 2;
+const reeding = canvasTex(256, 256, (g, s) => { for (let x = 0; x < s; x += 8) { g.fillStyle = (x / 8) % 2 ? '#ffffff' : '#555555'; g.fillRect(x, 0, 8, s); } }, false);
+reeding.wrapS = THREE.RepeatWrapping; reeding.repeat.set(28, 1);
+const COIN = { color: new THREE.Color('#86C94F'), metalness: 1, roughness: 0.3 };
+const coinMats = [
+  new THREE.MeshPhysicalMaterial({ ...COIN, bumpMap: reeding, bumpScale: 1.2, clearcoat: 0.4 }),
+  new THREE.MeshPhysicalMaterial({ ...COIN, bumpMap: faceBump, bumpScale: 4, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
+  new THREE.MeshPhysicalMaterial({ ...COIN, bumpMap: faceBump, bumpScale: 4, clearcoat: 0.5 }),
+];
+function coin(r = 1) {
+  const geo = new THREE.CylinderGeometry(r, r, r * 0.15, 120, 1);   // flat on the table: faces up/down
+  const m = new THREE.Mesh(geo, coinMats); m.castShadow = true; m.receiveShadow = true; return m;
+}
+
+// A listing square of the old board: a little ad card, sometimes stamped.
+function listingTex(stamp, tone = '#DADDD8') {
+  return canvasTex(512, 512, (g, s) => {
+    g.fillStyle = tone; g.fillRect(0, 0, s, s);
+    g.fillStyle = '#AEB5AE'; roundRect(g, 34, 34, s - 68, 250, 18); g.fill();
+    g.fillStyle = '#C6CCC5'; g.beginPath(); g.moveTo(150, 230); g.lineTo(256, 120); g.lineTo(362, 230); g.fill(); g.fillRect(180, 222, 152, 40);
+    g.fillStyle = '#9AA39B'; roundRect(g, 34, 316, 300, 34, 10); g.fill(); roundRect(g, 34, 372, 200, 26, 10); g.fill(); roundRect(g, 34, 420, 380, 22, 10); g.fill();
+    if (stamp) {
+      g.save(); g.translate(s / 2, 300); g.rotate(-0.22);
+      g.strokeStyle = C.ink; g.lineWidth = 11; roundRect(g, -226, -60, 452, 120, 14); g.stroke();
+      g.fillStyle = C.ink; g.font = "800 76px 'Barlow Condensed'"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(stamp, 0, 4); g.restore();
+    }
+  });
+}
+const STAMPS = ['YA SE ARRENDÓ', 'NO DISPONIBLE', 'SIN RESPUESTA', 'YA SE VENDIÓ', null, null, null];
+const texCache = new Map();
+const listing = stamp => { const k = stamp || '-'; if (!texCache.has(k)) texCache.set(k, listingTex(stamp)); return texCache.get(k); };
+
+// ------------------------------------------------------------------ game pieces
+function slab(w, d, h, r, mats) {   // rounded-corner tile, top face up
+  const sh = new THREE.Shape(); sh.moveTo(-w / 2 + r, -d / 2); sh.lineTo(w / 2 - r, -d / 2); sh.quadraticCurveTo(w / 2, -d / 2, w / 2, -d / 2 + r); sh.lineTo(w / 2, d / 2 - r); sh.quadraticCurveTo(w / 2, d / 2, w / 2 - r, d / 2); sh.lineTo(-w / 2 + r, d / 2); sh.quadraticCurveTo(-w / 2, d / 2, -w / 2, d / 2 - r); sh.lineTo(-w / 2, -d / 2 + r); sh.quadraticCurveTo(-w / 2, -d / 2, -w / 2 + r, -d / 2);
+  const geo = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: true, bevelSize: Math.min(0.04, r * 0.5), bevelThickness: 0.03, bevelSegments: 3, curveSegments: 6 });
+  // planar UVs on the top face so a texture fills it
+  const pos = geo.attributes.position, uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + w / 2) / w, (pos.getY(i) + d / 2) / d);
+  geo.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(geo, mats); m.castShadow = true; m.receiveShadow = true; return m;
+}
+function tile(tex, s = 1.6) {
+  const side = new THREE.MeshPhysicalMaterial({ color: '#CDD2CB', roughness: 0.6, envMapIntensity: 0.4 });
+  const top = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.55, clearcoat: 0.3, envMapIntensity: 0.4 });
+  return slab(s, s, 0.12, 0.12, [top, side]);
+}
+function pawn(color = C.seek, s = 1) {
+  const p = [[0, 0], [0.42, 0], [0.44, 0.05], [0.42, 0.11], [0.3, 0.16], [0.22, 0.22], [0.16, 0.5], [0.13, 0.7], [0.22, 0.74], [0.23, 0.79], [0.12, 0.83], [0, 0.84]].map(([x, y]) => new THREE.Vector2(x * s, y * s));
+  const mat = new THREE.MeshPhysicalMaterial({ color, metalness: 0.15, roughness: 0.28, clearcoat: 0.9, clearcoatRoughness: 0.12, envMapIntensity: 0.7 });
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.LatheGeometry(p, 64), mat); body.castShadow = true; body.receiveShadow = true; g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.25 * s, 48, 32), mat); head.position.y = 1.04 * s; head.castShadow = true; g.add(head);
+  return g;
+}
+function houseShape(s = 1) {
+  const sh = new THREE.Shape(); sh.moveTo(-0.6 * s, 0); sh.lineTo(0.6 * s, 0); sh.lineTo(0.6 * s, 0.7 * s); sh.lineTo(0, 1.2 * s); sh.lineTo(-0.6 * s, 0.7 * s); sh.lineTo(-0.6 * s, 0); return sh;
+}
+function house(color = '#C9CEC8', s = 1, lit = false) {
+  const mat = lit
+    ? new THREE.MeshPhysicalMaterial({ color: '#7FC24B', metalness: 0.55, roughness: 0.3, clearcoat: 0.7, envMapIntensity: 0.8, emissive: '#2c5a12', emissiveIntensity: 0.35 })
+    : new THREE.MeshPhysicalMaterial({ color, roughness: 0.55, clearcoat: 0.3, envMapIntensity: 0.45 });
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(houseShape(s), { depth: 1.0 * s, bevelEnabled: true, bevelSize: 0.05 * s, bevelThickness: 0.05 * s, bevelSegments: 3 }), mat);
+  m.geometry.translate(0, 0, -0.5 * s); m.castShadow = true; m.receiveShadow = true;
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.26 * s, 0.42 * s, 0.02), new THREE.MeshBasicMaterial({ color: lit ? '#1E3A12' : '#8D968E' }));
+  door.position.set(0, 0.21 * s, 0.56 * s); m.add(door);
+  return m;
+}
+// Game timer: the seeker's time. Brote sand, clear glass, dark caps.
+function hourglass(s = 1, fill = 0.35, lying = false) {
+  const g = new THREE.Group();
+  const capMat = new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.35, clearcoat: 0.8, envMapIntensity: 0.6 });
+  for (const y of [0, 2.3]) { const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.78, 0.14, 64), capMat); cap.position.y = y + 0.07; cap.castShadow = true; g.add(cap); }
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + 0.5; const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 2.2, 16), capMat); post.position.set(Math.cos(a) * 0.66, 1.22, Math.sin(a) * 0.66); post.castShadow = true; g.add(post); }
+  const prof = [[0.05, 0.14], [0.42, 0.2], [0.57, 0.45], [0.5, 0.82], [0.2, 1.08], [0.06, 1.22], [0.2, 1.36], [0.5, 1.62], [0.57, 1.99], [0.42, 2.24], [0.05, 2.3]].map(([r, y]) => new THREE.Vector2(r, y));
+  const glass = new THREE.Mesh(new THREE.LatheGeometry(prof, 64), new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.04, metalness: 0, transparent: true, opacity: 0.16, clearcoat: 1, envMapIntensity: 1.4, side: THREE.DoubleSide, depthWrite: false }));
+  g.add(glass);
+  const sand = new THREE.MeshPhysicalMaterial({ color: C.acc, roughness: 0.85, emissive: '#3d6e1d', emissiveIntensity: 0.25 });
+  if (!lying) {
+    // top: what is left; bottom: a pile; a thin stream between
+    const topH = 0.25 + fill * 0.55;
+    const top = new THREE.Mesh(new THREE.LatheGeometry([[0.0, 1.24], [0.16, 1.32], [0.44, 1.24 + topH * 0.7], [0.5, 1.24 + topH], [0, 1.24 + topH]].map(([r, y]) => new THREE.Vector2(r, y)), 48), sand); g.add(top);
+    const pileH = 0.15 + (1 - fill) * 0.45;
+    const pile = new THREE.Mesh(new THREE.LatheGeometry([[0, 0.15], [0.44, 0.17], [0.52, 0.32], [0.3, 0.15 + pileH * 0.9], [0, 0.15 + pileH + 0.1]].map(([r, y]) => new THREE.Vector2(r, y)), 48), sand); g.add(pile);
+    const stream = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.22 - (0.25 + pileH), 8), sand); stream.position.y = (1.22 + 0.25 + pileH) / 2; g.add(stream);
+  } else {
+    // on its side the sand settles along the lower wall of both bulbs and stops
+    for (const yc of [0.62, 1.82]) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 16, 0, Math.PI * 2, Math.PI * 0.55, Math.PI * 0.45), sand); m.rotation.z = Math.PI / 2; m.position.set(-0.08, yc, 0); m.scale.set(1, 1, 1); g.add(m); }
+  }
+  g.traverse(o => { if (o.isMesh && o !== glass) o.castShadow = true; });
+  g.scale.setScalar(s);
+  if (lying) { g.rotation.z = -Math.PI / 2; }
+  return g;
+}
+
+// ------------------------------------------------------------------ scene helpers
+function studio(scene, color, opacity = 0.16) {
+  scene.background = new THREE.Color(color);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor); return floor;
+}
+function keyLight(scene, pos, intensity = 2.2, shadow = true, box = 14) {
+  const l = new THREE.DirectionalLight('#ffffff', intensity); l.position.set(...pos);
+  if (shadow) { l.castShadow = true; l.shadow.mapSize.set(2048, 2048); const s = l.shadow.camera; s.left = -box; s.right = box; s.top = box; s.bottom = -box; s.far = 100; l.shadow.radius = 6; l.shadow.bias = -0.0006; }
+  scene.add(l); return l;
+}
+function rim(scene, pos, color = C.acc, intensity = 6) { const l = new THREE.DirectionalLight(color, intensity); l.position.set(...pos); scene.add(l); return l; }
+// Miniature look: tilt-shift blur above and below a sharp band, then bloom.
+function finish(scene, camera, { bloom = 0.2, tilt = 0, band = 0.5 } = {}) {
+  const comp = new EffectComposer(renderer); comp.setSize(W, H);
+  comp.addPass(new RenderPass(scene, camera));
+  if (tilt) for (let i = 0; i < 2; i++) {
+    const h = new ShaderPass(HorizontalTiltShiftShader); h.uniforms.h.value = tilt / W; h.uniforms.r.value = band; comp.addPass(h);
+    const v = new ShaderPass(VerticalTiltShiftShader); v.uniforms.v.value = tilt / H; v.uniforms.r.value = band; comp.addPass(v);
+  }
+  if (bloom) comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), bloom, 0.4, 0.9));
+  comp.addPass(new OutputPass());
+  comp.render();
+}
+const screen = (v, cam) => { const p = v.clone().project(cam); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const rule = (x, y, text, dark = false) => html('rule', `left:${x}px;top:${y}px;background:${dark ? C.acc : C.ink};color:${dark ? C.black : C.marfil}`, text);
+
+// ------------------------------------------------------------------ frames
+const F = {};
+
+// 1 · OLD RULE 1 (seekers): an endless board of listings; the pawn hops square to square; the timer drains.
+F[1] = () => {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.55;
+  studio(scene, C.black, 0.35); scene.fog = new THREE.Fog(C.black, 18, 46);
+  const cam = new THREE.PerspectiveCamera(28, W / H, 0.1, 200); cam.position.set(2.5, 13.5, 17); cam.lookAt(1.2, 0, -2);
+  // a winding path of listing squares that never ends
+  const path = new THREE.CatmullRomCurve3([[-9, 0, 9], [-2, 0, 6], [5, 0, 5.5], [8, 0, 1], [3, 0, -2], [-5, 0, -3], [-7, 0, -9], [0, 0, -13], [9, 0, -15], [12, 0, -24], [2, 0, -30], [-8, 0, -36]].map(p => new THREE.Vector3(...p)));
+  const N = 64, pts = path.getSpacedPoints(N);
+  pts.forEach((p, i) => {
+    const t = tile(listing(i % 3 === 1 ? STAMPS[Math.floor(rnd() * 4)] : null));
+    t.position.copy(p); const tg = path.getTangentAt(i / N); t.rotation.y = Math.atan2(tg.x, tg.z) + Math.PI / 2; scene.add(t);
+  });
+  // the seeker's pawn mid-hop, with two ghosts of the hops before
+  const k = 14, at = pts[k], next = pts[k + 1];
+  const pw = pawn(C.seek, 1.05); pw.position.set(lerp(at.x, next.x, 0.5), 1.1, lerp(at.z, next.z, 0.5)); pw.rotation.z = -0.12; scene.add(pw);
+  [[k - 1, 0.18], [k - 2, 0.08]].forEach(([j, o]) => {
+    const gp = pawn(C.seek, 1.05); gp.position.set(pts[j].x, 0.14, pts[j].z);
+    gp.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = o; m.material.depthWrite = false; m.castShadow = false; } }); scene.add(gp);
+  });
+  // the timer in the foreground, draining
+  const hg = hourglass(1.6, 0.3); hg.position.set(-1.2, 0, 1.0); hg.rotation.y = 0.4; scene.add(hg);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#1a2a22', 0.25));
+  keyLight(scene, [-6, 14, 10], 2.0, true, 24); rim(scene, [6, 5, -10], C.acc, 2.2);
+  finish(scene, cam, { bloom: 0.16, tilt: 4.5, band: 0.42 });
+  html('', `position:absolute;inset:0;background:linear-gradient(0deg, rgba(11,23,18,.85) 0%, rgba(11,23,18,0) 38%)`, '');
+  rule(112, 772, 'REGLA DE SIEMPRE · SI BUSCAS CASA', true);
+  html('t', `left:110px;top:828px;font-size:150px;color:${C.marfil}`, 'PIERDES HORAS BUSCANDO.');
+};
+
+// 2 · OLD RULE 2 (agents): money poured into a billboard by the board; the pawns walk past it.
+F[2] = () => {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.55;
+  studio(scene, C.grey, 0.18);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200); cam.position.set(-1.5, 7.2, 19); cam.lookAt(0.4, 4.6, 0);
+  // the billboard: a dark panel on two legs, a generic ad and a coin slot
+  const ad = canvasTex(1024, 560, (g, w, h) => {
+    g.fillStyle = '#13261C'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#1F3A2B'; roundRect(g, 40, 40, 440, 480, 24); g.fill();
+    g.fillStyle = '#2E5240'; g.beginPath(); g.moveTo(110, 330); g.lineTo(260, 190); g.lineTo(410, 330); g.fill(); g.fillRect(150, 320, 220, 130);
+    g.fillStyle = C.marfil; g.font = "800 92px 'Barlow Condensed'"; g.textBaseline = 'top';
+    g.fillText('PORTALES', 530, 110); g.fillText('PUBLICIDAD', 530, 210);
+    g.fillStyle = C.acc; g.font = "800 140px 'Barlow Condensed'"; g.fillText('? ? ?', 530, 320);
+  });
+  const panel = slab(5.6, 3.1, 0.3, 0.18, [new THREE.MeshBasicMaterial({ map: ad, toneMapped: false }), new THREE.MeshPhysicalMaterial({ color: '#0E1D16', roughness: 0.4, clearcoat: 0.6 })]);
+  panel.rotation.x = Math.PI / 2; panel.position.set(4.4, 4.3, -1.5); scene.add(panel);
+  for (const x of [2.4, 6.4]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.8, 0.22), new THREE.MeshPhysicalMaterial({ color: '#0E1D16', roughness: 0.4 })); leg.position.set(x, 1.4, -1.6); leg.castShadow = true; scene.add(leg); }
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.12, 0.05), new THREE.MeshBasicMaterial({ color: '#020504' })); slot.position.set(4.4, 2.95, -1.33); scene.add(slot);
+  // the agent's stack of money on the left, and the arc of coins flying into the slot
+  for (let i = 0; i < 9; i++) { const c = coin(0.55); c.position.set(-5.2 + (rnd() - 0.5) * 0.06, 0.05 + i * 0.085, 3.2 + (rnd() - 0.5) * 0.06); c.rotation.y = rnd() * 6; scene.add(c); }
+  for (let i = 0; i < 14; i++) {
+    const u = i / 13, x = lerp(-4.6, 4.3, u), y = 1.0 + 2.4 * Math.sin(Math.PI * u * 0.92) + u * 0.7, z = lerp(3.0, -1.2, u);
+    const c = coin(0.4); c.position.set(x, y, z); c.rotation.set(rnd() * 6, rnd() * 6, rnd() * 6); scene.add(c);
+  }
+  // a strip of board in front; pawns walking past, their backs to the ad
+  for (let i = -6; i <= 8; i++) { const t = tile(listing(null), 1.5); t.position.set(i * 1.62, 0, 4.6); scene.add(t); }
+  [[-1.2, 4.6, 1.2, 0.35], [2.6, 4.6, 1.35, -0.4], [6.3, 4.6, 1.0, 0.3]].forEach(([x, z, s, r]) => { const p = pawn('#B9C2BE', s); p.position.set(x, 0.14, z); p.rotation.z = r * 0.25; scene.add(p); });
+  scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.3));
+  keyLight(scene, [-6, 13, 9], 1.8, true, 16); rim(scene, [7, 8, -8], '#ffffff', 1.2);
+  finish(scene, cam, { bloom: 0, tilt: 2.0, band: 0.6 });
+  rule(112, 128, 'REGLA DE SIEMPRE · SI ERES AGENTE');
+  html('t', `left:110px;top:184px;font-size:128px;color:${C.ink}`, 'INVIERTES DINERO\nY CRUZAS LOS DEDOS.');
+  html('s', `left:116px;top:430px;font-size:36px;color:${C.ink};font-weight:500`, 'Portales y publicidad que no te prometen nada.');
+};
+
+// 3 · NEW RULES: the board flips over; the old pieces fly off; the clean side comes up.
+F[3] = () => {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.6;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200); cam.position.set(0, 1.2, 22); cam.lookAt(0, 0.4, 0);
+  const board = new THREE.Group(); board.rotation.set(1.05, -0.35, 0.42); board.position.set(0.6, -0.4, 0); scene.add(board);
+  // old face (listings) and new face (ivory) of the same board
+  const old = new THREE.Mesh(new THREE.BoxGeometry(11, 0.3, 7.5), [
+    new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.5 }), new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.5 }),
+    new THREE.MeshPhysicalMaterial({ color: '#C9CEC8', roughness: 0.6 }), new THREE.MeshPhysicalMaterial({ color: '#DEDBD2', roughness: 0.5, clearcoat: 0.4 }),
+    new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.5 }), new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.5 })]);
+  board.add(old);
+  // the clean side shows a single green ring: one place, one search
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.045, 12, 96), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false })); ring.rotation.x = Math.PI / 2; ring.position.y = -0.17; board.add(ring);
+  // the old squares, pawns, timer and coins sliding off into the dark
+  for (let i = 0; i < 16; i++) { const t = tile(listing(i % 3 ? null : STAMPS[i % 4]), 1.3); t.position.set(-6 + rnd() * 14, 2.0 + rnd() * 5.5, -4 + rnd() * 5); t.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3); scene.add(t); }
+  for (let i = 0; i < 9; i++) { const c = coin(0.42); c.position.set(-7 + rnd() * 15, -3 + rnd() * 9, -2 + rnd() * 4); c.rotation.set(rnd() * 6, rnd() * 6, rnd() * 6); scene.add(c); }
+  [[-5.5, 4.2, 0.6], [6.2, 3.5, -0.9]].forEach(([x, y, r]) => { const p = pawn('#B9C2BE', 1.1); p.position.set(x, y, -1); p.rotation.set(r, 0, r * 1.5); scene.add(p); });
+  const hg = hourglass(0.9, 0.5); hg.position.set(-6.6, -1.6, 1.5); hg.rotation.set(0.6, 0, 1.1); scene.add(hg);
+  const ring2 = ring.clone(); ring2.position.y = 0.17; board.add(ring2);
+  const arc = new THREE.EllipseCurve(0, 0, 7.4, 7.4, 2.2, 3.9, false, 0); const ap = arc.getPoints(80).map(p => new THREE.Vector3(p.x + 0.6, p.y - 0.4, 0.5));
+  scene.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ap), 120, 0.04, 8), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false })));
+  keyLight(scene, [-4, 6, 10], 1.1, false); rim(scene, [5, 6, -6], C.acc, 3); rim(scene, [-6, -3, -3], '#ffffff', 0.8);
+  finish(scene, cam, { bloom: 0.12 });
+  html('t', `left:0;width:1920px;text-align:center;top:770px;font-size:230px;color:${C.acc}`, 'NUEVAS REGLAS.');
+};
+
+// 4 · NEW RULE 1 (seekers): on the clean ivory board, the pawn stays put and stands up its request; the timer lies down.
+F[4] = () => {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.5;
+  studio(scene, C.marfil, 0.14);
+  const cam = new THREE.PerspectiveCamera(28, W / H, 0.1, 200); cam.position.set(0.2, 7.2, 14.5); cam.lookAt(-0.6, 1.3, 0);
+  // its square, with a soft green signal ring
+  const sq = slab(2.4, 2.4, 0.14, 0.2, [new THREE.MeshPhysicalMaterial({ color: '#F1EFE7', roughness: 0.5, clearcoat: 0.3 }), new THREE.MeshPhysicalMaterial({ color: '#E2DFD6', roughness: 0.6 })]);
+  sq.position.set(3.0, 0, 0); scene.add(sq);
+  for (const [r, o] of [[1.6, 0.9], [2.3, 0.45], [3.0, 0.2]]) { const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.03, 8, 128), new THREE.MeshBasicMaterial({ color: C.acc, transparent: true, opacity: o, toneMapped: false })); ring.rotation.x = Math.PI / 2; ring.position.set(3.0, 0.2, 0); scene.add(ring); }
+  const pw = pawn(C.seek, 1.5); pw.position.set(2.5, 0.17, 0.3); scene.add(pw);
+  // the request card, standing like a flag
+  const card = canvasTex(700, 900, (g, w, h) => {
+    g.fillStyle = '#FFFFFF'; roundRect(g, 0, 0, w, h, 40); g.fill();
+    g.fillStyle = C.acc; roundRect(g, 0, 0, w, 150, 40); g.fill(); g.fillRect(0, 100, w, 50);
+    g.fillStyle = C.black; g.font = "800 96px 'Barlow Condensed'"; g.textBaseline = 'middle'; g.fillText('BUSCO', 56, 80);
+    const row = (y, t) => { g.fillStyle = C.ink; g.font = "600 58px Outfit"; g.fillText(t, 56, y); g.fillStyle = '#E4E7E2'; g.fillRect(56, y + 50, w - 112, 3); };
+    row(250, 'Departamento'); row(380, '3 habitaciones'); row(510, '2 baños'); row(640, 'Con parqueadero');
+    g.fillStyle = '#5E6B64'; g.font = "500 40px Outfit"; g.fillText('Publicado gratis', 56, 800);
+  });
+  const cm = slab(1.9, 2.45, 0.06, 0.12, [new THREE.MeshPhysicalMaterial({ map: card, roughness: 0.45, clearcoat: 0.4 }), new THREE.MeshPhysicalMaterial({ color: '#e8e6df' })]);
+  cm.rotation.set(Math.PI / 2 - 0.12, -0.32, 0); cm.position.set(4.25, 1.55, -0.55); scene.add(cm);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.5, 12), new THREE.MeshPhysicalMaterial({ color: '#C9CEC8' })); pole.position.set(4.25, 0.3, -0.4); scene.add(pole);
+  // the timer, lying on its side: the sand stops
+  const hg = hourglass(0.9, 0.5, true); hg.position.set(-0.6, 0.71, 1.4); hg.rotation.y = 0.5; scene.add(hg);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#e5e2d8', 0.35));
+  keyLight(scene, [-5, 12, 8], 1.7, true, 12); rim(scene, [6, 6, -8], C.acc, 1.4);
+  finish(scene, cam, { bloom: 0, tilt: 1.2, band: 0.75 });
+  rule(112, 128, 'NUEVA REGLA · SI BUSCAS CASA', true);
+  html('t', `left:110px;top:184px;font-size:136px;color:${C.ink}`, 'PUBLICAS GRATIS\nLO QUE NECESITAS.');
+  html('s', `left:116px;top:440px;font-size:36px;color:${C.ink};font-weight:500`, 'Y los agentes trabajan por ti.');
+};
+
+// 5 · NEW RULE 2 (agents): among the agents' houses only the one that fits lights up; the agent puts money on that prospect; it comes to the pawn.
+F[5] = () => {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.5;
+  studio(scene, C.marfil, 0.15);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200); cam.position.set(2.6, 8.6, 13.5); cam.lookAt(2.4, 0.4, -0.4);
+  const sq = slab(2.2, 2.2, 0.14, 0.2, [new THREE.MeshPhysicalMaterial({ color: '#F1EFE7', roughness: 0.5, clearcoat: 0.3 }), new THREE.MeshPhysicalMaterial({ color: '#E2DFD6', roughness: 0.6 })]);
+  sq.position.set(-2.4, 0, 2.0); scene.add(sq);
+  const pw = pawn(C.seek, 1.35); pw.position.set(-2.6, 0.17, 2.1); scene.add(pw);
+  // the agents' houses around the board; one of them fits
+  const spots = [[-8, -4.5], [-4.5, -6], [0.5, -6.5], [5, -5.5], [8.5, -2.5], [9.5, 2.5], [-9, 0.5], [6.5, 5.5]];
+  spots.forEach(([x, z], i) => { const h = house('#CFD3CC', 1.0); h.position.set(x, 0, z); h.rotation.y = (rnd() - 0.5) * 0.7; scene.add(h); });
+  const lit = house('#7FC24B', 1.15, true); lit.position.set(1.6, 0, 0.6); lit.rotation.y = -0.35; scene.add(lit);
+  // the glowing trail from where it stood to the pawn
+  const trail = new THREE.CatmullRomCurve3([new THREE.Vector3(5, 0.04, -5.5), new THREE.Vector3(3.8, 0.04, -2.2), new THREE.Vector3(1.6, 0.04, 0.6)]);
+  scene.add(new THREE.Mesh(new THREE.TubeGeometry(trail, 120, 0.05, 8), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false })));
+  const empty = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.62, 48), new THREE.MeshBasicMaterial({ color: C.acc, transparent: true, opacity: 0.5, toneMapped: false })); empty.rotation.x = -Math.PI / 2; empty.position.set(5, 0.02, -5.5); scene.add(empty);
+  // the one coin the agent puts on this prospect, dropping onto the square
+  const c = coin(0.5); c.position.set(-1.3, 1.9, 2.5); c.rotation.set(0.5, 0, 0.35); scene.add(c);
+  const c2 = coin(0.5); c2.position.set(-1.25, 0.2, 2.6); scene.add(c2);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#e5e2d8', 0.35));
+  keyLight(scene, [-6, 14, 8], 1.7, true, 16); rim(scene, [6, 6, -8], C.acc, 1.4);
+  finish(scene, cam, { bloom: 0, tilt: 1.4, band: 0.7 });
+  const [bx, by] = screen(new THREE.Vector3(1.6, 1.6, 0.6), cam);
+  html('bubble', `left:${bx + 150}px;top:${by - 60}px;background:#fff;color:${C.ink}`, 'Hola, tengo lo que buscas.');
+  rule(112, 128, 'NUEVA REGLA · SI ERES AGENTE');
+  html('t', `left:110px;top:184px;font-size:100px;color:${C.ink}`, 'INVIERTES SOLO EN\nPROSPECTOS QUE ENCAJAN\nCON LO QUE TIENES.');
+};
+
+// 6 · end card: the real logo on ivory, the one-line definition and the domain.
+F[6] = () => {
+  document.getElementById('gl').style.display = 'none';
+  document.getElementById('stage').style.background = C.marfil;
+  const img = document.createElement('img'); img.src = '../../anuncios/reel-publica-tu-busqueda/marca/logo-horizontal-transparente.png';
+  img.style.cssText = 'position:absolute;left:557px;top:230px;width:806px;height:287px'; over.appendChild(img);
+  html('t', `left:0;width:1920px;text-align:center;top:600px;font-size:96px;color:${C.ink}`, 'TÚ PUBLICAS. ELLOS TE ENCUENTRAN.');
+  html('s', `left:0;width:1920px;text-align:center;top:735px;font-size:38px;color:${C.ink};font-weight:500`, 'Publica gratis lo que buscas: el agente que lo tiene, te contacta.');
+  html('s', `left:0;width:1920px;text-align:center;top:880px;font-size:30px;letter-spacing:.06em;color:${C.ink};font-weight:500`, 'propiedadconecta.com');
+};
+
+window.READY = false;
+(async () => {
+  await Promise.all([document.fonts.load("800 200px 'Barlow Condensed'"), document.fonts.load('600 40px Outfit'), document.fonts.load('500 40px Outfit'), document.fonts.load('700 40px Outfit')]);
+  const f = Number(new URLSearchParams(location.search).get('f') || 1);
+  F[f]();
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
