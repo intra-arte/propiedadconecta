@@ -67,7 +67,8 @@ const aPantalla = (c, [x, y]) => [c.s * x + c.o[0], c.s * y + c.o[1]];
 // ======================================================================
 // MOVIMIENTO: saltos con anticipación, aterrizaje y la cabeza que llega un instante después
 // ======================================================================
-const hundir = (t, tl, a = 9) => (t < tl ? 0 : a * Math.sin(Math.PI * clamp((t - tl) / 0.16)) * Math.exp(-(t - tl) * 3));
+// el cuerpo se hunde de golpe al tocar el suelo (dos fotogramas); la cabeza, con su retraso, hace el asentamiento suave
+const hundir = (t, tl, a = 9) => (t < tl ? 0 : a * Math.sin(Math.PI * clamp((t - tl) / 0.07)));
 const retraso = (t, tl, a = 13) => (t < tl + 0.02 ? 0 : a * Math.sin(Math.PI * clamp((t - tl - 0.02) / 0.24)) * Math.exp(-(t - tl) * 2));
 const agacho = (t, t0, a = 8) => a * Math.sin(Math.PI * clamp((t - (t0 - 0.13)) / 0.15));
 // recorre saltos [{ b0, b1, x, y, h }] (beats de despegue y aterrizaje) desde (x0, y0)
