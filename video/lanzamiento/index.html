@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nuevas reglas · 40 s</title>
+<!--
+  «Nuevas reglas»: 40 s launch film (docs/lanzamiento/idea.md). Three.js (MIT) shared from video/monedas/vendor/.
+  Every frame is a pure function of time: draw(t). 120 BPM grid: one beat = 0.5 s, one bar = 2 s, cuts on bar lines.
+  Render: node video/render.mjs --gl --page video/lanzamiento/index.html … (see video/lanzamiento/README.md).
+  Every game piece is drawn in code; the only brand asset is the real logo.
+-->
+<style>
+  @font-face { font-family: Outfit; src: url(../../anuncios/reel-publica-tu-busqueda/animatic/fuentes/Outfit-Variable.ttf) format('truetype'); font-weight: 100 900; }
+  @font-face { font-family: 'Barlow Condensed'; src: url(../explicativo/fuentes/BarlowCondensed-800.woff2) format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #111; }
+  body.preview { display: grid; place-items: center; min-height: 100vh; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0B1712; font-family: Outfit, sans-serif; }
+  #gl { position: absolute; inset: 0; }
+  #over { position: absolute; inset: 0; pointer-events: none; }
+  .o { position: absolute; display: none; }
+  .t { font-family: 'Barlow Condensed'; font-weight: 800; text-transform: uppercase; line-height: .9; letter-spacing: -0.01em; white-space: pre; }
+  .s { font-weight: 500; white-space: pre; }
+  .rule { font-weight: 700; font-size: 26px; letter-spacing: .16em; padding: 10px 20px 9px; border-radius: 8px; white-space: nowrap; }
+  .bubble { font-size: 30px; font-weight: 600; color: #142A22; background: #fff; padding: 18px 28px; border-radius: 26px 26px 26px 6px; box-shadow: 0 14px 34px rgba(11,23,18,.18); white-space: nowrap; transform-origin: 0% 100%; }
+</style>
+<script type="importmap">{ "imports": { "three": "../monedas/vendor/three/build/three.module.js", "three/addons/": "../monedas/vendor/three/examples/jsm/" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="gl" width="1920" height="1080"></canvas><div id="over"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { HorizontalTiltShiftShader } from 'three/addons/shaders/HorizontalTiltShiftShader.js';
+import { VerticalTiltShiftShader } from 'three/addons/shaders/VerticalTiltShiftShader.js';
+
+// ------------------------------------------------------------------ constants & helpers
+const W = 1920, H = 1080, DURATION = 40, B = 0.5, BAR = 4 * B;
+const C = { black: '#0B1712', acc: '#92CE58', grey: '#E4E7E2', marfil: '#FAF9F5', ink: '#142A22', seek: '#2E5A40', piece: '#B9C2BE' };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const expoIn = x => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const inOut = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const smooth = x => x * x * (3 - 2 * x);
+const backOut = (x, s = 1.4) => { x = clamp(x); const c3 = s + 1; return 1 + c3 * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2); };
+const beat = n => n * B;
+const hash = i => { let h = Math.imul(i + 1, 2654435761) ^ 0x9e3779b9; h = Math.imul(h ^ (h >>> 15), 2246822519); return ((h ^ (h >>> 13)) >>> 0) / 4294967295; };
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const bounce = (q, amp, k = 16, d = 7) => (q > 0 ? Math.abs(Math.sin(q * k)) * amp * Math.exp(-q * d) : 0);
+
+// ------------------------------------------------------------------ renderer
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H, false); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const ENV = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ------------------------------------------------------------------ overlays (DOM)
+const over = document.getElementById('over');
+const O = [];
+function ov(cls, css, html) { const d = document.createElement('div'); d.className = 'o ' + cls; d.style.cssText += css; d.innerHTML = html; over.appendChild(d); O.push(d); return d; }
+function showO(d, op = 1, extra = '') { d.style.display = op > 0.001 ? 'block' : 'none'; d.style.opacity = op; d.style.transform = extra; }
+function screenOf(v, cam) { const p = v.clone().project(cam); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; }
+// a title that rises 24 px into place while it fades in
+function rise(d, t, t0, t1 = 99) { const q = ramp(t, t0, t0 + 0.35); const out = 1 - smooth(ramp(t, t1 - 0.2, t1)); showO(d, smooth(q) * out, `translateY(${(1 - expoOut(q)) * 24}px)`); }
+
+// ------------------------------------------------------------------ textures drawn in code
+function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function tex(c, srgb = true) { const t = new THREE.CanvasTexture(c); t.anisotropy = 8; if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; }
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+let coinMats, listingPlain, listingStamped, stampTex, adTex, cardTex;
+function makeTextures() {
+  // the agent's coin (same coin as «Monedas al aire»)
+  const c1 = canvas(1024, 1024), g = c1.getContext('2d'), s = 1024, c = 512;
+  g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, s, s);
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(c, c, s * 0.5, 0, 7); g.arc(c, c, s * 0.445, 0, 7, true); g.fill('evenodd');
+  for (let i = 0; i < 72; i++) { const a = i / 72 * Math.PI * 2; g.beginPath(); g.arc(c + Math.cos(a) * s * 0.415, c + Math.sin(a) * s * 0.415, 5.5, 0, 7); g.fill(); }
+  g.strokeStyle = '#fff'; g.lineWidth = 62; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(c - 210, c + 120); g.lineTo(c, c - 95); g.lineTo(c + 210, c + 120); g.stroke();
+  g.fillRect(c - 52, c + 40, 104, 104);
+  g.font = '600 46px Outfit'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const txt = 'PROPIEDAD · CONECTA · PROPIEDAD · CONECTA · ';
+  for (let i = 0; i < txt.length; i++) { const a = -Math.PI / 2 + i / txt.length * Math.PI * 2; g.save(); g.translate(c + Math.cos(a) * s * 0.36, c + Math.sin(a) * s * 0.36); g.rotate(a + Math.PI / 2); g.fillText(txt[i], 0, 0); g.restore(); }
+  const faceBump = tex(c1, false);
+  const c3 = canvas(256, 256), r = c3.getContext('2d');
+  for (let x = 0; x < 256; x += 8) { r.fillStyle = (x / 8) % 2 ? '#fff' : '#555'; r.fillRect(x, 0, 8, 256); }
+  const reeding = tex(c3, false); reeding.wrapS = THREE.RepeatWrapping; reeding.repeat.set(28, 1);
+  const M = { color: new THREE.Color('#86C94F'), metalness: 1, roughness: 0.3 };
+  coinMats = [
+    new THREE.MeshPhysicalMaterial({ ...M, bumpMap: reeding, bumpScale: 1.2, clearcoat: 0.4 }),
+    new THREE.MeshPhysicalMaterial({ ...M, bumpMap: faceBump, bumpScale: 4, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
+    new THREE.MeshPhysicalMaterial({ ...M, bumpMap: faceBump, bumpScale: 4, clearcoat: 0.5 }),
+  ];
+  // a listing square of the old board
+  const listing = stamp => {
+    const k = canvas(512, 512), q = k.getContext('2d');
+    q.fillStyle = '#DADDD8'; q.fillRect(0, 0, 512, 512);
+    q.fillStyle = '#AEB5AE'; roundRect(q, 34, 34, 444, 250, 18); q.fill();
+    q.fillStyle = '#C6CCC5'; q.beginPath(); q.moveTo(150, 230); q.lineTo(256, 120); q.lineTo(362, 230); q.fill(); q.fillRect(180, 222, 152, 40);
+    q.fillStyle = '#9AA39B'; roundRect(q, 34, 316, 300, 34, 10); q.fill(); roundRect(q, 34, 372, 200, 26, 10); q.fill(); roundRect(q, 34, 420, 380, 22, 10); q.fill();
+    if (stamp) stampOn(q, stamp, 256, 300);
+    return tex(k);
+  };
+  const stampOn = (q, word, x, y) => { q.save(); q.translate(x, y); q.rotate(-0.22); q.strokeStyle = C.ink; q.lineWidth = 11; roundRect(q, -226, -60, 452, 120, 14); q.stroke(); q.fillStyle = C.ink; q.font = "800 76px 'Barlow Condensed'"; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(word, 0, 4); q.restore(); };
+  listingPlain = listing(null);
+  listingStamped = ['YA SE ARRENDÓ', 'NO DISPONIBLE', 'SIN RESPUESTA', 'YA SE VENDIÓ'].map(listing);
+  stampTex = ['NO DISPONIBLE', 'YA SE ARRENDÓ', 'SIN RESPUESTA', 'YA SE VENDIÓ'].map(w => { const k = canvas(512, 256), q = k.getContext('2d'); stampOn(q, w, 256, 128); return tex(k); });
+  // the billboard's generic ad
+  const a = canvas(1024, 560), h = a.getContext('2d');
+  h.fillStyle = '#13261C'; h.fillRect(0, 0, 1024, 560);
+  h.fillStyle = '#1F3A2B'; roundRect(h, 40, 40, 440, 480, 24); h.fill();
+  h.fillStyle = '#2E5240'; h.beginPath(); h.moveTo(110, 330); h.lineTo(260, 190); h.lineTo(410, 330); h.fill(); h.fillRect(150, 320, 220, 130);
+  h.fillStyle = C.marfil; h.font = "800 92px 'Barlow Condensed'"; h.textBaseline = 'top'; h.fillText('PORTALES', 530, 110); h.fillText('PUBLICIDAD', 530, 210);
+  h.fillStyle = C.acc; h.font = "800 140px 'Barlow Condensed'"; h.fillText('? ? ?', 530, 320);
+  adTex = tex(a);
+  // the request card
+  const k = canvas(700, 900), q = k.getContext('2d');
+  q.fillStyle = '#FFFFFF'; roundRect(q, 0, 0, 700, 900, 40); q.fill();
+  q.fillStyle = C.acc; roundRect(q, 0, 0, 700, 150, 40); q.fill(); q.fillRect(0, 100, 700, 50);
+  q.fillStyle = C.black; q.font = "800 96px 'Barlow Condensed'"; q.textBaseline = 'middle'; q.fillText('BUSCO', 56, 80);
+  const row = (y, t) => { q.fillStyle = C.ink; q.font = '600 58px Outfit'; q.fillText(t, 56, y); q.fillStyle = '#E4E7E2'; q.fillRect(56, y + 50, 588, 3); };
+  row(250, 'Departamento'); row(380, '3 habitaciones'); row(510, '2 baños'); row(640, 'Con parqueadero');
+  q.fillStyle = '#5E6B64'; q.font = '500 40px Outfit'; q.fillText('Publicado gratis', 56, 800);
+  cardTex = tex(k);
+}
+
+// ------------------------------------------------------------------ game pieces
+function coin(r = 1) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, r * 0.15, 120, 1), coinMats); m.castShadow = true; m.receiveShadow = true; return m; }
+function slab(w, d, h, r, mats) {   // rounded tile, top face up, planar UVs on the top
+  const sh = new THREE.Shape(); sh.moveTo(-w / 2 + r, -d / 2); sh.lineTo(w / 2 - r, -d / 2); sh.quadraticCurveTo(w / 2, -d / 2, w / 2, -d / 2 + r); sh.lineTo(w / 2, d / 2 - r); sh.quadraticCurveTo(w / 2, d / 2, w / 2 - r, d / 2); sh.lineTo(-w / 2 + r, d / 2); sh.quadraticCurveTo(-w / 2, d / 2, -w / 2, d / 2 - r); sh.lineTo(-w / 2, -d / 2 + r); sh.quadraticCurveTo(-w / 2, -d / 2, -w / 2 + r, -d / 2);
+  const geo = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: true, bevelSize: Math.min(0.04, r * 0.5), bevelThickness: 0.03, bevelSegments: 3, curveSegments: 6 });
+  const pos = geo.attributes.position, uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + w / 2) / w, (pos.getY(i) + d / 2) / d);
+  geo.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(geo, mats); m.castShadow = true; m.receiveShadow = true; return m;
+}
+const tileSide = () => new THREE.MeshPhysicalMaterial({ color: '#CDD2CB', roughness: 0.6, envMapIntensity: 0.4 });
+const tileMats = new Map();
+function tile(t, s = 1.6) {
+  if (!tileMats.has(t)) tileMats.set(t, [new THREE.MeshPhysicalMaterial({ map: t, roughness: 0.55, clearcoat: 0.3, envMapIntensity: 0.4 }), tileSide()]);
+  return slab(s, s, 0.12, 0.12, tileMats.get(t));
+}
+// pawn; head(): the group is centred on the head, so it can become a head of the logo
+function pawn(color = C.seek, s = 1, head = false) {
+  const p = [[0, 0], [0.42, 0], [0.44, 0.05], [0.42, 0.11], [0.3, 0.16], [0.22, 0.22], [0.16, 0.5], [0.13, 0.7], [0.22, 0.74], [0.23, 0.79], [0.12, 0.83], [0, 0.84]].map(([x, y]) => new THREE.Vector2(x * s, y * s));
+  const mat = new THREE.MeshPhysicalMaterial({ color, metalness: 0.15, roughness: 0.28, clearcoat: 0.9, clearcoatRoughness: 0.12, envMapIntensity: 0.7 });
+  const g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
+  const bodyMat = mat.clone();
+  const body = new THREE.Mesh(new THREE.LatheGeometry(p, 64), bodyMat); body.castShadow = true; body.receiveShadow = true; inner.add(body);
+  const hd = new THREE.Mesh(new THREE.SphereGeometry(0.25 * s, 48, 32), mat); hd.position.y = 1.04 * s; hd.castShadow = true; inner.add(hd);
+  if (head) inner.position.y = -1.04 * s;
+  g.userData = { mat, bodyMat, body, headR: 0.25 * s };
+  return g;
+}
+function houseShape(s = 1) { const sh = new THREE.Shape(); sh.moveTo(-0.6 * s, 0); sh.lineTo(0.6 * s, 0); sh.lineTo(0.6 * s, 0.7 * s); sh.lineTo(0, 1.2 * s); sh.lineTo(-0.6 * s, 0.7 * s); sh.lineTo(-0.6 * s, 0); return sh; }
+function house(s = 1) {
+  const mat = new THREE.MeshPhysicalMaterial({ color: '#CFD3CC', roughness: 0.55, clearcoat: 0.3, envMapIntensity: 0.45, emissive: new THREE.Color('#2c5a12'), emissiveIntensity: 0 });
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(houseShape(s), { depth: 1.0 * s, bevelEnabled: true, bevelSize: 0.05 * s, bevelThickness: 0.05 * s, bevelSegments: 3 }), mat);
+  m.geometry.translate(0, 0, -0.5 * s); m.castShadow = true; m.receiveShadow = true;
+  const doorMat = new THREE.MeshBasicMaterial({ color: '#8D968E' });
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.26 * s, 0.42 * s, 0.02), doorMat); door.position.set(0, 0.21 * s, 0.56 * s); m.add(door);
+  m.userData = { mat, doorMat };
+  return m;
+}
+// light a house: 0 grey → 1 Brote
+function lightHouse(h, k) {
+  const { mat, doorMat } = h.userData;
+  mat.color.set('#CFD3CC').lerp(new THREE.Color('#7FC24B'), k); mat.metalness = 0.55 * k; mat.roughness = lerp(0.55, 0.3, k); mat.emissiveIntensity = 0.35 * k;
+  doorMat.color.set('#8D968E').lerp(new THREE.Color('#1E3A12'), k);
+}
+// the game timer: setFill(f) drains the top into the bottom; flow(on) shows the stream
+function hourglass(s = 1) {
+  const g = new THREE.Group();
+  const capMat = new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.35, clearcoat: 0.8, envMapIntensity: 0.6 });
+  for (const y of [0, 2.3]) { const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.78, 0.14, 64), capMat); cap.position.y = y + 0.07; cap.castShadow = true; g.add(cap); }
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + 0.5; const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 2.2, 16), capMat); post.position.set(Math.cos(a) * 0.66, 1.22, Math.sin(a) * 0.66); post.castShadow = true; g.add(post); }
+  const prof = [[0.05, 0.14], [0.42, 0.2], [0.57, 0.45], [0.5, 0.82], [0.2, 1.08], [0.06, 1.22], [0.2, 1.36], [0.5, 1.62], [0.57, 1.99], [0.42, 2.24], [0.05, 2.3]];
+  g.add(new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 64), new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.04, transparent: true, opacity: 0.16, clearcoat: 1, envMapIntensity: 1.4, side: THREE.DoubleSide, depthWrite: false })));
+  const rad = y => { for (let i = 1; i < prof.length; i++) if (y <= prof[i][1]) { const [r0, y0] = prof[i - 1], [r1, y1] = prof[i]; return lerp(r0, r1, (y - y0) / (y1 - y0)); } return 0.05; };
+  const sand = new THREE.MeshPhysicalMaterial({ color: C.acc, roughness: 0.85, emissive: new THREE.Color('#3d6e1d'), emissiveIntensity: 0.25 });
+  const topPts = [new THREE.Vector2(0, 0)]; for (let y = 1.25; y <= 2.06; y += 0.04) topPts.push(new THREE.Vector2(Math.max(0.02, rad(y) - 0.05), y - 1.25)); topPts.push(new THREE.Vector2(0, 0.81));
+  const top = new THREE.Mesh(new THREE.LatheGeometry(topPts, 48), sand); top.position.y = 1.25; g.add(top);
+  const pile = new THREE.Mesh(new THREE.LatheGeometry([[0, 0], [0.5, 0.02], [0.52, 0.12], [0.28, 0.42], [0, 0.55]].map(([r, y]) => new THREE.Vector2(r, y)), 48), sand); pile.position.y = 0.14; g.add(pile);
+  const stream = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1, 8), sand); g.add(stream);
+  g.traverse(o => { if (o.isMesh && o.material !== undefined && !o.material.transparent) o.castShadow = true; });
+  g.scale.setScalar(s);
+  g.userData = {
+    setFill(f) { top.scale.y = Math.max(0.02, f); top.visible = f > 0.02; pile.scale.set(1, 0.15 + 0.85 * (1 - f), 1); const ph = 0.14 + 0.55 * pile.scale.y; stream.scale.y = 1.22 - ph; stream.position.y = (1.22 + ph) / 2; },
+    flow(on) { stream.visible = on; },
+  };
+  return g;
+}
+function tube(points, r, color, closed = false) {
+  const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, closed, 'catmullrom', 0.5), 300, r, 8, closed);
+  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, toneMapped: false, transparent: true }));
+}
+function ring(r, w, color, opacity = 1) { const m = new THREE.Mesh(new THREE.TorusGeometry(r, w, 8, 128), new THREE.MeshBasicMaterial({ color, transparent: true, opacity, toneMapped: false })); m.rotation.x = Math.PI / 2; return m; }
+
+// ------------------------------------------------------------------ scene helpers
+function studio(scene, color, opacity = 0.16) {
+  scene.background = new THREE.Color(color);
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity }));
+  f.rotation.x = -Math.PI / 2; f.receiveShadow = true; scene.add(f); return f;
+}
+function keyLight(scene, pos, intensity = 2, shadow = true, span = 14) {
+  const l = new THREE.DirectionalLight('#ffffff', intensity); l.position.set(...pos);
+  if (shadow) { l.castShadow = true; l.shadow.mapSize.set(2048, 2048); Object.assign(l.shadow.camera, { left: -span, right: span, top: span, bottom: -span, far: 120 }); l.shadow.radius = 6; l.shadow.bias = -0.0006; }
+  scene.add(l); return l;
+}
+const rim = (scene, pos, color = C.acc, i = 3) => { const l = new THREE.DirectionalLight(color, i); l.position.set(...pos); scene.add(l); return l; };
+function composer(scene, cam, { bloom = 0.15, tilt = 0, band = 0.5 } = {}) {
+  const comp = new EffectComposer(renderer); comp.setSize(W, H);
+  comp.addPass(new RenderPass(scene, cam));
+  if (tilt) for (let i = 0; i < 2; i++) {
+    const h = new ShaderPass(HorizontalTiltShiftShader); h.uniforms.h.value = tilt / W; h.uniforms.r.value = band; comp.addPass(h);
+    const v = new ShaderPass(VerticalTiltShiftShader); v.uniforms.v.value = tilt / H; v.uniforms.r.value = band; comp.addPass(v);
+  }
+  if (bloom) comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), bloom, 0.4, 0.9));
+  comp.addPass(new OutputPass());
+  return comp;
+}
+
+// ------------------------------------------------------------------ scenes
+const S = {};
+
+// shots 1-2 (0-10 s): the old board lays itself out; the pawn hops square after square; the timer drains
+function buildOld() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.55;
+  studio(scene, C.black, 0.35); scene.fog = new THREE.Fog(C.black, 18, 52);
+  const cam = new THREE.PerspectiveCamera(28, W / H, 0.1, 200);
+  const path = new THREE.CatmullRomCurve3([[-9, 0, 9], [-2, 0, 6], [5, 0, 5.5], [8, 0, 1], [3, 0, -2], [-5, 0, -3], [-7, 0, -9], [0, 0, -13], [9, 0, -15], [12, 0, -24], [2, 0, -30], [-8, 0, -36]].map(p => V3(...p)));
+  const N = 64, pts = path.getSpacedPoints(N);
+  const STAMP_AT = { 9: 0, 11: 1, 12: 2, 14: 3, 16: 0, 17: 1, 19: 2 };   // hop target → stamp word
+  const tiles = pts.slice(0, N).map((p, i) => {
+    const t = tile(i > 22 && i % 3 === 1 ? listingStamped[i % 4] : listingPlain);
+    const tg = path.getTangentAt(i / N); t.rotation.y = Math.atan2(tg.x, tg.z) + Math.PI / 2; t.position.copy(p); scene.add(t);
+    let stamp = null;
+    if (STAMP_AT[i] !== undefined) {
+      stamp = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.65), new THREE.MeshBasicMaterial({ map: stampTex[STAMP_AT[i]], transparent: true, depthWrite: false }));
+      stamp.rotation.x = -Math.PI / 2; stamp.position.y = 0.17; t.add(stamp);
+    }
+    return { t, p, td: 0.1 + i * 0.042, stamp };
+  });
+  const pw = pawn(C.seek, 1.05); scene.add(pw);
+  const ghosts = [0.2, 0.09].map(o => { const g = pawn(C.seek, 1.05); g.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = o; m.material.depthWrite = false; m.castShadow = false; } }); scene.add(g); return g; });
+  const hg = hourglass(1.6); hg.rotation.y = 0.4; scene.add(hg);
+  const HG = V3(-1.2, 0, 1.0);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#1a2a22', 0.25));
+  keyLight(scene, [-6, 14, 10], 2.0, true, 26); rim(scene, [6, 5, -10], C.acc, 2.2);
+  const hopPos = t => {           // pawn position at time t (4-10 s: one hop per beat, landing at 70 % of the beat)
+    const h = (t - 4) / B, k = 8 + Math.floor(h), f = h - Math.floor(h), g = clamp(f / 0.7);
+    const a = pts[Math.min(k, N - 1)], b = pts[Math.min(k + 1, N - 1)];
+    const v = a.clone().lerp(b, inOut(g)); v.y = 0.14 + Math.sin(Math.PI * g) * 1.3; return { v, g, k };
+  };
+  S.old = {
+    scene, cam, comp: composer(scene, cam, { bloom: 0.16, tilt: 4.5, band: 0.42 }), update(t) {
+      // camera: wide over the board while it builds, then down into the hop view
+      const m = inOut(ramp(t, 2.6, 4.2));
+      const p0 = V3(0.5, 30, 24), l0 = V3(0, 0, -8), p1 = V3(2.5, 13.5, 17), l1 = V3(1.2, 0, -2);
+      const push = Math.max(0, t - 4.2);
+      cam.position.copy(p0.clone().lerp(p1, m)).add(V3(-0.06 * push, -0.12 * push, -0.18 * push)); cam.lookAt(l0.clone().lerp(l1, m));
+      // squares drop into place one after another
+      for (const k of tiles) {
+        const q = ramp(t, k.td, k.td + 0.28); k.t.visible = t >= k.td;
+        k.t.position.set(k.p.x, lerp(3.2, 0, q * q) + bounce(t - k.td - 0.28, 0.12), k.p.z);
+        if (k.stamp) { const s = hopLand(k); const sq = ramp(t, s, s + 0.12); k.stamp.visible = t >= s; k.stamp.scale.setScalar(lerp(1.8, 1, expoOut(sq))); k.stamp.material.opacity = clamp(sq * 3); }
+      }
+      // the pawn: drops on square 8 at 3.0 s, then hops
+      if (t < 4) {
+        const q = ramp(t, 3.0, 3.3); pw.visible = t >= 3.0; pw.position.set(pts[8].x, lerp(5, 0.14, q * q) + bounce(t - 3.3, 0.25), pts[8].z); pw.rotation.set(0, 0, 0);
+        ghosts.forEach(g => (g.visible = false));
+      } else {
+        const { v, g } = hopPos(t); pw.visible = true; pw.position.copy(v); pw.rotation.z = -0.12 * Math.sin(Math.PI * g);
+        ghosts.forEach((gh, i) => { const o = hopPos(t - 0.05 * (i + 1)); gh.visible = g > 0.05 && g < 1 && o.g > 0; gh.position.copy(o.v); gh.rotation.z = pw.rotation.z; });
+      }
+      // the timer slams down at 3.5 s and drains until 10 s
+      const hq = ramp(t, 3.2, 3.5); hg.visible = t >= 3.2; hg.position.set(HG.x, lerp(6, 0, hq * hq) + bounce(t - 3.5, 0.18), HG.z);
+      hg.userData.setFill(lerp(0.95, 0.08, ramp(t, 3.5, 10))); hg.userData.flow(t > 3.55);
+    },
+  };
+  function hopLand(k) { const i = tiles.indexOf(k); return 4 + (i - 9) * B + 0.7 * B; }
+}
+
+// shot 3 (10-16 s): the agent's money flies into the billboard; the pawns walk past it
+function buildAd() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.55;
+  studio(scene, C.grey, 0.18);
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200);
+  const faceMat = new THREE.MeshBasicMaterial({ map: adTex, toneMapped: false });
+  const panel = slab(5.6, 3.1, 0.3, 0.18, [faceMat, new THREE.MeshPhysicalMaterial({ color: '#0E1D16', roughness: 0.4, clearcoat: 0.6 })]);
+  panel.rotation.x = Math.PI / 2; panel.position.set(4.4, 4.3, -1.5); scene.add(panel);
+  for (const x of [2.4, 6.4]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.8, 0.22), new THREE.MeshPhysicalMaterial({ color: '#0E1D16', roughness: 0.4 })); leg.position.set(x, 1.4, -1.6); leg.castShadow = true; scene.add(leg); }
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.12, 0.05), new THREE.MeshBasicMaterial({ color: '#020504' })); slot.position.set(4.4, 2.95, -1.33); scene.add(slot);
+  const NC = 16, coins = [];
+  for (let i = 0; i < NC; i++) { const c = coin(0.55); scene.add(c); coins.push({ c, tc: 0.3 + i * 0.32, y0: 0.05 + (NC - 1 - i) * 0.085, ry: hash(i) * 6, r: [hash(i + 3) * 6, hash(i + 5) * 6] }); }
+  for (let i = -6; i <= 8; i++) { const t = tile(listingPlain, 1.5); t.position.set(i * 1.62, 0, 1.2); scene.add(t); }
+  const walkers = [[-9.5, 1.2], [-5.8, 1.35], [-2.2, 1.0]].map(([x0, s]) => { const p = pawn(C.piece, s); scene.add(p); return { p, x0 }; });
+  const glow = new THREE.PointLight(C.acc, 0, 6, 1.5); glow.position.set(4.4, 4.3, 0.2); scene.add(glow);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#cfd4cc', 0.3));
+  keyLight(scene, [-6, 13, 9], 1.8, true, 16); rim(scene, [7, 8, -8], '#ffffff', 1.2);
+  const S0 = V3(-3.4, 0, -3.6), SLOT = V3(4.4, 2.95, -1.3);
+  S.ad = { scene, cam, comp: composer(scene, cam, { bloom: 0, tilt: 2.0, band: 0.6 }), update(u) {
+    cam.position.set(-1.5 + u * 0.08, 7.2, 19 - u * 0.25); cam.lookAt(0.4 + u * 0.05, 4.6, 0);
+    let pulse = 0;
+    for (const k of coins) {
+      const p = ramp(u, k.tc, k.tc + 0.85);
+      k.c.visible = p < 1;
+      if (u < k.tc) { k.c.position.set(S0.x + (hash(k.tc * 100) - 0.5) * 0.06, k.y0, S0.z); k.c.rotation.set(0, k.ry, 0); }
+      else if (p < 1) { const e = inOut(p); k.c.position.set(lerp(S0.x, SLOT.x, e), lerp(k.y0, SLOT.y, e) + 3.0 * Math.sin(Math.PI * p), lerp(S0.z, SLOT.z, e)); k.c.rotation.set(k.r[0] + p * 8, k.r[1] + p * 4, Math.PI / 2 * e); }
+      pulse = Math.max(pulse, u >= k.tc + 0.85 ? Math.exp(-(u - k.tc - 0.85) * 6) : 0);
+    }
+    glow.intensity = pulse * 8;
+    faceMat.color.setScalar(1 + pulse * 0.25);
+    for (const w of walkers) { const x = w.x0 + u * 2.1, ph = (u / B) % 1; w.p.position.set(x, 0.14 + Math.abs(Math.sin(Math.PI * ph)) * 0.3, 1.2); w.p.rotation.z = -0.08 * Math.sin(2 * Math.PI * ph); }
+  } };
+}
+
+// shot 4 (16-18 s): the board flips; the old pieces fly off; the clean side lands face up
+function buildFlip() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.6;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 200);
+  const board = new THREE.Group(); scene.add(board);
+  const dark = new THREE.MeshPhysicalMaterial({ color: '#173326', roughness: 0.5 });
+  const slabM = new THREE.Mesh(new THREE.BoxGeometry(11, 0.3, 7.5), [dark, dark, new THREE.MeshPhysicalMaterial({ color: '#C9CEC8', roughness: 0.6 }), new THREE.MeshPhysicalMaterial({ color: '#E6E3DA', roughness: 0.5, clearcoat: 0.4 }), dark, dark]);
+  slabM.castShadow = true; board.add(slabM);
+  const newRing = ring(1.0, 0.045, C.acc, 0); newRing.position.y = -0.17; board.add(newRing);
+  // debris: what sat on the old side
+  const debris = [];
+  const addD = (obj, local, i) => { scene.add(obj); debris.push({ obj, local, v: V3(local.x * 2.6 + (hash(i) - 0.5) * 4, 7 + hash(i + 7) * 5, local.z * 2.2 + 4 + hash(i + 11) * 4), w: V3(hash(i + 1) * 9 - 4.5, hash(i + 2) * 9 - 4.5, hash(i + 4) * 9 - 4.5) }); };
+  for (let i = 0; i < 18; i++) { const x = -4.6 + (i % 6) * 1.8, z = -2.4 + Math.floor(i / 6) * 2.4; addD(tile(i % 4 === 1 ? listingStamped[i % 4] : listingPlain, 1.4), V3(x, 0.15, z), i); }
+  [V3(-2.6, 0.15, 0.1), V3(2.6, 0.15, -2.3)].forEach((l, i) => addD(pawn(C.piece, 1.0), l, 30 + i));
+  for (let i = 0; i < 6; i++) addD(coin(0.4), V3(-3 + i * 1.3, 0.2, 2.6 + (i % 2) * 0.4), 40 + i);
+  const hg = hourglass(0.8); hg.userData.setFill(0.15); hg.userData.flow(false); addD(hg, V3(4.2, 0.15, 2.2), 50);
+  const arcPts = []; for (let i = 0; i <= 60; i++) { const a = lerp(-0.6, Math.PI + 0.6, i / 60); arcPts.push(V3(6.2, Math.sin(a) * 4.2, Math.cos(a) * 4.2)); }
+  const arc = tube(arcPts, 0.04, C.acc); scene.add(arc); const arcCount = arc.geometry.index.count;
+  keyLight(scene, [-4, 9, 10], 1.2, false); rim(scene, [5, 6, -6], C.acc, 3); rim(scene, [-6, -3, -3], '#ffffff', 0.8);
+  const boardAt = u => { const f = inOut(ramp(u, 0.15, 0.95)); return { rx: Math.PI * f, y: 2.2 * Math.sin(Math.PI * ramp(u, 0.15, 0.95)), rz: 0.25 * Math.sin(Math.PI * f) }; };
+  const T0 = 0.3, tmp = new THREE.Object3D();
+  const placeOnBoard = (d, u) => { const b = boardAt(u); tmp.rotation.set(b.rx, 0, b.rz); tmp.position.set(0, b.y, 0); tmp.updateMatrixWorld(); return d.local.clone().applyMatrix4(tmp.matrixWorld); };
+  S.flip = { scene, cam, comp: composer(scene, cam, { bloom: 0.14 }), update(u) {
+    const b = boardAt(u); board.rotation.set(b.rx, 0, b.rz); board.position.y = b.y;
+    cam.position.set(0, lerp(10, 13, smooth(ramp(u, 1.0, 2))), lerp(17, 12.5, smooth(ramp(u, 1.0, 2)))); cam.lookAt(0, 0.5, 0);
+    for (const d of debris) {
+      if (u < T0) { d.obj.position.copy(placeOnBoard(d, u)); d.obj.rotation.set(b.rx, 0, b.rz); d.obj.visible = true; }
+      else { const dt = u - T0, p0 = placeOnBoard(d, T0); d.obj.position.set(p0.x + d.v.x * dt, p0.y + d.v.y * dt - 4 * dt * dt, p0.z + d.v.z * dt); d.obj.rotation.set(d.w.x * dt, d.w.y * dt, d.w.z * dt); d.obj.visible = d.obj.position.y > -12; }
+    }
+    arc.geometry.setDrawRange(0, Math.floor(arcCount * inOut(ramp(u, 0.15, 0.95)) / 3) * 3); arc.material.opacity = 1 - smooth(ramp(u, 1.1, 1.5));
+    newRing.material.opacity = smooth(ramp(u, 0.95, 1.3)); newRing.scale.setScalar(lerp(0.5, 1, backOut(ramp(u, 0.95, 1.4))));
+  } };
+}
+
+// shots 5-6 (18-30 s): the clean ivory board. The pawn stays put and stands up its request; the timer lies down;
+// the agents' houses; only the one that fits lights up and comes; the agent puts money on this prospect.
+function buildNew() {
+  const scene = new THREE.Scene(); scene.environment = ENV; scene.environmentIntensity = 0.5;
+  studio(scene, C.marfil, 0.15);
+  const cam = new THREE.PerspectiveCamera(28, W / H, 0.1, 200);
+  const sq = slab(2.4, 2.4, 0.14, 0.2, [new THREE.MeshPhysicalMaterial({ color: '#F1EFE7', roughness: 0.5, clearcoat: 0.3 }), new THREE.MeshPhysicalMaterial({ color: '#E2DFD6', roughness: 0.6 })]); scene.add(sq);
+  const halos = [1.6, 2.3, 3.0].map((r, i) => { const m = ring(r, 0.03, C.acc, 0); m.position.y = 0.2; scene.add(m); return m; });
+  const pulses = [0, 1, 2, 3].map(() => { const m = ring(1, 0.035, C.acc, 0); m.position.y = 0.2; scene.add(m); return m; });
+  const pw = pawn(C.seek, 1.5); scene.add(pw);
+  // the request card on a hinge at its bottom edge
+  const hinge = new THREE.Group(); hinge.position.set(1.25, 0.08, -0.55); hinge.rotation.y = -0.32; scene.add(hinge);
+  const card = slab(1.9, 2.45, 0.06, 0.12, [new THREE.MeshPhysicalMaterial({ map: cardTex, roughness: 0.45, clearcoat: 0.4 }), new THREE.MeshPhysicalMaterial({ color: '#e8e6df' })]);
+  card.position.z = -2.45 / 2; hinge.add(card);
+  const hg = hourglass(0.9); scene.add(hg);
+  // the agents' houses
+  const spots = [[-9.5, -6], [-5, -9], [0.5, -10.5], [11, -6], [12.5, -1], [-12, -1.5], [9, 5.5], [-8.5, 6], [4.5, -12.5]];
+  const houses = spots.map(([x, z], i) => { const h = house(1.0); h.position.set(x, 0, z); h.rotation.y = (hash(i) - 0.5) * 0.7; scene.add(h); return h; });
+  const L0 = V3(7.4, 0, -7.4), L1 = V3(3.9, 0, -1.6);
+  const lit = house(1.15); lit.rotation.y = -0.35; scene.add(lit);
+  const trailCurve = new THREE.CatmullRomCurve3([L0.clone().setY(0.04), V3(6.4, 0.04, -4.2), L1.clone().setY(0.04)]);
+  const trail = new THREE.Mesh(new THREE.TubeGeometry(trailCurve, 160, 0.05, 8), new THREE.MeshBasicMaterial({ color: C.acc, toneMapped: false })); scene.add(trail);
+  const trailCount = trail.geometry.index.count;
+  const scan = ring(1, 0.05, C.acc, 0); scan.position.y = 0.05; scene.add(scan);
+  const c = coin(0.5); scene.add(c);
+  const click = ring(1, 0.04, C.acc, 0); click.position.set(1.15, 0.2, 0.65); scene.add(click);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#e5e2d8', 0.35));
+  keyLight(scene, [-6, 14, 8], 1.7, true, 18); rim(scene, [6, 6, -8], C.acc, 1.4);
+  const HG0 = V3(-3.4, 0, 1.1), CLICK = 4.0;                 // u6: the coin lands at 28.0 s
+  const bubble = ov('bubble', '', 'Hola, tengo lo que buscas.');
+  S.nuevo = { scene, cam, comp: composer(scene, cam, { bloom: 0, tilt: 1.3, band: 0.72 }), bubble, update(t) {
+    const u5 = t - 18, u6 = t - 24;
+    // camera: shot 5 close on the pawn (it sits right of frame); shot 6 wide and high over the board
+    if (t < 24) { const k = u5 / 6; cam.position.set(lerp(-2.3, -2.6, k), lerp(7.2, 7.6, k), lerp(14.2, 15.4, k)); cam.lookAt(lerp(-3.1, -2.8, k), 1.3, -0.3); }
+    else { const k = u6 / 6; cam.position.set(lerp(5.4, 5.0, k), lerp(9.4, 8.6, k), lerp(12.6, 11.6, k)); cam.lookAt(lerp(4.6, 4.8, k), -0.4, lerp(-4.9, -4.5, k)); }
+    // the pawn drops onto its square
+    const dq = ramp(u5, 0, 0.3); pw.position.set(-0.4, lerp(4, 0.17, dq * dq) + bounce(u5 - 0.3, 0.22), 0.25);
+    // the card stands up like a flag
+    hinge.rotation.x = lerp(0, Math.PI / 2 - 0.12, backOut(ramp(u5, 0.5, 1.0), 1.6));
+    card.visible = u5 > 0.45;
+    // halos and the signal pulses (every second from 19 s)
+    halos.forEach((h, i) => { h.material.opacity = [0.9, 0.45, 0.2][i] * smooth(ramp(u5, 0.9 + i * 0.12, 1.3 + i * 0.12)); });
+    pulses.forEach((p, i) => { const s = ((u5 - 1.0 - i * 1.0) % 4 + 4) % 4, on = u5 > 1.0 + i; const q = s / 1.4; p.material.opacity = on && q < 1 ? (1 - q) * 0.8 : 0; p.scale.setScalar(lerp(1.4, 4.2, expoOut(Math.min(q, 1)))); });
+    // the timer: still draining, then it tips over at 19.6 s and the sand stops
+    const tip = ramp(u5, 1.6, 2.05), e = tip < 1 ? expoIn(tip) : 1;
+    hg.position.set(HG0.x, 0.70 * e + bounce(u5 - 2.05, 0.08), HG0.z); hg.rotation.set(0, 0.5, -Math.PI / 2 * e);
+    hg.userData.setFill(lerp(0.62, 0.5, ramp(u5, 0, 1.6))); hg.userData.flow(u5 < 1.6);
+    // shot 6: the scan ring, the house that fits, the trip, the money on this prospect
+    const R = 12 * ramp(u6, 0.4, 2.0); scan.visible = t >= 24.4 && u6 < 2.3; scan.scale.setScalar(Math.max(0.01, R)); scan.material.opacity = (1 - ramp(u6, 1.6, 2.2)) * 0.9;
+    houses.forEach(h => { const d = Math.hypot(h.position.x, h.position.z), hit = t >= 24 ? clamp(1 - Math.abs(R - d) / 0.8) : 0; h.position.y = hit * 0.25; });
+    const litK = t >= 24 ? smooth(ramp(u6, 1.8, 2.1)) : 0; lightHouse(lit, litK);
+    const g = inOut(ramp(u6, 2.0, 3.6)); lit.position.copy(trailCurve.getPoint(g)).setY(Math.abs(Math.sin(g * Math.PI * 3)) * 0.25 * (g > 0 && g < 1 ? 1 : 0));
+    trail.visible = t >= 24 && u6 > 1.9; trail.geometry.setDrawRange(0, Math.floor(trailCount * ramp(u6, 1.95, 2.4) / 3) * 3);
+    trail.material.opacity = 1;
+    const cq = ramp(u6, CLICK - 0.45, CLICK); c.visible = t >= 24 && u6 > CLICK - 0.45;
+    c.position.set(lerp(3.4, 1.15, smooth(cq)), lerp(6.5, 0.06, expoIn(cq)) + bounce(u6 - CLICK, 0.12, 22, 9), lerp(3.5, 0.65, smooth(cq)));
+    c.rotation.set(lerp(1.2, 0, cq), cq * 4, lerp(0.7, 0, cq));
+    const kq = ramp(u6, CLICK, CLICK + 0.6); click.visible = u6 >= CLICK && kq < 1; click.scale.setScalar(lerp(0.6, 3.0, expoOut(kq))); click.material.opacity = 1 - kq;
+    const [bx, by] = screenOf(V3(lit.position.x, 1.6, lit.position.z), cam);
+    bubble.style.left = (bx + 60) + 'px'; bubble.style.top = (by - 70) + 'px';
+    const bq = ramp(u6, CLICK + 0.2, CLICK + 0.5); if (t >= 24 && u6 > CLICK + 0.2) showO(bubble, 1, `scale(${lerp(0.3, 1, backOut(bq))})`);
+  } };
+}
+
+// shot 7 (30-34 s): the seeker's pawn and the agent's coin rise; a roof of light; they become the logo's heads
+function buildPayoff() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(C.black); scene.environment = ENV; scene.environmentIntensity = 0.6;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100); cam.position.set(0, 0, 12);
+  const P = pawn(C.seek, 1.25, true); scene.add(P);                 // centred on its head
+  const K = coin(0.82); K.rotation.x = Math.PI / 2; scene.add(K);
+  const roofPath = new THREE.CurvePath(); roofPath.add(new THREE.LineCurve3(V3(-2.4, -1.5, 0), V3(0, 0.25, 0))); roofPath.add(new THREE.LineCurve3(V3(0, 0.25, 0), V3(2.4, -1.5, 0)));
+  const roof = new THREE.Mesh(new THREE.TubeGeometry(roofPath, 200, 0.035, 8), new THREE.MeshBasicMaterial({ color: C.marfil, toneMapped: false, transparent: true })); scene.add(roof); const roofCount = roof.geometry.index.count;
+  keyLight(scene, [-3, 3, 8], 1.8, false); rim(scene, [0, 5, -6], C.acc, 3); rim(scene, [-6, -3, -3], '#ffffff', 1.2);
+  // the logo's heads in the end card (logo 806 px wide at 557, 230), in world units at z = 0
+  const tanH = Math.tan(THREE.MathUtils.degToRad(15)), ppu = H / (2 * 12 * tanH);
+  const toWorld = (sx, sy) => V3((sx - W / 2) / ppu, -(sy - H / 2) / ppu, 0);
+  const LK = 806 / 1208;
+  const headL = { p: toWorld(557 + 147.5 * LK, 230 + 109 * LK), r: 71 * LK / 2 / ppu }, headR = { p: toWorld(557 + 320 * LK, 230 + 108.5 * LK), r: 72 * LK / 2 / ppu };
+  const r0 = P.userData.headR;
+  P.userData.bodyMat.transparent = true;
+  S.payoff = { scene, cam, comp: composer(scene, cam, { bloom: 0.22 }), update(u) {
+    const rl = expoOut(ramp(u, 0, 0.6)), rr = expoOut(ramp(u, 0.25, 0.85));
+    const m = inOut(ramp(u, 2.5, 3.3));
+    const pL = V3(-2.0, lerp(-7, 1.2, rl), 0).lerp(headL.p, m), pR = V3(2.0, lerp(-7, 1.2, rr), 0).lerp(headR.p, m);
+    P.position.copy(pL); K.position.copy(pR);
+    P.scale.setScalar(lerp(1, headL.r / r0, m)); K.scale.setScalar(lerp(1, headR.r / 0.82, m));
+    P.rotation.set(0, (1 - rl) * 2, 0); K.rotation.set(Math.PI / 2 + 0.05 * (1 - m), 0, lerp(-0.15, 0, m) - (1 - rr) * 2);
+    P.userData.bodyMat.opacity = 1 - smooth(ramp(u, 2.4, 2.9)); P.userData.body.visible = u < 2.9;
+    roof.geometry.setDrawRange(0, Math.floor(roofCount * inOut(ramp(u, 0.45, 1.1)) / 3) * 3);
+    roof.material.opacity = 1 - smooth(ramp(u, 2.2, 2.6));
+    scene.background.set(C.black).lerp(new THREE.Color(C.marfil), smooth(ramp(u, 2.85, 3.3)));
+  } };
+}
+
+// ------------------------------------------------------------------ text
+const T = {};
+function buildOverlays() {
+  T.vigOld = ov('', `left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse 55% 45% at 50% 50%, rgba(11,23,18,.8), rgba(11,23,18,0) 75%)`, '');
+  T.juego = ov('t', `left:0;width:1920px;text-align:center;top:470px;font-size:170px;color:${C.marfil}`, 'EL JUEGO DE SIEMPRE.');
+  T.gradOld = ov('', `left:0;top:0;width:1920px;height:1080px;background:linear-gradient(0deg, rgba(11,23,18,.85) 0%, rgba(11,23,18,0) 38%)`, '');
+  T.rule1 = ov('rule', `left:112px;top:772px;background:${C.acc};color:${C.black}`, 'REGLA DE SIEMPRE · SI BUSCAS CASA');
+  T.horas = ov('t', `left:110px;top:828px;font-size:150px;color:${C.marfil}`, 'PIERDES HORAS BUSCANDO.');
+  T.rule2 = ov('rule', `left:112px;top:128px;background:${C.ink};color:${C.marfil}`, 'REGLA DE SIEMPRE · SI ERES AGENTE');
+  T.dinero = ov('t', `left:110px;top:184px;font-size:128px;color:${C.ink}`, 'INVIERTES DINERO\nY CRUZAS LOS DEDOS.');
+  T.dinero2 = ov('s', `left:116px;top:430px;font-size:36px;color:${C.ink}`, 'Portales y publicidad que no te prometen nada.');
+  T.nuevas = ov('t', `left:0;width:1920px;text-align:center;top:770px;font-size:230px;color:${C.acc}`, 'NUEVAS REGLAS.');
+  T.rule3 = ov('rule', `left:112px;top:128px;background:${C.acc};color:${C.black}`, 'NUEVA REGLA · SI BUSCAS CASA');
+  T.publicas = ov('t', `left:110px;top:184px;font-size:136px;color:${C.ink}`, 'PUBLICAS GRATIS\nLO QUE NECESITAS.');
+  T.trabajan = ov('t', `left:110px;top:184px;font-size:136px;color:${C.ink}`, 'DEJA QUE LOS AGENTES\nTRABAJEN POR TI.');
+  T.rule4 = ov('rule', `left:112px;top:128px;background:${C.ink};color:${C.marfil}`, 'NUEVA REGLA · SI ERES AGENTE');
+  T.prospectos = ov('t', `left:110px;top:184px;font-size:88px;color:${C.ink}`, 'INVIERTES SOLO EN\nPROSPECTOS QUE ENCAJAN\nCON LO QUE TIENES.');
+  T.tiempo = ov('t', `left:${960 - 2.0 * 167.9 - 360}px;width:720px;text-align:center;top:840px;font-size:84px;color:${C.marfil}`, 'DEJA DE REGALAR\nTU TIEMPO.');
+  T.ciegas = ov('t', `left:${960 + 2.0 * 167.9 - 360}px;width:720px;text-align:center;top:840px;font-size:84px;color:${C.acc}`, 'DEJA DE INVERTIR\nA CIEGAS.');
+  T.end = ov('', `left:0;top:0;width:1920px;height:1080px;background:${C.marfil}`, `<img src="../../anuncios/reel-publica-tu-busqueda/marca/logo-horizontal-transparente.png" style="position:absolute;left:557px;top:230px;width:806px;height:287px">`);
+  T.slogan = ov('t', `left:0;width:1920px;text-align:center;top:600px;font-size:96px;color:${C.ink}`, 'TÚ BUSCAS. NOSOTROS CONECTAMOS.');
+  T.sub = ov('s', `left:0;width:1920px;text-align:center;top:735px;font-size:38px;color:${C.ink}`, 'Publica gratis lo que buscas: el agente que lo tiene, te contacta.');
+  T.url = ov('s', `left:0;width:1920px;text-align:center;top:880px;font-size:30px;letter-spacing:.06em;color:${C.ink}`, 'propiedadconecta.com');
+}
+
+// ------------------------------------------------------------------ timeline (beats; one beat = 0.5 s)
+const SHOTS = [
+  [0, 20, t => run(S.old, t)],                 // 1-2 · the old board, the hops (0-10 s)
+  [20, 32, t => run(S.ad, t - 10)],            // 3 · money into the billboard (10-16 s)
+  [32, 36, t => run(S.flip, t - 16)],          // 4 · NUEVAS REGLAS (16-18 s)
+  [36, 60, t => run(S.nuevo, t)],              // 5-6 · the new rules (18-30 s)
+  [60, 68, t => run(S.payoff, t - 30)],        // 7 · the payoff (30-34 s)
+  [68, 81, () => {}],                          // 8 · end card (DOM only)
+];
+function run(s, lt) { s.update(lt); s.comp.render(); }
+
+function overlays(t) {
+  if (t >= 1.0 && t < 4.0) { const a = smooth(ramp(t, 1.0, 1.3)) * (1 - smooth(ramp(t, 3.6, 3.95))); showO(T.vigOld, a); showO(T.juego, a, `scale(${lerp(1.06, 1, expoOut(ramp(t, 1.0, 1.6)))})`); }
+  if (t >= 5.0 && t < 10) { showO(T.gradOld, smooth(ramp(t, 4.8, 5.2))); rise(T.rule1, t, 5.0); rise(T.horas, t, 5.15); }
+  if (t >= 11 && t < 16) { rise(T.rule2, t, 11.0); rise(T.dinero, t, 11.15); rise(T.dinero2, t, 12.0); }
+  if (t >= 16.5 && t < 18) { const q = ramp(t, 16.5, 16.75); showO(T.nuevas, smooth(q), `scale(${lerp(1.35, 1, expoOut(q))})`); }
+  if (t >= 18.5 && t < 24) { rise(T.rule3, t, 18.5); }
+  if (t >= 18.65 && t < 21) rise(T.publicas, t, 18.65, 21.0);
+  if (t >= 21.0 && t < 24) rise(T.trabajan, t, 21.05);
+  if (t >= 24.5 && t < 30) { rise(T.rule4, t, 24.5); rise(T.prospectos, t, 24.65); }
+  if (t >= 30.3 && t < 32.6) { rise(T.tiempo, t, 30.3, 32.6); }
+  if (t >= 31.3 && t < 32.6) { rise(T.ciegas, t, 31.3, 32.6); }
+  // the pieces land on the logo's heads at 33.3 s; the ivory card and the real logo fade in over them
+  if (t >= 33.3) showO(T.end, smooth(ramp(t, 33.3, 33.6)));
+  if (t >= 34.5) rise(T.slogan, t, 34.5);
+  if (t >= 35.3) rise(T.sub, t, 35.3);
+  if (t >= 35.9) showO(T.url, smooth(ramp(t, 35.9, 36.3)));
+}
+
+function draw(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  for (const d of O) d.style.display = 'none';            // scenes and overlays() re-show what they need
+  for (const [a, b, f] of SHOTS) if (t >= beat(a) && t < beat(b)) { f(t); break; }
+  overlays(t);
+}
+
+// ------------------------------------------------------------------ boot
+window.READY = false; window.draw = draw;
+(async () => {
+  await Promise.all([document.fonts.load("800 200px 'Barlow Condensed'"), document.fonts.load('600 40px Outfit'), document.fonts.load('500 40px Outfit'), document.fonts.load('700 40px Outfit')]);
+  makeTextures();
+  buildOld(); buildAd(); buildFlip(); buildNew(); buildPayoff(); buildOverlays();
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  for (const t of [1, 6, 12, 17, 20, 27, 31]) draw(t);    // compile every scene's shaders once
+  window.READY = true;
+  const q = new URLSearchParams(location.search);
+  if (q.has('render')) { draw(0); return; }
+  document.body.classList.add('preview');
+  const st = document.getElementById('stage'); const fit = () => { st.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; }; fit(); addEventListener('resize', fit);
+  if (q.has('t')) { draw(parseFloat(q.get('t'))); return; }
+  let t0 = performance.now(), paused = false, pt = 0;
+  addEventListener('click', () => { paused = !paused; if (!paused) t0 = performance.now() - pt * 1000; });
+  const loop = now => { if (!paused) { pt = ((now - t0) / 1000) % DURATION; draw(pt); } requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

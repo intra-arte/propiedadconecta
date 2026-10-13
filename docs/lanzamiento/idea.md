@@ -7,7 +7,7 @@ Style frames en [`video/lanzamiento/style-frames/`](../../video/lanzamiento/styl
 
 ## La idea en una línea
 
-**Buscar casa siempre fue un juego con malas reglas: quien busca pierde horas y el agente apuesta su dinero. Propiedad Conecta voltea el tablero y pone reglas nuevas: tú publicas lo que buscas y el agente que lo tiene te encuentra.**
+**Buscar casa siempre fue un juego con malas reglas: quien busca pierde horas y el agente apuesta su dinero. Propiedad Conecta voltea el tablero y pone reglas nuevas: tú publicas lo que buscas y el agente que lo tiene te encuentra. Firma: «Tú buscas. Nosotros conectamos.»**
 
 ## Por qué funciona
 
@@ -47,16 +47,16 @@ Todo es 3D real (Three.js), con la estética de una maqueta de mesa: luz suave d
 
 | # | Tiempo | Plano | En pantalla | Locución |
 |---|---|---|---|---|
-| **1** | 0–4 s | **Apertura.** Negro. Una caja de juego se abre desde arriba y el tablero se despliega solo; las piezas caen a su lugar con un clac. | «EL JUEGO DE SIEMPRE.» | «Hasta hoy, encontrar casa era un juego con malas reglas.» |
-| **2** | 4–10 s | **Regla de siempre · quien busca.** La ficha salta de casilla en casilla por un camino que no termina; las casillas se sellan en el pulso; el reloj se vacía en primer plano. *(SF1)* | Etiqueta «REGLA DE SIEMPRE · SI BUSCAS CASA» · «PIERDES HORAS BUSCANDO.» | «Si buscas, pierdes horas en portales… sin saber si lo que quieres está ahí.» |
+| **1** | 0–4 s | **Apertura.** Negro. Una caja de juego se abre desde arriba y el tablero se despliega solo; las piezas caen a su lugar con un clac. | «EL JUEGO DE SIEMPRE.» | «Buscar casa era un juego con malas reglas.» |
+| **2** | 4–10 s | **Regla de siempre · quien busca.** La ficha salta de casilla en casilla por un camino que no termina; las casillas se sellan en el pulso; el reloj se vacía en primer plano. *(SF1)* | Etiqueta «REGLA DE SIEMPRE · SI BUSCAS CASA» · «PIERDES HORAS BUSCANDO.» | «Si buscas, pierdes horas en portales… sin saber si está ahí.» |
 | **3** | 10–16 s | **Regla de siempre · agente.** La pila de dinero se vacía hacia la valla «PORTALES · PUBLICIDAD · ? ? ?». Las fichas pasan de largo; una se voltea y sigue. *(SF2)* | «REGLA DE SIEMPRE · SI ERES AGENTE» · «INVIERTES DINERO Y CRUZAS LOS DEDOS.» | «Si eres agente, inviertes dinero en portales y publicidad que no te prometen nada.» |
 | **4** | 16–18 s | **El volteo.** El tablero gira 180° en el aire, todo lo viejo sale volando y cae del lado marfil. Golpe fuerte de la música. *(SF3)* | «NUEVAS REGLAS.» | «Cambiamos las reglas.» |
 | **5** | 18–24 s | **Nueva regla · quien busca.** Sobre el tablero limpio, la ficha se queda en su casilla y levanta su tarjeta «BUSCO». El reloj se acuesta y la arena se detiene. *(SF4)* | «NUEVA REGLA · SI BUSCAS CASA» · «PUBLICAS GRATIS LO QUE NECESITAS.» → «DEJA QUE LOS AGENTES TRABAJEN POR TI.» | «Con Propiedad Conecta, publicas gratis lo que necesitas… y los agentes trabajan por ti.» |
 | **6** | 24–30 s | **Nueva regla · agente.** La cámara se abre: el tablero está lleno de casitas grises. Solo una se enciende en Brote; el agente pone **una** moneda en la casilla de esa ficha (**clic** en 28 s) y la casa viaja hasta ella. Burbuja: «Hola, tengo lo que buscas.» *(SF5)* | «NUEVA REGLA · SI ERES AGENTE» · «INVIERTES SOLO EN PROSPECTOS QUE ENCAJAN CON LO QUE TIENES.» | «Y el agente invierte solo en prospectos que encajan con lo que tiene.» |
 | **7** | 30–34 s | **El remate.** Plano frontal: la cabeza de la ficha (quien busca) y la moneda (el agente) suben a cada lado; la casa se vuelve un techo de luz entre ellas. El fondo pasa a marfil. | Izquierda: «DEJA DE REGALAR TU TIEMPO.» · derecha: «DEJA DE INVERTIR A CIEGAS.» | «Deja de regalar tu tiempo. Deja de invertir a ciegas.» |
-| **8** | 34–40 s | **Cierre.** Las dos piezas se encogen al lugar exacto de las cabezas del isotipo y aparece el **logo real** (sin animar sus partes). *(SF6)* | «TÚ PUBLICAS. ELLOS TE ENCUENTRAN.» · «Publica gratis lo que buscas: el agente que lo tiene, te contacta.» · propiedadconecta.com | «Propiedad Conecta. Tú publicas… ellos te encuentran.» |
+| **8** | 34–40 s | **Cierre.** Las dos piezas se encogen al lugar exacto de las cabezas del isotipo y aparece el **logo real** (sin animar sus partes). *(SF6)* | El slogan **«TÚ BUSCAS. NOSOTROS CONECTAMOS.»** · «Publica gratis lo que buscas: el agente que lo tiene, te contacta.» · propiedadconecta.com | «Propiedad Conecta. Tú buscas… nosotros conectamos.» |
 
-**Texto total de la locución:** unas 85 palabras, con aire entre frases. Cada plano tiene una sola acción y un solo titular.
+**Texto total de la locución:** unas 80 palabras, con aire entre frases. El texto exacto para ElevenLabs está en [`locucion.md`](locucion.md). Cada plano tiene una sola acción y un solo titular.
 
 ## Sonido
 
@@ -89,7 +89,7 @@ Música original a 120 BPM, hecha con el mismo motor de los otros videos. Esta v
    - «NUEVAS REGLAS.»
    - «PUBLICAS GRATIS LO QUE NECESITAS.»
    - «INVIERTES SOLO EN PROSPECTOS QUE ENCAJAN CON LO QUE TIENES.»
-   - Firma: «TÚ PUBLICAS. ELLOS TE ENCUENTRAN.»
+   - Firma: el slogan «TÚ BUSCAS. NOSOTROS CONECTAMOS.» ✅ (confirmado)
 
    ¿Cambiarías alguna palabra?
 3. **Duración:** 40 s le da aire a la locución. Si lo necesitas para pauta, del mismo proyecto salen cortes de 20 s, uno para quien busca y otro para agentes.
